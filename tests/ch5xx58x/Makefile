@@ -44,6 +44,13 @@ ARCH_FLAGS	:= -march=$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) MARCH)$(she
 		   -mabi=$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) MABI)
 FAMILY_CPPFLAGS	:= $(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) CPPFLAGS)
 
+## The startup code in lib/qingke/vector.c may call memcpy()/memset() to copy
+## .data and zero .bss -- whether it does depends on the compiler version, so
+## the archive cannot be assumed to be free of them.  This link is freestanding
+## (-nostdlib), so satisfy the reference from the mini-libc rather than from a
+## C library the toolchain may not ship.
+MINILIB		= $(OPENWCH_DIR)/lib/libopenwch_mini_libc_$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) FAMILY).a
+
 WARNINGS	= -Wall -Wextra -Wredundant-decls -Wmissing-prototypes \
 		  -Wstrict-prototypes -Wundef -Wshadow -Werror
 
@@ -68,7 +75,7 @@ api_smoke.elf: api_smoke.o generated.$(DEVICE).ld
 	$(Q)$(CC) $(CFLAGS) $(ARCH_FLAGS) -nostdlib \
 		-T generated.$(DEVICE).ld -Wl,--gc-sections \
 		$< -L$(OPENWCH_DIR)/lib -lopenwch_$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) FAMILY) \
-		-lgcc -o $@
+		$(MINILIB) -lgcc -o $@
 	@$(SIZE) $@
 
 clean:

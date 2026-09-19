@@ -18,7 +18,7 @@
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
 | 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0** |
 | 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest` / 四个示例 × 两种链接模式） |
-| freestanding 状态 | ✅ 库只依赖 libgcc；冒烟测试以 `-nostdlib` 链接，可在**无 newlib** 的 Debian/Ubuntu 包上工作 |
+| freestanding 状态 | ✅ 冒烟测试与模板 freestanding 模式均以 `-nostdlib` + 按族 mini-libc 链接，可在**无 newlib** 的 Debian/Ubuntu 包上工作。注意起动代码是否调用 `memcpy`/`memset` 取决于编译器版本，故 mini-libc 是**必需**而非可选 |
 
 ### 可复现的验证命令与结果
 
@@ -359,8 +359,9 @@ P3 已全部完成，见上一节。P4 待办：
 | GitHub 许可识别 | `api.github.com/repos/LrkSeraph/libopenwch` | ✅ `spdx_id: LGPL-3.0` |
 | 远程一致性 | `git rev-parse HEAD` vs `git rev-parse origin/master` | ✅ 一致（`f0b94f7`） |
 | 远程文件树 | `contents/include/libopenwch/dispatch` | ✅ `nvic.h` 已在远端（修复前该目录 0 文件） |
-| **freestanding 链接** | 冒烟测试加 `-nostdlib` 后链接 | ✅ 两族均成功，链接行不再出现 `-lc`/`-lgloss` |
-| 库的 libc 依赖 | `nm --undefined-only lib/*.a` | ✅ 只引用 libgcc（`__mulsi3`/`__udivsi3`/`__udivdi3` 等），无任何 libc 符号 |
+| **freestanding 链接** | 冒烟测试以 `-nostdlib` + mini-libc 链接 | ✅ 两族均成功，链接行不再出现 `-lc`/`-lgloss` |
+| 库的 libc 依赖 | `nm --undefined-only lib/*.a`（**不截断**） | ⚠️ 本机 GCC 15 下未出现 `memcpy`/`memset`（循环被内联），但 **GCC 13.2 会为 `openwch_reset_init` 的 `.data`/`.bss` 循环生成这两个调用**——即该依赖**随编译器版本变化**，因此不能假定归档无 libc 依赖 |
+| 强制复现 GCC 13 行为 | 链接时加 `-Wl,--undefined=memcpy -Wl,--undefined=memset` | ✅ 链接成功，二者由 `libopenwch_mini_libc_ch32v0.a` 解析（`T memcpy` / `T memset`） |
 | mini-libc 正确性 | 宿主 `gcc` 重命名符号后跑断言 | ✅ 12 个函数全部通过，含双向重叠 `memmove` 与 `strncpy` 补零 |
 | mini-libc 归档 | `ls lib/*.a` / `nm` | ✅ 每族一个（`libopenwch_mini_libc_ch32v0.a` 等），ISA 跟随该族 |
 | mini-libc 防自递归 | 构建时加 `-fno-builtin -ffreestanding` | ✅ 目标级变量生效，未出现 memcpy 自调用 |
@@ -384,5 +385,5 @@ P3 已全部完成，见上一节。P4 待办：
 | 第 6 轮 | **P3 完成**：CH58x 12 个外设（202 个公开函数）、`tests/ch5xx58x/api_smoke.c`、`ch582_blink` 改为真正的 blink。修正 `memorymap.h` 的 CH58x 身份/复位寄存器偏移（`R8_CHIP_ID`/`R8_GLOB_RESET_KEEP` 写错，由两个独立代理同时报出）与 `RWA` helper 必须 `always_inline` 的时序要求。两族合计 518 个公开函数，全部 0 警告、0 重名、0 命名违规 |
 | 第 7 轮 | **P4 软件部分**：`doc/`（单份 Doxygen 模板 + `@FAMILY@` 替换，缺 doxygen 时优雅跳过）、`.github/workflows/ci.yml`（3 工具链 × 2 族矩阵 + 双族单次 `make`）、`NOTICE`（来源与许可边界）；`template/` 补 `ch582_blink` 与 `ch582_uart_echo` 示例 |
 | 第 8 轮（发布轮） | 新增 `LICENSE`（LGPL-3.0 文本，作为 GitHub 识别入口）与 `COPYING.GPL2`——`scripts/checkpatch.pl` 文件头声明的是 **GPL-2.0**，而仓库此前只随附了 `COPYING.GPL3`；`NOTICE`/`README.md` 同步说明该布局。推送至 `git@github.com:LrkSeraph/libopenwch.git`。**发现并修正一个严重缺陷**：`.gitignore` 中用于忽略*生成*头文件的 `include/libopenwch/*/nvic.h` 通配，同时匹配了**手写**的 `qingke/nvic.h` 和整个 `dispatch/` 目录（后者此前 **0 个文件**被跟踪），导致**干净克隆无法构建**（`fatal error: libopenwch/qingke/nvic.h: No such file or directory`）；本地一直未暴露，是因为未跟踪文件仍留在磁盘上而 `make clean` 不会删除它们。改为对这两个路径取反，并核实 `make clean` 仍会删除生成文件、保留手写文件。另修正 CI 的 xpack 版本号（xpack 版本有第四段：`14.2.0-3` 不存在，实为 `14.2.0-3.1`），并把 bin 目录改为用 `find` 定位而非硬编码 |
-| 第 9 轮（CI 收敛轮） | GitHub Actions 连续暴露并修复 4 个真实缺陷：**(1)** `apitest` 无条件遍历两族，`make TARGETS=ch32v0` 之后必然链接失败（`cannot find -lopenwch_ch5xx58x`）——改为 `APITEST_DIRS` 由 `TARGETS` 推导，并让 `apitest` 依赖 `lib`。**(2)** 工作流把 `${{ runner.temp }}` 用在 job 级 `env`，而 `runner` 上下文在 job 级并不存在，导致**整个工作流校验失败**（表现为「以文件路径命名的 run + 0 个 job」，极易误读为构建失败）。**(3)** **Debian/Ubuntu 的 `gcc-riscv64-unknown-elf` 完全不附带 newlib**（`rv32e`/`rv32imac` 多库都没有），冒烟测试原先只加 `-nostartfiles`，于是隐式请求 `-lc`/`-lgloss` 而失败；改为 `-nostdlib`，同时证明库本身**完全 freestanding**（归档只引用 libgcc 的 `__mulsi3`/`__udivsi3` 等）。**(4)** 模板的 `LIBOPENWCH_NOSTDLIB=1` 引用了一个**从未存在**的 `lib/mini_libc.a`；现补齐为按族构建的真实 mini-libc（12 个字符串/内存函数，独立归档，`-fno-builtin` 防自递归），并新增 CI job 在无 newlib 的工具链上验证该路径。另外把 CI 失败详情写入 step summary 与 error annotation，因为下载原始 job 日志需要仓库管理员权限 |
+| 第 9 轮（CI 收敛轮） | GitHub Actions 连续暴露并修复 4 个真实缺陷：**(1)** `apitest` 无条件遍历两族，`make TARGETS=ch32v0` 之后必然链接失败（`cannot find -lopenwch_ch5xx58x`）——改为 `APITEST_DIRS` 由 `TARGETS` 推导，并让 `apitest` 依赖 `lib`。**(2)** 工作流把 `${{ runner.temp }}` 用在 job 级 `env`，而 `runner` 上下文在 job 级并不存在，导致**整个工作流校验失败**（表现为「以文件路径命名的 run + 0 个 job」，极易误读为构建失败）。**(3)** **Debian/Ubuntu 的 `gcc-riscv64-unknown-elf` 完全不附带 newlib**（`rv32e`/`rv32imac` 多库都没有），冒烟测试原先只加 `-nostartfiles`，于是隐式请求 `-lc`/`-lgloss` 而失败；改为 `-nostdlib`。此处一度误判为「库完全 freestanding」——那是**基于被 `head -20` 截断的 `nm` 输出**得出的错误结论；实际 `openwch_reset_init` 的 `.data`/`.bss` 循环在 GCC 13.2 下会生成 `memcpy`/`memset` 调用（GCC 15 则内联），故该依赖**随编译器而变**，必须显式满足：冒烟测试与模板 freestanding 模式均改为链接按族 mini-libc。**(4)** 模板的 `LIBOPENWCH_NOSTDLIB=1` 引用了一个**从未存在**的 `lib/mini_libc.a`；现补齐为按族构建的真实 mini-libc（12 个字符串/内存函数，独立归档，`-fno-builtin` 防自递归），并新增 CI job 在无 newlib 的工具链上验证该路径。另外把 CI 失败详情写入 step summary 与 error annotation，因为下载原始 job 日志需要仓库管理员权限 |
 | 第 10 轮（CI 收敛轮·续） | CI 增加 `nostdlib` job：在 Debian 无 newlib 工具链上构建库、跑冒烟测试、并以 `LIBOPENWCH_NOSTDLIB=1` 构建模板示例 |

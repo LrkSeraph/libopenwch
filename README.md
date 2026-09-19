@@ -46,15 +46,20 @@ make PREFIX=/opt/xpack-riscv-none-elf-gcc/bin/riscv-none-elf-
 `riscv64-linux-gnu-` is deliberately **not** probed: its startup files and libc
 conventions are different enough to break bare-metal firmware builds.
 
-### No C library required
+### C library requirements
 
-libopenwch is freestanding: its archives reference only libgcc (for `__mulsi3`,
-`__udivsi3` and friends) and no part of the library calls the C library.  This
-matters in practice, because Debian's and Ubuntu's `gcc-riscv64-unknown-elf`
-ship **no newlib at all** for the `rv32e` or `rv32imac` multilibs, so any link
-that pulls in `-lc` or `-lgloss` fails outright.
+libopenwch calls no C library function directly, and its archives reference
+only libgcc (`__mulsi3`, `__udivsi3`, `__udivdi3` and friends) — but one part
+of it is not free of the C library in practice.  `openwch_reset_init()` copies
+`.data` from flash to RAM and zeroes `.bss`, and whether the compiler turns
+those loops into `memcpy()`/`memset()` calls depends on the compiler version:
+GCC 13 emits the calls, GCC 15 inlines the loops.  A freestanding link
+therefore has to supply `memcpy` and `memset` alongside libgcc.
 
-Applications built from `template/` have two modes:
+This matters, because Debian's and Ubuntu's `gcc-riscv64-unknown-elf` ship
+**no newlib at all** for the `rv32e` or `rv32imac` multilibs, so any link that
+pulls in `-lc` or `-lgloss` fails outright.  The bundled mini-libc supplies
+what is missing, and applications built from `template/` have two modes:
 
 | mode | link | use when |
 |---|---|---|
@@ -70,6 +75,10 @@ The mini-libc is a small freestanding set — `memcpy`, `memmove`, `memset`,
 `strncpy`, `strchr` — built per family into its own archive, so that it carries
 the right ISA and never shadows a real C library unless you ask for it.  It has
 no `printf`, no `malloc` and no floating point.
+
+The API smoke tests link the same way (`-nostdlib` plus the mini-libc), which
+is what keeps this requirement honest: if the library ever grows a dependency
+on some other part of the C library, `make apitest` stops linking.
 
 ## Building the library
 
