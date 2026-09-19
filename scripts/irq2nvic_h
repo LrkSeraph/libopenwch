@@ -82,6 +82,20 @@ TEMPLATE_NVIC_H = '''/* This file is part of the libopenwch project.
 /* Number of entries in the generated descriptor table. */
 #define OPENWCH_IRQ_TABLE_SIZE OPENWCH_IRQ_COUNT
 
+/*
+ * Core exception identifiers.  These live in the low (RISC-V) part of the
+ * vector table, before OPENWCH_IRQ_FIRST, and are NOT routed through the PFIC
+ * interrupt-enable array -- nvic_enable_irq() must not be used with them.
+ * SysTick is enabled through its own control register instead, and the
+ * software interrupt through the PFIC system control register.
+ */
+#define SYSTICK_IRQ 12
+#define SW_IRQ 14
+
+/* nvic_enable_irq()/nvic_disable_irq() accept ids in this range only. */
+#define OPENWCH_NVIC_IRQ_MIN OPENWCH_IRQ_FIRST
+#define OPENWCH_NVIC_IRQ_MAX OPENWCH_IRQ_LAST
+
 /**@}}*/
 
 /** @defgroup qingke_nvic_isrprototypes_{partname_doxygen} Interrupt service routine prototypes for {partname_humanreadable}

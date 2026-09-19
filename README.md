@@ -113,6 +113,22 @@ int main(void)
 }
 ```
 
+## Starting a project
+
+`template/` is an application skeleton, the counterpart of
+[libopencm3-template](https://github.com/bonedaddy/libopencm3-template):
+
+```sh
+cp -r libopenwch/template ~/src/my-firmware
+cd ~/src/my-firmware/examples/blink
+make OPENWCH_DIR=~/src/libopenwch
+make OPENWCH_DIR=~/src/libopenwch flash    # needs minichlink
+```
+
+Each example is a self-contained directory with its own `Makefile`; `DEVICE`
+selects the part and everything else (ISA, linker script, library) is derived
+from it.  See `template/README.md` for the full variable reference.
+
 ## API conventions
 
 * Functions: `periph_verb_object()` — `gpio_set_mode()`, `usart_set_baudrate()`,
@@ -144,6 +160,7 @@ lib/
     qingke/             core layer implementation
     ch32v0/             CH32V00x family build
     ch5xx58x/           CH58x family build
+template/           application skeleton (rules/, examples/)
 doc/  tests/  examples/
 ```
 

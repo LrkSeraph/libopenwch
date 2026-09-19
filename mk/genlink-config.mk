@@ -63,15 +63,31 @@ CPPFLAGS	+= $(genlink_cppflags)
 ## implement the integer multiply instructions.  GCC >= 13 expresses this as the
 ## `zmmul` extension; older GCC does not know the extension name at all, so it
 ## must be omitted (the multiply helpers then come from libgcc, i.e. soft
-## multiply).  ZMMUL_OK is probed by mk/gcc-config.mk.
+## multiply).
 ##
+## The probe lives here rather than in mk/gcc-config.mk so that this module is
+## self-sufficient: an application only has to include genlink-config.mk to get
+## a correct ARCH_FLAGS, without having to know which other module computes
+## which helper variable.
+##
+## ZMMUL_OK may still be supplied by the caller (mk/gcc-config.mk sets it) to
+## avoid probing twice.
+##
+ifneq ($(genlink_zmmul),1)
+genlink_zmmul_ok :=
+else ifneq ($(ZMMUL_OK),)
+genlink_zmmul_ok := $(ZMMUL_OK)
+else ifneq ($(genlink_march),)
+genlink_zmmul_ok := $(shell \
+	printf '' | $(CC) -march=$(genlink_march)_zmmul -mabi=$(genlink_mabi) \
+		-x c -fsyntax-only - 2>/dev/null && echo yes)
+endif
+
 ## Order matters for readability only, but keep it canonical:
 ##   <base ISA>[_zmmul]<always-on extensions>
 genlink_march_full := $(genlink_march)
-ifeq ($(genlink_zmmul),1)
-  ifneq ($(ZMMUL_OK),)
-    genlink_march_full := $(genlink_march)_zmmul
-  endif
+ifeq ($(genlink_zmmul_ok),yes)
+genlink_march_full := $(genlink_march)_zmmul
 endif
 genlink_march_full := $(genlink_march_full)$(genlink_zext)
 

@@ -73,18 +73,21 @@ OBJS += rcc.o rcc_common_v1.o
 #OBJS += iwdg.o wwdg.o pwr.o opa.o syscfg.o dbgmcu.o
 
 ##
-## Compile flags: RV32EC, with the zmmul extension when the assembler knows it.
+## Compile flags.
 ##
-OPENWCH_ZMMUL_OK := $(shell \
-	printf '' | $(CC) -march=rv32ec_zmmul -mabi=ilp32e -x c -fsyntax-only - 2>/dev/null \
-	&& echo yes)
-
-OPENWCH_MARCH	:= rv32ec
-ifeq ($(OPENWCH_ZMMUL_OK),yes)
-OPENWCH_MARCH	:= rv32ec_zmmul
-endif
-OPENWCH_MARCH	:= $(OPENWCH_MARCH)_zicsr_zifencei
-
+## The family is built as plain rv32ec, WITHOUT the zmmul extension.
+##
+## Rationale: the archive is shared by every CH32V00x part, and the CH32V003
+## does not advertise zmmul, so tagging the archive's objects with it would
+## make a linked CH32V003 image claim an extension the part does not have.
+##
+## Nothing in the core or peripheral code needs the tag either:
+##   * the core layer contains no mul/div at all (verified with objdump);
+##   * QingKe V2 has no hardware divide, so / and % always call libgcc;
+##   * multiplication uses the hardware only when the *application* asks for
+##     it, and an application built for a CH32V002/004/005/006/007 gets
+##     -march=rv32ec_zmmul_zicsr_zifencei from ld/devices.data automatically.
+##
 TGT_CFLAGS	= -Os -g3 \
 		  -Wall -Wextra -Wimplicit-function-declaration \
 		  -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes \
@@ -92,7 +95,7 @@ TGT_CFLAGS	= -Os -g3 \
 		  -I$(OPENWCH_INC) -fno-common \
 		  -ffunction-sections -fdata-sections -MD \
 		  -mno-relax \
-		  -march=$(OPENWCH_MARCH) -mabi=ilp32e \
+		  -march=rv32ec_zicsr_zifencei -mabi=ilp32e \
 		  -DCH32V0
 TGT_CFLAGS	+= $(DEBUG_FLAGS)
 TGT_CFLAGS	+= $(STANDARD_FLAGS)

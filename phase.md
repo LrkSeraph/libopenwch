@@ -178,6 +178,29 @@
    已在头文件中显著说明。拉/下拉方向仍由 OUTDR 选择，因此
    `GPIO_MODE_IPD` 写 0、`GPIO_MODE_IPU` 写 1。
 
+### P2 实现记录（模板 / 应用侧）
+
+模板的引入暴露了库构建系统中的两个真实缺陷，已修正：
+
+10. **`CC ?= $(PREFIX)-gcc` 不生效**。GNU make 预定义了 `CC = cc`（还有
+    `CXX = g++`），因此 `?=` 永远不会赋值，构建会**静默地使用宿主编译器**。
+    模板的 `toolchain.mk` 改用 `:=` 显式赋值。库侧的 `mk/gcc-config.mk`
+    用的是 `?=`，但在 `PREFIX` 已知的前提下无害；应用侧必须用 `:=`。
+
+11. **`ZMMUL_OK` 只在 `mk/gcc-config.mk` 中探测**，而模板只
+    `include genlink-config.mk`，导致 `ZMMUL_OK` 为空、`_zmmul` **永远不被
+    追加**——CH32V002/004/005/006/007 会静默退化为软乘法。已把探测移入
+    `mk/genlink-config.mk`（该模块本就消费这个值），使模块自洽；调用方仍可
+    预先设置 `ZMMUL_OK` 以避免重复探测。
+
+12. **`libopenwch_ch32v0.a` 曾用 `_zmmul` 编译**，导致链接后的 CH32V003
+    映像声明了一个该型号并未宣称的扩展。族归档现已改为**纯 `rv32ec`**：
+    - 核心层与已实现外设中**没有任何 mul/div 指令**（objdump 验证）；
+    - QingKe V2 无硬件除法，`/`/`%` 本来就总是调用 libgcc；
+    - 乘法仅在**应用**请求时使用硬件，而针对 002/004/005/006/007 构应用会
+      自动从 `ld/devices.data` 得到 `-march=rv32ec_zmmul_zicsr_zifencei`。
+    这样单个族归档对全部型号都是正确的。
+
 ### P0 验收
 
 - [x] `make TARGETS=""` 成功（空构建不报错）
@@ -325,6 +348,18 @@
 - [ ] `lib/ch5xx/58x/<periph>.c`
 - [ ] `examples/ch582/blink/`、`examples/ch582/uart_echo/`
 - [ ] 确认 `-march=rv32imac -mabi=ilp32`、`.highcode` 段、`0x20003800` RAM 偏移（`ch571/573` 才用，58x 不用）等差异
+
+### P2.6 用户应用模板（`template/`）
+
+- [x] `template/rules/toolchain.mk` —— RISC-V 前缀探测、`PREFIX` 覆盖、
+      工具链缺失硬报错、`monitor`/`unbrick` 目标
+- [x] `template/rules/rules.mk` —— `PROJECT`/`DEVICE` 驱动；`-nostartfiles`
+      （必须，否则与工具链 crt0 冲突）；`${PROJECT}.{elf,bin,hex,map,list}`；
+      `flash`/`size`/`monitor`/`unbrick`；`LIBOPENWCH_NOSTDLIB` 选项
+- [x] `template/examples/blink` —— CH32V003 可编译可链接（1124 B）
+- [x] `template/examples/ch582_blink` —— CH58x 核心层 bring-up（SysTick 1 ms）
+- [x] `template/README.md`、`template/.gitignore`、`template/.vscode/*`
+- [x] 验证 `DEVICE=` 切换会正确改变 ISA（V003 无 zmmul，V002/V004 有）
 
 ### P3 验收
 
