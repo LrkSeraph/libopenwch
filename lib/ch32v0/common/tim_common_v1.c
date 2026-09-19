@@ -79,22 +79,19 @@ static const struct tim_channel_desc tim_channels[4] = {
  * table lookups below cannot run off the end when asserts are compiled out by
  * NDEBUG.
  */
-static unsigned int tim_channel_index(uint32_t ic)
-{
+static unsigned int tim_channel_index(uint32_t ic) {
 	openwch_assert(ic < TIM_CHANNEL_COUNT);
 
 	return (ic < TIM_CHANNEL_COUNT) ? (unsigned int)ic : 0u;
 }
 
 /** Access the capture/compare control register that holds a channel. */
-static uint16_t tim_chctlr_read(uint32_t tim, uint32_t ic)
-{
+static uint16_t tim_chctlr_read(uint32_t tim, uint32_t ic) {
 	return (tim_channels[tim_channel_index(ic)].chctlr == 0)
 			? TIM_CHCTLR1(tim) : TIM_CHCTLR2(tim);
 }
 
-static void tim_chctlr_write(uint32_t tim, uint32_t ic, uint16_t value)
-{
+static void tim_chctlr_write(uint32_t tim, uint32_t ic, uint16_t value) {
 	if (tim_channels[tim_channel_index(ic)].chctlr == 0) {
 		TIM_CHCTLR1(tim) = value;
 	} else {
@@ -103,21 +100,18 @@ static void tim_chctlr_write(uint32_t tim, uint32_t ic, uint16_t value)
 }
 
 /** The CCER enable/polarity bit for channel `ic`. */
-static uint16_t tim_ccer_bit(uint32_t ic)
-{
+static uint16_t tim_ccer_bit(uint32_t ic) {
 	/* CCxE is bit 0 of each channel's four-bit CCER group. */
 	return (uint16_t)(1u << (tim_channel_index(ic) * 4u));
 }
 
 /** The CCER polarity bit (CCxP), one above the enable bit. */
-static uint16_t tim_ccer_polarity_bit(uint32_t ic)
-{
+static uint16_t tim_ccer_polarity_bit(uint32_t ic) {
 	return (uint16_t)(1u << ((tim_channel_index(ic) * 4u) + 1u));
 }
 
 /** Access a capture/compare value register. */
-static uint32_t tim_ccr(uint32_t tim, uint32_t ic)
-{
+static uint32_t tim_ccr(uint32_t tim, uint32_t ic) {
 	switch (tim_channel_index(ic)) {
 	case 0:
 		return TIM_CH1CVR(tim);
@@ -132,8 +126,7 @@ static uint32_t tim_ccr(uint32_t tim, uint32_t ic)
 
 /** Write a capture/compare value register.  This is the \e setter half of the
  * pair; tim_ccr() only reads.  Channel validity is checked by the caller. */
-static void tim_ccr_write(uint32_t tim, uint32_t ic, uint16_t value)
-{
+static void tim_ccr_write(uint32_t tim, uint32_t ic, uint16_t value) {
 	switch (tim_channel_index(ic)) {
 	case 0:
 		TIM_CH1CVR(tim) = value;
@@ -154,8 +147,7 @@ static void tim_ccr_write(uint32_t tim, uint32_t ic, uint16_t value)
  * --- Counter -------------------------------------------------------------
  */
 
-void timer_set_mode(uint32_t tim, uint32_t mode)
-{
+void timer_set_mode(uint32_t tim, uint32_t mode) {
 	uint16_t reg = TIM_CTLR1(tim);
 
 	/*
@@ -172,38 +164,31 @@ void timer_set_mode(uint32_t tim, uint32_t mode)
 	TIM_CTLR1(tim) = reg;
 }
 
-void timer_enable(uint32_t tim)
-{
+void timer_enable(uint32_t tim) {
 	TIM_CTLR1(tim) |= TIM_CTLR1_CEN;
 }
 
-void timer_disable(uint32_t tim)
-{
+void timer_disable(uint32_t tim) {
 	TIM_CTLR1(tim) &= ~TIM_CTLR1_CEN;
 }
 
-void timer_set_prescaler(uint32_t tim, uint16_t psc)
-{
+void timer_set_prescaler(uint32_t tim, uint16_t psc) {
 	TIM_PSC(tim) = psc;
 }
 
-void timer_set_period(uint32_t tim, uint16_t arr)
-{
+void timer_set_period(uint32_t tim, uint16_t arr) {
 	TIM_ATRLR(tim) = arr;
 }
 
-void timer_set_counter(uint32_t tim, uint16_t cnt)
-{
+void timer_set_counter(uint32_t tim, uint16_t cnt) {
 	TIM_CNT(tim) = cnt;
 }
 
-uint16_t timer_get_counter(uint32_t tim)
-{
+uint16_t timer_get_counter(uint32_t tim) {
 	return TIM_CNT(tim);
 }
 
-void timer_set_alignment(uint32_t tim, uint32_t alignment)
-{
+void timer_set_alignment(uint32_t tim, uint32_t alignment) {
 	uint16_t reg = TIM_CTLR1(tim);
 
 	openwch_assert((alignment & ~TIM_CTLR1_CMS_MASK) == 0);
@@ -213,8 +198,7 @@ void timer_set_alignment(uint32_t tim, uint32_t alignment)
 	TIM_CTLR1(tim) = reg;
 }
 
-void timer_set_direction(uint32_t tim, uint32_t direction)
-{
+void timer_set_direction(uint32_t tim, uint32_t direction) {
 	uint16_t reg = TIM_CTLR1(tim);
 
 	openwch_assert((direction & ~TIM_CTLR1_DIR) == 0);
@@ -224,18 +208,15 @@ void timer_set_direction(uint32_t tim, uint32_t direction)
 	TIM_CTLR1(tim) = reg;
 }
 
-void timer_enable_preload(uint32_t tim)
-{
+void timer_enable_preload(uint32_t tim) {
 	TIM_CTLR1(tim) |= TIM_CTLR1_ARPE;
 }
 
-void timer_disable_preload(uint32_t tim)
-{
+void timer_disable_preload(uint32_t tim) {
 	TIM_CTLR1(tim) &= ~TIM_CTLR1_ARPE;
 }
 
-void timer_set_clock_division(uint32_t tim, enum tim_clock_division ckd)
-{
+void timer_set_clock_division(uint32_t tim, enum tim_clock_division ckd) {
 	uint16_t reg = TIM_CTLR1(tim);
 
 	openwch_assert((ckd == TIM_CKD_DIV1) || (ckd == TIM_CKD_DIV2)
@@ -247,8 +228,7 @@ void timer_set_clock_division(uint32_t tim, enum tim_clock_division ckd)
 	TIM_CTLR1(tim) = reg;
 }
 
-void timer_generate_event(uint32_t tim, enum tim_event event)
-{
+void timer_generate_event(uint32_t tim, enum tim_event event) {
 	switch (event) {
 	case TIM_EVENT_UPDATE:
 		TIM_SWEVGR(tim) = TIM_SWEVGR_UG;
@@ -284,8 +264,7 @@ void timer_generate_event(uint32_t tim, enum tim_event event)
  * --- Output compare ------------------------------------------------------
  */
 
-void timer_set_oc_mode(uint32_t tim, enum tim_oc_id oc, enum tim_oc_mode mode)
-{
+void timer_set_oc_mode(uint32_t tim, enum tim_oc_id oc, enum tim_oc_mode mode) {
 	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift
 			+ 4);
 	uint16_t mask = (uint16_t)(0x7u << shift);
@@ -299,16 +278,17 @@ void timer_set_oc_mode(uint32_t tim, enum tim_oc_id oc, enum tim_oc_mode mode)
 	tim_chctlr_write(tim, oc, reg);
 }
 
-void timer_set_oc_value(uint32_t tim, enum tim_oc_id oc, uint16_t value)
-{
+void timer_set_oc_value(uint32_t tim, enum tim_oc_id oc, uint16_t value) {
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
 
 	tim_ccr_write(tim, oc, value);
 }
 
-void timer_set_oc_polarity(uint32_t tim, enum tim_oc_id oc,
-			   enum tim_oc_polarity polarity)
-{
+void timer_set_oc_polarity(
+	uint32_t tim,
+	enum tim_oc_id oc,
+	enum tim_oc_polarity polarity
+) {
 	uint16_t reg = TIM_CCER(tim);
 
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
@@ -323,22 +303,19 @@ void timer_set_oc_polarity(uint32_t tim, enum tim_oc_id oc,
 	TIM_CCER(tim) = reg;
 }
 
-void timer_enable_oc_output(uint32_t tim, enum tim_oc_id oc)
-{
+void timer_enable_oc_output(uint32_t tim, enum tim_oc_id oc) {
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
 
 	TIM_CCER(tim) |= tim_ccer_bit(oc);
 }
 
-void timer_disable_oc_output(uint32_t tim, enum tim_oc_id oc)
-{
+void timer_disable_oc_output(uint32_t tim, enum tim_oc_id oc) {
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
 
 	TIM_CCER(tim) &= (uint16_t)~tim_ccer_bit(oc);
 }
 
-void timer_enable_oc_preload(uint32_t tim, enum tim_oc_id oc)
-{
+void timer_enable_oc_preload(uint32_t tim, enum tim_oc_id oc) {
 	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift
 			+ 3);
 	uint16_t reg = tim_chctlr_read(tim, oc);
@@ -349,8 +326,7 @@ void timer_enable_oc_preload(uint32_t tim, enum tim_oc_id oc)
 	tim_chctlr_write(tim, oc, reg);
 }
 
-void timer_disable_oc_preload(uint32_t tim, enum tim_oc_id oc)
-{
+void timer_disable_oc_preload(uint32_t tim, enum tim_oc_id oc) {
 	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift
 			+ 3);
 	uint16_t reg = tim_chctlr_read(tim, oc);
@@ -361,9 +337,11 @@ void timer_disable_oc_preload(uint32_t tim, enum tim_oc_id oc)
 	tim_chctlr_write(tim, oc, reg);
 }
 
-void timer_set_oc_idle_state(uint32_t tim, enum tim_oc_id oc,
-			     enum tim_oc_idle_state state)
-{
+void timer_set_oc_idle_state(
+	uint32_t tim,
+	enum tim_oc_id oc,
+	enum tim_oc_idle_state state
+) {
 	uint16_t bit;
 	uint16_t reg;
 
@@ -398,8 +376,7 @@ void timer_set_oc_idle_state(uint32_t tim, enum tim_oc_id oc,
  * --- Input capture -------------------------------------------------------
  */
 
-void timer_set_input_filter(uint32_t tim, enum tim_ic_id ic, uint8_t filter)
-{
+void timer_set_input_filter(uint32_t tim, enum tim_ic_id ic, uint8_t filter) {
 	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(ic)].ccxs_shift
 			+ 4);
 	uint16_t mask = (uint16_t)(0xfu << shift);
@@ -413,9 +390,11 @@ void timer_set_input_filter(uint32_t tim, enum tim_ic_id ic, uint8_t filter)
 	tim_chctlr_write(tim, ic, reg);
 }
 
-void timer_set_input_polarity(uint32_t tim, enum tim_ic_id ic,
-			      enum tim_ic_polarity polarity)
-{
+void timer_set_input_polarity(
+	uint32_t tim,
+	enum tim_ic_id ic,
+	enum tim_ic_polarity polarity
+) {
 	uint16_t reg = TIM_CCER(tim);
 
 	openwch_assert((ic >= TIM_IC1) && (ic <= TIM_IC4));
@@ -431,8 +410,7 @@ void timer_set_input_polarity(uint32_t tim, enum tim_ic_id ic,
 	TIM_CCER(tim) = reg;
 }
 
-void timer_set_ic_prescaler(uint32_t tim, enum tim_ic_id ic, uint8_t psc)
-{
+void timer_set_ic_prescaler(uint32_t tim, enum tim_ic_id ic, uint8_t psc) {
 	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(ic)].ccxs_shift
 			+ 2);
 	uint16_t mask = (uint16_t)(0x3u << shift);
@@ -446,8 +424,7 @@ void timer_set_ic_prescaler(uint32_t tim, enum tim_ic_id ic, uint8_t psc)
 	tim_chctlr_write(tim, ic, reg);
 }
 
-uint16_t timer_get_ic_value(uint32_t tim, enum tim_ic_id ic)
-{
+uint16_t timer_get_ic_value(uint32_t tim, enum tim_ic_id ic) {
 	openwch_assert((ic >= TIM_IC1) && (ic <= TIM_IC4));
 
 	return (uint16_t)tim_ccr(tim, ic);
@@ -457,13 +434,11 @@ uint16_t timer_get_ic_value(uint32_t tim, enum tim_ic_id ic)
  * --- Break and dead-time (TIM1 only) -------------------------------------
  */
 
-void timer_enable_break_main_output(uint32_t tim)
-{
+void timer_enable_break_main_output(uint32_t tim) {
 	TIM_BDTR(tim) |= TIM_BDTR_MOE;
 }
 
-void timer_set_deadtime(uint32_t tim, uint8_t deadtime)
-{
+void timer_set_deadtime(uint32_t tim, uint8_t deadtime) {
 	uint16_t reg = TIM_BDTR(tim);
 
 	reg = (uint16_t)((reg & ~TIM_BDTR_DTG_MASK)
@@ -483,8 +458,7 @@ void timer_set_deadtime(uint32_t tim, uint8_t deadtime)
  * positions as the first eight flags, but the table keeps the two namespaces
  * independent.
  */
-static uint16_t tim_flag_mask(enum tim_flag flag)
-{
+static uint16_t tim_flag_mask(enum tim_flag flag) {
 	static const uint16_t masks[] = {
 		TIM_INTFR_UIF,
 		TIM_INTFR_CC1IF,
@@ -505,27 +479,23 @@ static uint16_t tim_flag_mask(enum tim_flag flag)
 	return masks[(flag <= TIM_FLAG_CC4_OVERCAPTURE) ? (unsigned int)flag : 0u];
 }
 
-void timer_enable_irq(uint32_t tim, enum tim_irq irq)
-{
+void timer_enable_irq(uint32_t tim, enum tim_irq irq) {
 	openwch_assert((irq >= TIM_IRQ_UPDATE) && (irq <= TIM_IRQ_BREAK));
 
 	TIM_DMAINTENR(tim) |= (uint16_t)(1u << (uint16_t)irq);
 }
 
-void timer_disable_irq(uint32_t tim, enum tim_irq irq)
-{
+void timer_disable_irq(uint32_t tim, enum tim_irq irq) {
 	openwch_assert((irq >= TIM_IRQ_UPDATE) && (irq <= TIM_IRQ_BREAK));
 
 	TIM_DMAINTENR(tim) &= (uint16_t)~(1u << (uint16_t)irq);
 }
 
-uint16_t timer_get_flag(uint32_t tim, enum tim_flag flag)
-{
+uint16_t timer_get_flag(uint32_t tim, enum tim_flag flag) {
 	return (uint16_t)(TIM_INTFR(tim) & tim_flag_mask(flag));
 }
 
-void timer_clear_flag(uint32_t tim, enum tim_flag flag)
-{
+void timer_clear_flag(uint32_t tim, enum tim_flag flag) {
 	/*
 	 * INTFR is a write-1-to-clear register, so writing the wanted mask
 	 * directly clears exactly those flags: the ones written as 0 keep
@@ -535,8 +505,7 @@ void timer_clear_flag(uint32_t tim, enum tim_flag flag)
 	TIM_INTFR(tim) = tim_flag_mask(flag);
 }
 
-uint8_t timer_get_interrupt_source(uint32_t tim, uint16_t irq)
-{
+uint8_t timer_get_interrupt_source(uint32_t tim, uint16_t irq) {
 	return (TIM_INTFR(tim) & TIM_DMAINTENR(tim) & irq) ? 1 : 0;
 }
 /**@}*/

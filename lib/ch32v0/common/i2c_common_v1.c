@@ -80,8 +80,7 @@
  * Round-to-nearest integer division.  QingKe V2 has no hardware divide, so
  * this ends up in libgcc; that is expected and fine.
  */
-static uint32_t i2c_div_round(uint32_t dividend, uint32_t divisor)
-{
+static uint32_t i2c_div_round(uint32_t dividend, uint32_t divisor) {
 	return (dividend + (divisor / 2u)) / divisor;
 }
 
@@ -94,8 +93,7 @@ static uint32_t i2c_div_round(uint32_t dividend, uint32_t divisor)
  * Dividing the clock down to kHz first would lose too much precision at the
  * low APB1 frequencies the part supports, so the whole product is kept.
  */
-static void i2c_set_rise_time(uint32_t i2c, uint32_t clock, uint32_t speed)
-{
+static void i2c_set_rise_time(uint32_t i2c, uint32_t clock, uint32_t speed) {
 	uint32_t rise_ns;
 
 	if (speed > I2C_SPEED_STANDARD) {
@@ -110,8 +108,7 @@ static void i2c_set_rise_time(uint32_t i2c, uint32_t clock, uint32_t speed)
 
 /* --- Configuration ------------------------------------------------------- */
 
-void i2c_set_clock_frequency(uint32_t i2c, uint32_t clock)
-{
+void i2c_set_clock_frequency(uint32_t i2c, uint32_t clock) {
 	uint32_t freq_mhz;
 
 	openwch_assert(clock != 0);
@@ -133,9 +130,12 @@ void i2c_set_clock_frequency(uint32_t i2c, uint32_t clock)
 				& I2C_CTLR2_FREQ_MASK));
 }
 
-void i2c_init_master(uint32_t i2c, uint32_t clock, uint32_t speed,
-		uint32_t duty_cycle)
-{
+void i2c_init_master(
+	uint32_t i2c,
+	uint32_t clock,
+	uint32_t speed,
+	uint32_t duty_cycle
+) {
 	uint16_t ckcfgr;
 	uint32_t divider;
 
@@ -175,8 +175,7 @@ void i2c_init_master(uint32_t i2c, uint32_t clock, uint32_t speed,
 	i2c_set_rise_time(i2c, clock, speed);
 }
 
-void i2c_init_slave(uint32_t i2c, uint32_t clock, uint8_t address)
-{
+void i2c_init_slave(uint32_t i2c, uint32_t clock, uint8_t address) {
 	openwch_assert(clock != 0);
 
 	i2c_set_clock_frequency(i2c, clock);
@@ -185,40 +184,33 @@ void i2c_init_slave(uint32_t i2c, uint32_t clock, uint8_t address)
 
 /* --- Enable -------------------------------------------------------------- */
 
-void i2c_enable(uint32_t i2c)
-{
+void i2c_enable(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_PE;
 }
 
-void i2c_disable(uint32_t i2c)
-{
+void i2c_disable(uint32_t i2c) {
 	I2C_CTLR1(i2c) &= ~I2C_CTLR1_PE;
 }
 
 /* --- Bus control --------------------------------------------------------- */
 
-void i2c_send_start(uint32_t i2c)
-{
+void i2c_send_start(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_START;
 }
 
-void i2c_send_stop(uint32_t i2c)
-{
+void i2c_send_stop(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_STOP;
 }
 
-void i2c_send_data(uint32_t i2c, uint8_t data)
-{
+void i2c_send_data(uint32_t i2c, uint8_t data) {
 	I2C_DATAR(i2c) = (uint16_t)(data & I2C_DATAR_MASK);
 }
 
-uint8_t i2c_read_data(uint32_t i2c)
-{
+uint8_t i2c_read_data(uint32_t i2c) {
 	return (uint8_t)(I2C_DATAR(i2c) & I2C_DATAR_MASK);
 }
 
-void i2c_send_7bit_address(uint32_t i2c, uint8_t address, uint8_t read)
-{
+void i2c_send_7bit_address(uint32_t i2c, uint8_t address, uint8_t read) {
 	openwch_assert(address <= 0x7fu);
 	openwch_assert(read <= 1u);
 
@@ -232,15 +224,13 @@ void i2c_send_7bit_address(uint32_t i2c, uint8_t address, uint8_t read)
 
 /* --- Own address --------------------------------------------------------- */
 
-void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address)
-{
+void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address) {
 	openwch_assert(address <= 0x7fu);
 
 	I2C_OADDR1(i2c) = (uint16_t)((address << 1) & I2C_OADDR1_ADD1_7);
 }
 
-void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address)
-{
+void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address) {
 	openwch_assert(address <= 0x3ffu);
 
 	I2C_OADDR1(i2c) = (uint16_t)((address << 1 & I2C_OADDR1_ADD8_9)
@@ -248,31 +238,27 @@ void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address)
 			| I2C_OADDR1_ADDMODE);
 }
 
-void i2c_enable_dual_address(uint32_t i2c, uint8_t address)
-{
+void i2c_enable_dual_address(uint32_t i2c, uint8_t address) {
 	openwch_assert(address <= 0x7fu);
 
 	I2C_OADDR2(i2c) = (uint16_t)(((address << 1) & I2C_OADDR2_ADD2)
 			| I2C_OADDR2_ENDUAL);
 }
 
-void i2c_enable_general_call(uint32_t i2c)
-{
+void i2c_enable_general_call(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_ENGC;
 }
 
 /* --- Clock generation ---------------------------------------------------- */
 
-void i2c_set_ccr(uint32_t i2c, uint32_t ccr)
-{
+void i2c_set_ccr(uint32_t i2c, uint32_t ccr) {
 	openwch_assert((ccr & I2C_CKCFGR_CCR_MASK) == ccr);
 
 	I2C_CKCFGR(i2c) = (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK)
 			| ccr);
 }
 
-void i2c_set_trise(uint32_t i2c, uint32_t trise)
-{
+void i2c_set_trise(uint32_t i2c, uint32_t trise) {
 	openwch_assert((trise & I2C_CKCFGR_CCR_MASK) == trise);
 
 	/*
@@ -288,18 +274,15 @@ void i2c_set_trise(uint32_t i2c, uint32_t trise)
 
 /* --- Acknowledge --------------------------------------------------------- */
 
-void i2c_enable_ack(uint32_t i2c)
-{
+void i2c_enable_ack(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_ACK;
 }
 
-void i2c_disable_ack(uint32_t i2c)
-{
+void i2c_disable_ack(uint32_t i2c) {
 	I2C_CTLR1(i2c) &= ~I2C_CTLR1_ACK;
 }
 
-void i2c_nack_current(uint32_t i2c)
-{
+void i2c_nack_current(uint32_t i2c) {
 	/*
 	 * POS = 0: the ACK bit applies to the byte currently being received,
 	 * so clearing it NACKs that byte.
@@ -308,8 +291,7 @@ void i2c_nack_current(uint32_t i2c)
 	I2C_CTLR1(i2c) &= ~I2C_CTLR1_ACK;
 }
 
-void i2c_nack_next(uint32_t i2c)
-{
+void i2c_nack_next(uint32_t i2c) {
 	/* POS = 1: ACK applies to the byte after the next one. */
 	I2C_CTLR1(i2c) |= I2C_CTLR1_POS;
 	I2C_CTLR1(i2c) &= ~I2C_CTLR1_ACK;
@@ -317,8 +299,7 @@ void i2c_nack_next(uint32_t i2c)
 
 /* --- PEC ----------------------------------------------------------------- */
 
-void i2c_enable_pec(uint32_t i2c)
-{
+void i2c_enable_pec(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_ENPEC;
 	/*
 	 * PEC must be set for the transfer that computes the CRC; ENPEC alone
@@ -327,41 +308,35 @@ void i2c_enable_pec(uint32_t i2c)
 	I2C_CTLR1(i2c) |= I2C_CTLR1_PEC;
 }
 
-void i2c_disable_pec(uint32_t i2c)
-{
+void i2c_disable_pec(uint32_t i2c) {
 	I2C_CTLR1(i2c) &= ~(I2C_CTLR1_ENPEC | I2C_CTLR1_PEC);
 }
 
-uint8_t i2c_get_pec(uint32_t i2c)
-{
+uint8_t i2c_get_pec(uint32_t i2c) {
 	return (uint8_t)((I2C_STAR2(i2c) & I2C_STAR2_PEC_MASK)
 			>> I2C_STAR2_PEC_SHIFT);
 }
 
 /* --- Reset --------------------------------------------------------------- */
 
-void i2c_software_reset(uint32_t i2c)
-{
+void i2c_software_reset(uint32_t i2c) {
 	I2C_CTLR1(i2c) |= I2C_CTLR1_SWRST;
 	I2C_CTLR1(i2c) &= ~I2C_CTLR1_SWRST;
 }
 
 /* --- Interrupts ---------------------------------------------------------- */
 
-void i2c_enable_interrupt(uint32_t i2c, uint32_t interrupt)
-{
+void i2c_enable_interrupt(uint32_t i2c, uint32_t interrupt) {
 	I2C_CTLR2(i2c) |= (uint16_t)(interrupt & I2C_CTLR2_IT_MASK);
 }
 
-void i2c_disable_interrupt(uint32_t i2c, uint32_t interrupt)
-{
+void i2c_disable_interrupt(uint32_t i2c, uint32_t interrupt) {
 	I2C_CTLR2(i2c) &= (uint16_t)~(interrupt & I2C_CTLR2_IT_MASK);
 }
 
 /* --- Flags --------------------------------------------------------------- */
 
-uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag)
-{
+uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag) {
 	uint16_t status = 0;
 
 	if (flag & I2C_CTLR2_IT_MASK) {
@@ -383,8 +358,7 @@ uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag)
 	return (uint16_t)(status & flag);
 }
 
-void i2c_clear_flag(uint32_t i2c, uint32_t flag)
-{
+void i2c_clear_flag(uint32_t i2c, uint32_t flag) {
 	/*
 	 * Several STAR1 flags (ADDR, STOPF, BTF) are cleared by reading STAR1
 	 * and then STAR2, which must be done in that order.  Do it first so a
@@ -403,8 +377,7 @@ void i2c_clear_flag(uint32_t i2c, uint32_t flag)
 	}
 }
 
-uint16_t i2c_get_interrupt_status(uint32_t i2c)
-{
+uint16_t i2c_get_interrupt_status(uint32_t i2c) {
 	/*
 	 * STAR1 and STAR2 together form the interrupt status; the error flags
 	 * live in STAR1 and the state flags in STAR2, so report both.
@@ -412,8 +385,7 @@ uint16_t i2c_get_interrupt_status(uint32_t i2c)
 	return (uint16_t)(I2C_STAR1(i2c) | I2C_STAR2(i2c));
 }
 
-void i2c_clear_interrupt_pending_bit(uint32_t i2c)
-{
+void i2c_clear_interrupt_pending_bit(uint32_t i2c) {
 	/*
 	 * There is no explicit interrupt-pending register: a pending event is
 	 * retired by reading STAR1 and then STAR2, and the error flags are

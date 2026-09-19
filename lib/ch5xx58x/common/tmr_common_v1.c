@@ -65,8 +65,7 @@
  * then lets the caller use DMA only on an instance that has it.
  */
 
-void tmr_set_mode(uint32_t tmr, uint32_t mode)
-{
+void tmr_set_mode(uint32_t tmr, uint32_t mode) {
 	openwch_assert(mode == TMR_MODE_TIMER || mode == TMR_MODE_PWM ||
 		       mode == TMR_MODE_CAPTURE || mode == TMR_MODE_COUNT);
 
@@ -78,39 +77,33 @@ void tmr_set_mode(uint32_t tmr, uint32_t mode)
 	TMR_CTRL_MOD_REG(tmr) = (uint8_t)mode;
 }
 
-void tmr_enable(uint32_t tmr)
-{
+void tmr_enable(uint32_t tmr) {
 	TMR_CTRL_MOD_REG(tmr) |= RB_TMR_COUNT_EN;
 }
 
-void tmr_disable(uint32_t tmr)
-{
+void tmr_disable(uint32_t tmr) {
 	/* Stop the output as well, so that no partial waveform is left on the
 	 * pin once the count is halted. */
 	TMR_CTRL_MOD_REG(tmr) &= (uint8_t)~(RB_TMR_COUNT_EN | RB_TMR_OUT_EN);
 }
 
-void tmr_set_period(uint32_t tmr, uint32_t cycles)
-{
+void tmr_set_period(uint32_t tmr, uint32_t cycles) {
 	openwch_assert(cycles <= TMR_COUNT_MAX);
 
 	TMR_CNT_END_REG(tmr) = cycles & TMR_COUNT_MAX;
 }
 
-void tmr_set_count(uint32_t tmr, uint32_t cycles)
-{
+void tmr_set_count(uint32_t tmr, uint32_t cycles) {
 	openwch_assert(cycles <= TMR_COUNT_MAX);
 
 	TMR_COUNT_REG(tmr) = cycles & TMR_COUNT_MAX;
 }
 
-uint32_t tmr_get_count(uint32_t tmr)
-{
+uint32_t tmr_get_count(uint32_t tmr) {
 	return TMR_COUNT_REG(tmr) & TMR_COUNT_MAX;
 }
 
-void tmr_set_capture_mode(uint32_t tmr, uint32_t mode)
-{
+void tmr_set_capture_mode(uint32_t tmr, uint32_t mode) {
 	openwch_assert(mode == TMR_CAPTURE_DISABLE || mode == TMR_CAPTURE_EDGE ||
 		       mode == TMR_CAPTURE_FALLING || mode == TMR_CAPTURE_RISING);
 
@@ -121,14 +114,12 @@ void tmr_set_capture_mode(uint32_t tmr, uint32_t mode)
 					  | (mode & RB_TMR_CAP_EDGE));
 }
 
-uint32_t tmr_get_capture(uint32_t tmr)
-{
+uint32_t tmr_get_capture(uint32_t tmr) {
 	/* Reading the FIFO pops the oldest captured value. */
 	return TMR_FIFO_REG(tmr) & TMR_COUNT_MAX;
 }
 
-void tmr_set_pwm_polarity(uint32_t tmr, uint32_t polarity)
-{
+void tmr_set_pwm_polarity(uint32_t tmr, uint32_t polarity) {
 	openwch_assert(polarity == TMR_POLARITY_ACTIVE_HIGH ||
 		       polarity == TMR_POLARITY_ACTIVE_LOW);
 
@@ -139,18 +130,15 @@ void tmr_set_pwm_polarity(uint32_t tmr, uint32_t polarity)
 	}
 }
 
-void tmr_enable_pwm(uint32_t tmr)
-{
+void tmr_enable_pwm(uint32_t tmr) {
 	TMR_CTRL_MOD_REG(tmr) |= RB_TMR_OUT_EN;
 }
 
-void tmr_disable_pwm(uint32_t tmr)
-{
+void tmr_disable_pwm(uint32_t tmr) {
 	TMR_CTRL_MOD_REG(tmr) &= (uint8_t)~RB_TMR_OUT_EN;
 }
 
-void tmr_set_pwm_repeat(uint32_t tmr, uint32_t repeat)
-{
+void tmr_set_pwm_repeat(uint32_t tmr, uint32_t repeat) {
 	openwch_assert(repeat == TMR_PWM_REPEAT_1 || repeat == TMR_PWM_REPEAT_4 ||
 		       repeat == TMR_PWM_REPEAT_8 || repeat == TMR_PWM_REPEAT_16);
 
@@ -159,32 +147,28 @@ void tmr_set_pwm_repeat(uint32_t tmr, uint32_t repeat)
 					  | (repeat & RB_TMR_PWM_REPEAT));
 }
 
-void tmr_enable_irq(uint32_t tmr, uint32_t irq)
-{
+void tmr_enable_irq(uint32_t tmr, uint32_t irq) {
 	openwch_assert((irq & ~(uint32_t)TMR_IE_ALL) == 0);
 	openwch_assert((irq & TMR_IF_DMA_ONLY) == 0 || TMR_HAS_DMA(tmr));
 
 	TMR_INTER_EN_REG(tmr) |= (uint8_t)irq;
 }
 
-void tmr_disable_irq(uint32_t tmr, uint32_t irq)
-{
+void tmr_disable_irq(uint32_t tmr, uint32_t irq) {
 	openwch_assert((irq & ~(uint32_t)TMR_IE_ALL) == 0);
 	openwch_assert((irq & TMR_IF_DMA_ONLY) == 0 || TMR_HAS_DMA(tmr));
 
 	TMR_INTER_EN_REG(tmr) &= (uint8_t)~irq;
 }
 
-uint32_t tmr_get_flag(uint32_t tmr, uint32_t flag)
-{
+uint32_t tmr_get_flag(uint32_t tmr, uint32_t flag) {
 	openwch_assert((flag & ~(uint32_t)TMR_IF_ALL) == 0);
 	openwch_assert((flag & TMR_IF_DMA_ONLY) == 0 || TMR_HAS_DMA(tmr));
 
 	return TMR_INT_FLAG_REG(tmr) & flag;
 }
 
-void tmr_clear_flag(uint32_t tmr, uint32_t flag)
-{
+void tmr_clear_flag(uint32_t tmr, uint32_t flag) {
 	openwch_assert((flag & ~(uint32_t)TMR_IF_ALL) == 0);
 	openwch_assert((flag & TMR_IF_DMA_ONLY) == 0 || TMR_HAS_DMA(tmr));
 
@@ -192,8 +176,7 @@ void tmr_clear_flag(uint32_t tmr, uint32_t flag)
 	TMR_INT_FLAG_REG(tmr) = (uint8_t)flag;
 }
 
-void tmr_enable_dma(uint32_t tmr, uint32_t mode, uint32_t start, uint32_t end)
-{
+void tmr_enable_dma(uint32_t tmr, uint32_t mode, uint32_t start, uint32_t end) {
 	openwch_assert(TMR_HAS_DMA(tmr));
 	openwch_assert(mode == TMR_DMA_DISABLE || mode == TMR_DMA_SINGLE ||
 		       mode == TMR_DMA_LOOP);

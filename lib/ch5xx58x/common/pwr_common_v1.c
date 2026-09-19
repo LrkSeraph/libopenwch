@@ -84,8 +84,8 @@
  * Wait for an event.  always_inline is required, not a hint: the call sites
  * are in .highcode and must not jump into flash while the flash is parked.
  */
-static inline __attribute__((always_inline)) void pwr_wfi(void)
-{
+__attribute__((always_inline))
+static inline void pwr_wfi(void) {
 	__asm__ volatile ("wfi");
 }
 
@@ -94,8 +94,7 @@ static inline __attribute__((always_inline)) void pwr_wfi(void)
 
 /* --- DC/DC converter ----------------------------------------------------- */
 
-void pwr_enable_dcdc(void)
-{
+void pwr_enable_dcdc(void) {
 	RWA_SET_BITS(PWR_AUX_POWER_ADJ, PWR_DCDC_CHARGE);
 	RWA_SET_BITS(PWR_POWER_PLAN, PWR_DCDC_PRE);
 
@@ -105,16 +104,14 @@ void pwr_enable_dcdc(void)
 	RWA_SET_BITS(PWR_POWER_PLAN, PWR_DCDC_EN);
 }
 
-void pwr_disable_dcdc(void)
-{
+void pwr_disable_dcdc(void) {
 	RWA_CLEAR_BITS(PWR_POWER_PLAN, PWR_DCDC_EN | PWR_DCDC_PRE);
 	RWA_CLEAR_BITS(PWR_AUX_POWER_ADJ, PWR_DCDC_CHARGE);
 }
 
 /* --- Clock units --------------------------------------------------------- */
 
-void pwr_set_unit(bool enable, uint32_t unit)
-{
+void pwr_set_unit(bool enable, uint32_t unit) {
 	uint8_t hfck = PWR_HFCK_PWR_CTRL;
 	uint8_t ck32k = PWR_CK32K_CONFIG;
 	uint32_t hfck_unit = unit & (PWR_UNIT_HSE | PWR_UNIT_PLL);
@@ -145,15 +142,13 @@ void pwr_set_unit(bool enable, uint32_t unit)
  * peripheral clock.  The API names below are from the caller's point of view,
  * so the enable path clears the bit and the disable path sets it.
  */
-void pwr_periph_clock_enable(uint32_t periph)
-{
+void pwr_periph_clock_enable(uint32_t periph) {
 	openwch_assert((periph & ~PWR_CLK_ALL) == 0);
 
 	RWA_CLEAR_BITS(PWR_SLEEP_CONTROL, periph);
 }
 
-void pwr_periph_clock_disable(uint32_t periph)
-{
+void pwr_periph_clock_disable(uint32_t periph) {
 	openwch_assert((periph & ~PWR_CLK_ALL) == 0);
 
 	RWA_SET_BITS(PWR_SLEEP_CONTROL, periph);
@@ -161,8 +156,7 @@ void pwr_periph_clock_disable(uint32_t periph)
 
 /* --- Sleep wake-up sources ----------------------------------------------- */
 
-void pwr_set_wakeup(bool enable, uint32_t periph, pwr_wakeup_delay_t mode)
-{
+void pwr_set_wakeup(bool enable, uint32_t periph, pwr_wakeup_delay_t mode) {
 	openwch_assert((periph & ~PWR_WAKE_MASK) == 0);
 	openwch_assert(mode <= PWR_WAKEUP_DELAY_LONG);
 
@@ -184,8 +178,7 @@ void pwr_set_wakeup(bool enable, uint32_t periph, pwr_wakeup_delay_t mode)
 
 /* --- Supply voltage monitor ---------------------------------------------- */
 
-void pwr_enable_voltage_monitor(pwr_voltage_monitor_t level)
-{
+void pwr_enable_voltage_monitor(pwr_voltage_monitor_t level) {
 	uint8_t cfg = (uint8_t)level & PWR_BAT_LOW_VTH_MASK;
 	uint8_t ctrl;
 
@@ -207,15 +200,13 @@ void pwr_enable_voltage_monitor(pwr_voltage_monitor_t level)
 	RWA_SET_BITS(PWR_BAT_DET_CTRL, PWR_BAT_LOWER_IE | PWR_BAT_LOW_IE);
 }
 
-void pwr_disable_voltage_monitor(void)
-{
+void pwr_disable_voltage_monitor(void) {
 	RWA_WRITE8(PWR_BAT_DET_CTRL, 0);
 }
 
 /* --- Flags --------------------------------------------------------------- */
 
-bool pwr_get_flag(uint32_t flag)
-{
+bool pwr_get_flag(uint32_t flag) {
 	openwch_assert((flag & ~PWR_FLAG_MASK) == 0);
 	openwch_assert(flag != 0);
 
@@ -225,8 +216,7 @@ bool pwr_get_flag(uint32_t flag)
 /* --- Low-power entry points ---------------------------------------------- */
 
 OPENWCH_HIGH_CODE
-void pwr_enter_idle(void)
-{
+void pwr_enter_idle(void) {
 	/* Park the flash; the sleep controller brings it back on wake-up. */
 	PWR_FLASH_CTRL = PWR_FLASH_PWR_DOWN;
 
@@ -239,8 +229,7 @@ void pwr_enter_idle(void)
 }
 
 OPENWCH_HIGH_CODE
-void pwr_enter_halt(void)
-{
+void pwr_enter_halt(void) {
 	uint8_t x32k_tune = PWR_XT32K_TUNE;
 	uint8_t x32m_tune = PWR_XT32M_TUNE;
 
@@ -271,8 +260,7 @@ void pwr_enter_halt(void)
 }
 
 OPENWCH_HIGH_CODE
-void pwr_enter_sleep(uint8_t rm)
-{
+void pwr_enter_sleep(uint8_t rm) {
 	uint32_t mac_before;
 	uint32_t mac_now;
 	uint16_t plan;
@@ -320,8 +308,7 @@ void pwr_enter_sleep(uint8_t rm)
 }
 
 OPENWCH_HIGH_CODE
-void pwr_enter_shutdown(uint8_t rm)
-{
+void pwr_enter_shutdown(uint8_t rm) {
 	uint8_t x32k_tune = PWR_XT32K_TUNE;
 	uint8_t x32m_tune = PWR_XT32M_TUNE;
 

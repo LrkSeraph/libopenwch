@@ -32,8 +32,7 @@
 
 #include <libopenwch/mini_libc.h>
 
-void *memcpy(void *dest, const void *src, size_t n)
-{
+void *memcpy(void *dest, const void *src, size_t n) {
 	unsigned char *d = dest;
 	const unsigned char *s = src;
 
@@ -44,8 +43,7 @@ void *memcpy(void *dest, const void *src, size_t n)
 	return dest;
 }
 
-void *memmove(void *dest, const void *src, size_t n)
-{
+void *memmove(void *dest, const void *src, size_t n) {
 	unsigned char *d = dest;
 	const unsigned char *s = src;
 
@@ -64,8 +62,7 @@ void *memmove(void *dest, const void *src, size_t n)
 	return dest;
 }
 
-void *memset(void *s, int c, size_t n)
-{
+void *memset(void *s, int c, size_t n) {
 	unsigned char *p = s;
 
 	while (n--) {
@@ -75,8 +72,7 @@ void *memset(void *s, int c, size_t n)
 	return s;
 }
 
-int memcmp(const void *s1, const void *s2, size_t n)
-{
+int memcmp(const void *s1, const void *s2, size_t n) {
 	const unsigned char *a = s1;
 	const unsigned char *b = s2;
 
@@ -91,8 +87,7 @@ int memcmp(const void *s1, const void *s2, size_t n)
 	return 0;
 }
 
-void *memchr(const void *s, int c, size_t n)
-{
+void *memchr(const void *s, int c, size_t n) {
 	const unsigned char *p = s;
 
 	while (n--) {
@@ -105,8 +100,7 @@ void *memchr(const void *s, int c, size_t n)
 	return 0;
 }
 
-size_t strlen(const char *s)
-{
+size_t strlen(const char *s) {
 	const char *p = s;
 
 	while (*p) {
@@ -116,8 +110,7 @@ size_t strlen(const char *s)
 	return (size_t)(p - s);
 }
 
-size_t strnlen(const char *s, size_t maxlen)
-{
+size_t strnlen(const char *s, size_t maxlen) {
 	size_t n = 0;
 
 	while (n < maxlen && s[n]) {
@@ -127,8 +120,7 @@ size_t strnlen(const char *s, size_t maxlen)
 	return n;
 }
 
-int strcmp(const char *s1, const char *s2)
-{
+int strcmp(const char *s1, const char *s2) {
 	while (*s1 && (*s1 == *s2)) {
 		s1++;
 		s2++;
@@ -137,8 +129,7 @@ int strcmp(const char *s1, const char *s2)
 	return (int)(unsigned char)*s1 - (int)(unsigned char)*s2;
 }
 
-int strncmp(const char *s1, const char *s2, size_t n)
-{
+int strncmp(const char *s1, const char *s2, size_t n) {
 	while (n && *s1 && (*s1 == *s2)) {
 		s1++;
 		s2++;
@@ -152,18 +143,17 @@ int strncmp(const char *s1, const char *s2, size_t n)
 	return (int)(unsigned char)*s1 - (int)(unsigned char)*s2;
 }
 
-char *strcpy(char *dest, const char *src)
-{
+char *strcpy(char *dest, const char *src) {
 	char *d = dest;
 
 	while ((*d++ = *src++) != '\0') {
+		;
 	}
 
 	return dest;
 }
 
-char *strncpy(char *dest, const char *src, size_t n)
-{
+char *strncpy(char *dest, const char *src, size_t n) {
 	char *d = dest;
 
 	while (n && *src) {
@@ -178,8 +168,7 @@ char *strncpy(char *dest, const char *src, size_t n)
 	return dest;
 }
 
-char *strchr(const char *s, int c)
-{
+char *strchr(const char *s, int c) {
 	for (;; s++) {
 		if (*s == (char)c) {
 			return (char *)s;

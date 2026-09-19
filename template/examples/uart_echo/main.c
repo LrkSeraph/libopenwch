@@ -47,8 +47,7 @@
  */
 #define UART_PIN_MAPPING	1
 
-static void console_init(void)
-{
+static void console_init(void) {
 	rcc_periph_clock_enable(RCC_USART1);
 	rcc_periph_clock_enable(RCC_AFIO);
 
@@ -87,16 +86,14 @@ static void console_init(void)
 	usart_enable(USART1);
 }
 
-static void console_puts(const char *s)
-{
+static void console_puts(const char *s) {
 	while (*s) {
 		usart_send_blocking(USART1, (uint8_t)*s++);
 	}
 }
 
 /** Print an unsigned value in decimal without pulling in printf. */
-static void console_putu(uint32_t value)
-{
+static void console_putu(uint32_t value) {
 	char buf[10];
 	int i = 0;
 
@@ -115,8 +112,7 @@ static void console_putu(uint32_t value)
 	}
 }
 
-int main(void)
-{
+int main(void) {
 	struct rcc_clock_scale clocks;
 	uint32_t count = 0;
 

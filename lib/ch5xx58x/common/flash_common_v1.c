@@ -43,8 +43,7 @@
 
 /* --- Factory information ------------------------------------------------- */
 
-void flash_get_unique_id(uint8_t *buf)
-{
+void flash_get_unique_id(uint8_t *buf) {
 	uint32_t lo;
 	uint32_t hi;
 
@@ -69,15 +68,13 @@ void flash_get_unique_id(uint8_t *buf)
 	buf[7] = 0;
 }
 
-uint8_t flash_get_chip_id(void)
-{
+uint8_t flash_get_chip_id(void) {
 	return FLASH_CHIP_ID;
 }
 
 /* --- Reading ------------------------------------------------------------- */
 
-void flash_read(uint32_t address, void *buf, uint32_t len)
-{
+void flash_read(uint32_t address, void *buf, uint32_t len) {
 	uint8_t *dst = (uint8_t *)buf;
 	uint32_t i;
 
@@ -88,8 +85,7 @@ void flash_read(uint32_t address, void *buf, uint32_t len)
 	}
 }
 
-void flash_rom_read(uint32_t address, void *buf, uint32_t len)
-{
+void flash_rom_read(uint32_t address, void *buf, uint32_t len) {
 	uint32_t *dst = (uint32_t *)buf;
 	const volatile uint32_t *src =
 		(const volatile uint32_t *)address;
@@ -108,8 +104,7 @@ void flash_rom_read(uint32_t address, void *buf, uint32_t len)
 
 /* --- Timing -------------------------------------------------------------- */
 
-void flash_set_latency(flash_latency_t latency)
-{
+void flash_set_latency(flash_latency_t latency) {
 	openwch_assert((latency == FLASH_LATENCY_PLL_FAST) ||
 		       (latency == FLASH_LATENCY_PLL) ||
 		       (latency == FLASH_LATENCY_HSE) ||
@@ -120,8 +115,7 @@ void flash_set_latency(flash_latency_t latency)
 
 /* --- Erase and program: not available in libopenwch ---------------------- */
 
-enum flash_status flash_erase_page(uint32_t address)
-{
+enum flash_status flash_erase_page(uint32_t address) {
 	/*
 	 * R8_FLASH_CFG selects the timing but there is no documented
 	 * erase/program register: on this family the operation is performed by
@@ -133,9 +127,11 @@ enum flash_status flash_erase_page(uint32_t address)
 	return FLASH_STATUS_UNSUPPORTED;
 }
 
-enum flash_status flash_program(uint32_t address, const void *buf,
-				uint32_t len)
-{
+enum flash_status flash_program(
+	uint32_t address,
+	const void *buf,
+	uint32_t len
+) {
 	(void)address;
 	(void)buf;
 	(void)len;

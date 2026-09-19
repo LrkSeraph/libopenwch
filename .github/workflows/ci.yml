@@ -145,6 +145,17 @@ jobs:
                 echo "::error::$line"
               done
 
+  style:
+    name: code style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # No toolchain install, deliberately: checkpatch.pl is Perl and the
+      # generated headers it skips come from irq2nvic_h, which is Python.
+      # `make stylecheck PREFIX=/nonexistent-tc-` is clean locally, so this
+      # job is a genuine gate rather than a report.
+      - run: make stylecheck
+
   nostdlib:
     name: freestanding (toolchain without newlib)
     runs-on: ubuntu-latest

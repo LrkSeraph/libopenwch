@@ -39,13 +39,11 @@
 #include <libopenwch/ch32v0/opa.h>
 #include <libopenwch/qingke/assert.h>
 
-void opa_reset(uint32_t exten)
-{
+void opa_reset(uint32_t exten) {
 	EXTEN_CTR(exten) &= ~(uint32_t)EXTEN_CTR_OPA_MASK;
 }
 
-void opa_set_inputs(uint32_t exten, opa_psel_t psel, opa_nsel_t nsel)
-{
+void opa_set_inputs(uint32_t exten, opa_psel_t psel, opa_nsel_t nsel) {
 	uint32_t reg = EXTEN_CTR(exten);
 
 	openwch_assert(psel <= OPA_PSEL_CHP1);
@@ -61,13 +59,11 @@ void opa_set_inputs(uint32_t exten, opa_psel_t psel, opa_nsel_t nsel)
 	EXTEN_CTR(exten) = reg;
 }
 
-void opa_enable(uint32_t exten)
-{
+void opa_enable(uint32_t exten) {
 	EXTEN_CTR(exten) |= EXTEN_CTR_OPA_EN;
 }
 
-void opa_disable(uint32_t exten)
-{
+void opa_disable(uint32_t exten) {
 	EXTEN_CTR(exten) &= ~(uint32_t)EXTEN_CTR_OPA_EN;
 }
 /**@}*/

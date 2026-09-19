@@ -95,8 +95,7 @@ BEGIN_DECLS
  * rwa_lock() can restore it.  Returns 0 if interrupts were already disabled,
  * in which case rwa_lock() must not re-enable them.
  */
-RWA_INLINE uint32_t rwa_unlock(void)
-{
+RWA_INLINE uint32_t rwa_unlock(void) {
 	uint32_t saved = 0;
 	uint32_t mstatus = mstatus_read();
 
@@ -118,8 +117,7 @@ RWA_INLINE uint32_t rwa_unlock(void)
 }
 
 /** Close the window opened by rwa_unlock() and restore the interrupt state. */
-RWA_INLINE void rwa_lock(uint32_t saved)
-{
+RWA_INLINE void rwa_lock(uint32_t saved) {
 	MMIO8(R8_SAFE_ACCESS_SIG) = SAFE_ACCESS_SIG0;
 
 	if (saved & CSR_MSTATUS_MIE) {
@@ -130,8 +128,7 @@ RWA_INLINE void rwa_lock(uint32_t saved)
 }
 
 /** True while a safe-access window is open. */
-RWA_INLINE bool rwa_is_unlocked(void)
-{
+RWA_INLINE bool rwa_is_unlocked(void) {
 	return (MMIO8(R8_SAFE_ACCESS_SIG) & RWA_STATUS_MODE) == RWA_STATUS_MODE;
 }
 
@@ -182,7 +179,8 @@ void rwa_close(void);
 	do { \
 		uint32_t rwa_saved_ = rwa_unlock(); \
 		uint32_t rwa_tmp_ = (reg); \
-		rwa_tmp_ = (rwa_tmp_ & ~(uint32_t)(mask)) | ((uint32_t)(value) & (uint32_t)(mask)); \
+		rwa_tmp_ = (rwa_tmp_ & ~(uint32_t)(mask)) | \
+			   ((uint32_t)(value) & (uint32_t)(mask)); \
 		(reg) = rwa_tmp_; \
 		rwa_lock(rwa_saved_); \
 	} while (0)

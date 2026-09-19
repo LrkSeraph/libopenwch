@@ -44,8 +44,7 @@
 
 void api_smoke(void);
 
-int main(void)
-{
+int main(void) {
 	/*
 	 * Take the address of the test body so that --gc-sections cannot
 	 * discard it.  The volatile pointer is never dereferenced.
@@ -59,8 +58,7 @@ int main(void)
 	}
 }
 
-void api_smoke(void)
-{
+void api_smoke(void) {
 	uint8_t buf[8];
 	uint32_t saved;
 

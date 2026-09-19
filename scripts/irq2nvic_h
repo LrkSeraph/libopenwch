@@ -137,8 +137,7 @@ TEMPLATE_VECTOR_HANDLERS_C = '''/* This file is part of the libopenwch project.
  * than in the core layer.  Applications may replace it by defining their own
  * non-weak blocking_handler().
  */
-void blocking_handler(void)
-{{
+void blocking_handler(void) {{
 	while (1) {{
 		;
 	}}
@@ -270,8 +269,8 @@ def convert(infile):
             irqdefinitions.append('#define %s_IRQ %d' % (cname.upper(), slot))
             isrprototypes.append('void %s(void);' % symbol)
             irqhandlers.append('#define %s_IRQHandler %s' % (cname.upper(), symbol))
-        isrdecls.append('void %s(void) __attribute__((weak, alias("blocking_handler")));'
-                        % symbol)
+        isrdecls.append('__attribute__((weak, alias("blocking_handler")))\n'
+                        'void %s(void);' % symbol)
         handler_entries.append('\t\t%s, /* [%2d] slot %2d %s */'
                                % (symbol, offset, slot,
                                   '' if slot in by_slot else '(reserved)'))

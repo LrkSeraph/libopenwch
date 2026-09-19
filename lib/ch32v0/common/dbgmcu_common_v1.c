@@ -41,33 +41,27 @@
 /* CSR 0x7c0: the CH32V00x debug control register (WCH calls it CFGR0). */
 #define DBGMCU_CSR_CONTROL	0x7c0
 
-uint32_t dbgmcu_get_revision_id(void)
-{
+uint32_t dbgmcu_get_revision_id(void) {
 	return DBGMCU_ID_WORD >> DBGMCU_ID_REVISION_SHIFT;
 }
 
-uint32_t dbgmcu_get_device_id(void)
-{
+uint32_t dbgmcu_get_device_id(void) {
 	return DBGMCU_ID_WORD & DBGMCU_ID_DEVICE_MASK;
 }
 
-uint32_t dbgmcu_get_control(void)
-{
+uint32_t dbgmcu_get_control(void) {
 	return OPENWCH_CSR_READ_NUM(DBGMCU_CSR_CONTROL);
 }
 
-void dbgmcu_set_control(uint32_t value)
-{
+void dbgmcu_set_control(uint32_t value) {
 	OPENWCH_CSR_WRITE_NUM(DBGMCU_CSR_CONTROL, value);
 }
 
-void dbgmcu_stop_peripheral(uint32_t mask)
-{
+void dbgmcu_stop_peripheral(uint32_t mask) {
 	dbgmcu_set_control(dbgmcu_get_control() | mask);
 }
 
-void dbgmcu_resume_peripheral(uint32_t mask)
-{
+void dbgmcu_resume_peripheral(uint32_t mask) {
 	dbgmcu_set_control(dbgmcu_get_control() & ~mask);
 }
 /**@}*/

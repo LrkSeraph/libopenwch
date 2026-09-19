@@ -44,14 +44,12 @@
 #include <libopenwch/qingke/assert.h>
 
 /** The CH58x has a single I2C block. */
-static void i2c_assert_valid(uint32_t i2c)
-{
+static void i2c_assert_valid(uint32_t i2c) {
 	openwch_assert(i2c == I2C1_BASE);
 }
 
 /** TRISE value WCH's own initialisation sequence uses. */
-static uint16_t i2c_rise_time(uint32_t sysclock, bool fast)
-{
+static uint16_t i2c_rise_time(uint32_t sysclock, bool fast) {
 	uint32_t mhz = sysclock / 1000000u;
 	uint32_t trise;
 
@@ -73,8 +71,7 @@ static uint16_t i2c_rise_time(uint32_t sysclock, bool fast)
 
 /* --- Clock generation ---------------------------------------------------- */
 
-void i2c_set_clock_frequency(uint32_t i2c)
-{
+void i2c_set_clock_frequency(uint32_t i2c) {
 	uint32_t sysclock;
 
 	i2c_assert_valid(i2c);
@@ -93,8 +90,7 @@ void i2c_set_clock_frequency(uint32_t i2c)
 
 /* --- Initialisation ------------------------------------------------------ */
 
-void i2c_init_master(uint32_t i2c, uint32_t speed)
-{
+void i2c_init_master(uint32_t i2c, uint32_t speed) {
 	uint32_t sysclock;
 	uint16_t ckcfgr;
 
@@ -141,8 +137,7 @@ void i2c_init_master(uint32_t i2c, uint32_t speed)
 	i2c_enable_ack(i2c);
 }
 
-void i2c_init_slave(uint32_t i2c, uint8_t address)
-{
+void i2c_init_slave(uint32_t i2c, uint8_t address) {
 	i2c_assert_valid(i2c);
 
 	i2c_software_reset(i2c);
@@ -155,15 +150,13 @@ void i2c_init_slave(uint32_t i2c, uint8_t address)
 
 /* --- Enable -------------------------------------------------------------- */
 
-void i2c_enable(uint32_t i2c)
-{
+void i2c_enable(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) |= RB_I2C_PE;
 }
 
-void i2c_disable(uint32_t i2c)
-{
+void i2c_disable(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) &= (uint16_t)~RB_I2C_PE;
@@ -171,36 +164,31 @@ void i2c_disable(uint32_t i2c)
 
 /* --- Bus control --------------------------------------------------------- */
 
-void i2c_send_start(uint32_t i2c)
-{
+void i2c_send_start(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) |= RB_I2C_START;
 }
 
-void i2c_send_stop(uint32_t i2c)
-{
+void i2c_send_stop(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) |= RB_I2C_STOP;
 }
 
-void i2c_send_data(uint32_t i2c, uint8_t data)
-{
+void i2c_send_data(uint32_t i2c, uint8_t data) {
 	i2c_assert_valid(i2c);
 
 	I2C_DATAR(i2c) = (uint16_t)(data & I2C_DATAR_MASK);
 }
 
-uint8_t i2c_read_data(uint32_t i2c)
-{
+uint8_t i2c_read_data(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	return (uint8_t)(I2C_DATAR(i2c) & I2C_DATAR_MASK);
 }
 
-void i2c_send_7bit_address(uint32_t i2c, uint8_t address, uint8_t read)
-{
+void i2c_send_7bit_address(uint32_t i2c, uint8_t address, uint8_t read) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x7fu);
 	openwch_assert(read <= 1u);
@@ -212,8 +200,7 @@ void i2c_send_7bit_address(uint32_t i2c, uint8_t address, uint8_t read)
 
 /* --- Own address --------------------------------------------------------- */
 
-void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address)
-{
+void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x7fu);
 
@@ -221,8 +208,7 @@ void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address)
 			| ((address << 1) & RB_I2C_ADD7_1));
 }
 
-void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address)
-{
+void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x3ffu);
 
@@ -230,8 +216,7 @@ void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address)
 			| ((address << 1) & (RB_I2C_ADD9_8 | RB_I2C_ADD7_1)));
 }
 
-void i2c_enable_dual_address(uint32_t i2c, uint8_t address)
-{
+void i2c_enable_dual_address(uint32_t i2c, uint8_t address) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x7fu);
 
@@ -239,8 +224,7 @@ void i2c_enable_dual_address(uint32_t i2c, uint8_t address)
 			| RB_I2C_ENDUAL);
 }
 
-void i2c_enable_general_call(uint32_t i2c)
-{
+void i2c_enable_general_call(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) |= RB_I2C_ENGC;
@@ -248,15 +232,13 @@ void i2c_enable_general_call(uint32_t i2c)
 
 /* --- Acknowledge --------------------------------------------------------- */
 
-void i2c_enable_ack(uint32_t i2c)
-{
+void i2c_enable_ack(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) |= RB_I2C_ACK;
 }
 
-void i2c_disable_ack(uint32_t i2c)
-{
+void i2c_disable_ack(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) &= (uint16_t)~RB_I2C_ACK;
@@ -264,23 +246,20 @@ void i2c_disable_ack(uint32_t i2c)
 
 /* --- PEC ----------------------------------------------------------------- */
 
-void i2c_enable_pec(uint32_t i2c)
-{
+void i2c_enable_pec(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	/* ENPEC computes the CRC; PEC asks for the byte to be transferred. */
 	I2C_CTRL1(i2c) |= RB_I2C_ENPEC | RB_I2C_PEC;
 }
 
-void i2c_disable_pec(uint32_t i2c)
-{
+void i2c_disable_pec(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL1(i2c) &= (uint16_t)~(RB_I2C_ENPEC | RB_I2C_PEC);
 }
 
-uint8_t i2c_get_pec(uint32_t i2c)
-{
+uint8_t i2c_get_pec(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	return I2C_PEC(i2c);
@@ -288,8 +267,7 @@ uint8_t i2c_get_pec(uint32_t i2c)
 
 /* --- Reset --------------------------------------------------------------- */
 
-void i2c_software_reset(uint32_t i2c)
-{
+void i2c_software_reset(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	/* SWRST is self-clearing once the block has been re-initialised, but
@@ -300,15 +278,13 @@ void i2c_software_reset(uint32_t i2c)
 
 /* --- Interrupts ---------------------------------------------------------- */
 
-void i2c_enable_interrupt(uint32_t i2c, uint32_t interrupt)
-{
+void i2c_enable_interrupt(uint32_t i2c, uint32_t interrupt) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL2(i2c) |= (uint16_t)(interrupt & I2C_CTRL2_IT_MASK);
 }
 
-void i2c_disable_interrupt(uint32_t i2c, uint32_t interrupt)
-{
+void i2c_disable_interrupt(uint32_t i2c, uint32_t interrupt) {
 	i2c_assert_valid(i2c);
 
 	I2C_CTRL2(i2c) &= (uint16_t)~(interrupt & I2C_CTRL2_IT_MASK);
@@ -316,8 +292,7 @@ void i2c_disable_interrupt(uint32_t i2c, uint32_t interrupt)
 
 /* --- Flags and interrupt status ------------------------------------------ */
 
-uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag)
-{
+uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag) {
 	uint16_t status = 0;
 
 	i2c_assert_valid(i2c);
@@ -338,8 +313,7 @@ uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag)
 	return (uint16_t)(status & (uint16_t)flag);
 }
 
-void i2c_clear_flag(uint32_t i2c, uint32_t flag)
-{
+void i2c_clear_flag(uint32_t i2c, uint32_t flag) {
 	i2c_assert_valid(i2c);
 	openwch_assert((flag & ~(uint32_t)I2C_FLAG_MASK) == 0);
 
@@ -360,16 +334,14 @@ void i2c_clear_flag(uint32_t i2c, uint32_t flag)
 	}
 }
 
-uint16_t i2c_get_interrupt_status(uint32_t i2c)
-{
+uint16_t i2c_get_interrupt_status(uint32_t i2c) {
 	i2c_assert_valid(i2c);
 
 	/* The error flags live in STAR1 and the state flags in STAR2. */
 	return (uint16_t)(I2C_STAR1(i2c) | I2C_STAR2(i2c));
 }
 
-void i2c_clear_interrupt_pending_bit(uint32_t i2c)
-{
+void i2c_clear_interrupt_pending_bit(uint32_t i2c) {
 	uint16_t star1;
 
 	i2c_assert_valid(i2c);

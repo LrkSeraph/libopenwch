@@ -58,27 +58,23 @@
 #define PFIC_BANK(id)	((id) >> 5)
 #define PFIC_BIT(id)	(1u << ((id) & 0x1f))
 
-static inline void pfic_check(uint32_t irqn)
-{
+static inline void pfic_check(uint32_t irqn) {
 	openwch_assert(irqn >= OPENWCH_IRQ_FIRST && irqn <= OPENWCH_IRQ_LAST);
 }
 
-void nvic_enable_irq(uint8_t irqn)
-{
+void nvic_enable_irq(uint8_t irqn) {
 	pfic_check(irqn);
 	PFIC->ienr[PFIC_BANK(irqn)] = PFIC_BIT(irqn);
 }
 
-void nvic_disable_irq(uint8_t irqn)
-{
+void nvic_disable_irq(uint8_t irqn) {
 	pfic_check(irqn);
 	PFIC->irer[PFIC_BANK(irqn)] = PFIC_BIT(irqn);
 	/* The QingKe pipeline may already have fetched the handler. */
 	qingke_fence_i();
 }
 
-uint8_t nvic_get_irq_enabled(uint8_t irqn)
-{
+uint8_t nvic_get_irq_enabled(uint8_t irqn) {
 	pfic_check(irqn);
 	/*
 	 * ienr is write-only on the PFIC; the enable state is read back through
@@ -87,61 +83,55 @@ uint8_t nvic_get_irq_enabled(uint8_t irqn)
 	return (PFIC->isr[PFIC_BANK(irqn)] & PFIC_BIT(irqn)) ? 1 : 0;
 }
 
-void nvic_set_pending_irq(uint8_t irqn)
-{
+void nvic_set_pending_irq(uint8_t irqn) {
 	pfic_check(irqn);
 	PFIC->ipsr[PFIC_BANK(irqn)] = PFIC_BIT(irqn);
 }
 
-void nvic_clear_pending_irq(uint8_t irqn)
-{
+void nvic_clear_pending_irq(uint8_t irqn) {
 	pfic_check(irqn);
 	PFIC->iprr[PFIC_BANK(irqn)] = PFIC_BIT(irqn);
 }
 
-uint8_t nvic_get_pending_irq(uint8_t irqn)
-{
+uint8_t nvic_get_pending_irq(uint8_t irqn) {
 	pfic_check(irqn);
 	return (PFIC->ipr[PFIC_BANK(irqn)] & PFIC_BIT(irqn)) ? 1 : 0;
 }
 
-uint8_t nvic_get_active_irq(uint8_t irqn)
-{
+uint8_t nvic_get_active_irq(uint8_t irqn) {
 	pfic_check(irqn);
 	return (PFIC->iactr[PFIC_BANK(irqn)] & PFIC_BIT(irqn)) ? 1 : 0;
 }
 
-void nvic_set_priority(uint8_t irqn, uint8_t priority)
-{
+void nvic_set_priority(uint8_t irqn, uint8_t priority) {
 	pfic_check(irqn);
 	/* iprior is a byte array indexed by interrupt id; bit 7 is the
 	 * pre-emption level and bits 6:4 the sub-priority. */
 	PFIC->iprior[irqn] = priority;
 }
 
-uint8_t nvic_get_priority(uint8_t irqn)
-{
+uint8_t nvic_get_priority(uint8_t irqn) {
 	pfic_check(irqn);
 	return PFIC->iprior[irqn];
 }
 
-void nvic_enable_irq_nesting(void)
-{
+void nvic_enable_irq_nesting(void) {
 	OPENWCH_CSR_SET_NUM(CSR_INTSYSCR, INTSYSCR_INEST);
 }
 
-void nvic_disable_irq_nesting(void)
-{
+void nvic_disable_irq_nesting(void) {
 	OPENWCH_CSR_CLEAR_NUM(CSR_INTSYSCR, INTSYSCR_INEST);
 }
 
-void nvic_set_irq_threshold(uint8_t threshold)
-{
+void nvic_set_irq_threshold(uint8_t threshold) {
 	PFIC->ithresdr = threshold;
 }
 
-void nvic_enable_fast_irq(uint8_t channel, uint8_t irqn, void (*handler)(void))
-{
+void nvic_enable_fast_irq(
+	uint8_t channel,
+	uint8_t irqn,
+	void (*handler)(void)
+) {
 	openwch_assert(channel < 4);
 	pfic_check(irqn);
 	PFIC->vtcfgr[channel] = irqn;
@@ -149,19 +139,16 @@ void nvic_enable_fast_irq(uint8_t channel, uint8_t irqn, void (*handler)(void))
 	PFIC->vtaddr[channel] = ((uint32_t)handler & ~1u) | 1u;
 }
 
-void nvic_disable_fast_irq(uint8_t channel)
-{
+void nvic_disable_fast_irq(uint8_t channel) {
 	openwch_assert(channel < 4);
 	PFIC->vtaddr[channel] = 0;
 }
 
-void nvic_generate_software_interrupt(void)
-{
+void nvic_generate_software_interrupt(void) {
 	PFIC->sctlr |= (1u << 31);
 }
 
-void qingke_system_reset(void)
-{
+void qingke_system_reset(void) {
 	PFIC->cfgr = PFIC_CFGR_SYS_RESET;
 	/* The reset is asynchronous; make sure nothing else executes. */
 	for (;;) {

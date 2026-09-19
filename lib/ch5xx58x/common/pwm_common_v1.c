@@ -56,8 +56,7 @@
  * neighbouring register.
  */
 
-void pwm_set_cycle(uint32_t pwm, uint32_t cycle)
-{
+void pwm_set_cycle(uint32_t pwm, uint32_t cycle) {
 	openwch_assert((cycle & ~(uint32_t)PWM_CYCLE_MASK) == 0);
 
 	/* The cycle generator is shared, so only its own two fields change. */
@@ -66,16 +65,14 @@ void pwm_set_cycle(uint32_t pwm, uint32_t cycle)
 					| (cycle & PWM_CYCLE_MASK));
 }
 
-void pwm_set_clock_divider(uint32_t pwm, uint32_t div)
-{
+void pwm_set_clock_divider(uint32_t pwm, uint32_t div) {
 	openwch_assert(div <= PWM_DATA_MASK);
 
 	/* The channel clock is (div + 1) * Tsys. */
 	PWM_CLOCK_DIV_REG(pwm) = (uint8_t)div;
 }
 
-void pwm_set_channel(uint32_t pwm, uint32_t channel, uint32_t duty)
-{
+void pwm_set_channel(uint32_t pwm, uint32_t channel, uint32_t duty) {
 	int index = pwm_channel_index(channel);
 
 	openwch_assert(index >= 0);
@@ -89,8 +86,7 @@ void pwm_set_channel(uint32_t pwm, uint32_t channel, uint32_t duty)
 	MMIO8(pwm + PWM_DATA_OFFSET((uint32_t)index)) = (uint8_t)duty;
 }
 
-void pwm_set_polarity(uint32_t pwm, uint32_t channel, uint32_t polarity)
-{
+void pwm_set_polarity(uint32_t pwm, uint32_t channel, uint32_t polarity) {
 	/* Only one channel can be described by one polarity bit at a time. */
 	uint32_t mask = (pwm_channel_index(channel) >= 0) ? channel : 0;
 
@@ -107,24 +103,21 @@ void pwm_set_polarity(uint32_t pwm, uint32_t channel, uint32_t polarity)
 	}
 }
 
-void pwm_enable_channel(uint32_t pwm, uint32_t channel)
-{
+void pwm_enable_channel(uint32_t pwm, uint32_t channel) {
 	openwch_assert(channel != 0);
 	openwch_assert((channel & ~(uint32_t)PWM_CH_ALL) == 0);
 
 	PWM_OUT_EN_REG(pwm) |= (uint8_t)channel;
 }
 
-void pwm_disable_channel(uint32_t pwm, uint32_t channel)
-{
+void pwm_disable_channel(uint32_t pwm, uint32_t channel) {
 	openwch_assert(channel != 0);
 	openwch_assert((channel & ~(uint32_t)PWM_CH_ALL) == 0);
 
 	PWM_OUT_EN_REG(pwm) &= (uint8_t)~channel;
 }
 
-void pwm_enable_alternate(uint32_t pwm, uint32_t channel)
-{
+void pwm_enable_alternate(uint32_t pwm, uint32_t channel) {
 	/*
 	 * "Alternate output" staggers a pair of channels onto the same pin: the
 	 * two channels drive their effective level one after the other instead

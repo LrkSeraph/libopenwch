@@ -39,48 +39,41 @@
 #include <libopenwch/ch32v0/wwdg.h>
 #include <libopenwch/qingke/assert.h>
 
-void wwdg_set_prescaler(uint32_t wwdg, uint32_t prescaler)
-{
+void wwdg_set_prescaler(uint32_t wwdg, uint32_t prescaler) {
 	openwch_assert((prescaler & ~WWDG_CFGR_WDGTB_MASK) == 0);
 
 	WWDG_CFGR(wwdg) = (WWDG_CFGR(wwdg) & ~WWDG_CFGR_WDGTB_MASK)
 			| (prescaler & WWDG_CFGR_WDGTB_MASK);
 }
 
-void wwdg_set_window(uint32_t wwdg, uint8_t window)
-{
+void wwdg_set_window(uint32_t wwdg, uint8_t window) {
 	openwch_assert((window & ~WWDG_CFGR_W_MASK) == 0);
 
 	WWDG_CFGR(wwdg) = (WWDG_CFGR(wwdg) & ~WWDG_CFGR_W_MASK)
 			| ((uint32_t)window & WWDG_CFGR_W_MASK);
 }
 
-void wwdg_enable_interrupt(uint32_t wwdg)
-{
+void wwdg_enable_interrupt(uint32_t wwdg) {
 	WWDG_CFGR(wwdg) |= WWDG_CFGR_EWI;
 }
 
-void wwdg_set_counter(uint32_t wwdg, uint8_t counter)
-{
+void wwdg_set_counter(uint32_t wwdg, uint8_t counter) {
 	openwch_assert((counter & ~WWDG_CTLR_T_MASK) == 0);
 
 	WWDG_CTLR(wwdg) = counter;
 }
 
-void wwdg_enable(uint32_t wwdg, uint8_t counter)
-{
+void wwdg_enable(uint32_t wwdg, uint8_t counter) {
 	openwch_assert((counter & ~WWDG_CTLR_T_MASK) == 0);
 
 	WWDG_CTLR(wwdg) = WWDG_CTLR_WDGA | counter;
 }
 
-uint8_t wwdg_get_flag(uint32_t wwdg)
-{
+uint8_t wwdg_get_flag(uint32_t wwdg) {
 	return (uint8_t)(WWDG_STATR(wwdg) & WWDG_STATR_EWIF);
 }
 
-void wwdg_clear_flag(uint32_t wwdg)
-{
+void wwdg_clear_flag(uint32_t wwdg) {
 	WWDG_STATR(wwdg) = 0;
 }
 /**@}*/

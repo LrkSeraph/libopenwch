@@ -68,43 +68,35 @@
 #define ADC_SAMPTR_SPLIT_CHANNEL	10u
 #define ADC_SAMPTR_SMP_BITS		3u
 
-void adc_enable(uint32_t adc)
-{
+void adc_enable(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_ADON;
 }
 
-void adc_disable(uint32_t adc)
-{
+void adc_disable(uint32_t adc) {
 	ADC_CTLR2(adc) &= ~ADC_CTLR2_ADON;
 }
 
-void adc_start_conversion_regular(uint32_t adc)
-{
+void adc_start_conversion_regular(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_SWSTART;
 }
 
-void adc_start_conversion_injected(uint32_t adc)
-{
+void adc_start_conversion_injected(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_JSWSTART;
 }
 
-void adc_set_continuous_conversion_mode(uint32_t adc)
-{
+void adc_set_continuous_conversion_mode(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_CONT;
 }
 
-void adc_set_single_conversion_mode(uint32_t adc)
-{
+void adc_set_single_conversion_mode(uint32_t adc) {
 	ADC_CTLR2(adc) &= ~ADC_CTLR2_CONT;
 }
 
-void adc_set_scan_mode(uint32_t adc)
-{
+void adc_set_scan_mode(uint32_t adc) {
 	ADC_CTLR1(adc) |= ADC_CTLR1_SCAN;
 }
 
-void adc_set_channel(uint32_t adc, uint8_t channel, uint8_t rank)
-{
+void adc_set_channel(uint32_t adc, uint8_t channel, uint8_t rank) {
 	uint32_t reg;
 	uint32_t shift;
 	uint32_t length;
@@ -143,9 +135,11 @@ void adc_set_channel(uint32_t adc, uint8_t channel, uint8_t rank)
 	}
 }
 
-void adc_set_sample_time(uint32_t adc, uint8_t channel,
-			 enum adc_sample_time time)
-{
+void adc_set_sample_time(
+	uint32_t adc,
+	uint8_t channel,
+	enum adc_sample_time time
+) {
 	uint32_t shift;
 	uint32_t reg;
 
@@ -166,9 +160,10 @@ void adc_set_sample_time(uint32_t adc, uint8_t channel,
 	}
 }
 
-void adc_set_sample_time_on_all_channels(uint32_t adc,
-					 enum adc_sample_time time)
-{
+void adc_set_sample_time_on_all_channels(
+	uint32_t adc,
+	enum adc_sample_time time
+) {
 	uint32_t all;
 
 	openwch_assert(((uint32_t)time & ~ADC_SAMPTR_SMP_MASK) == 0);
@@ -188,44 +183,37 @@ void adc_set_sample_time_on_all_channels(uint32_t adc,
 	ADC_SAMPTR2(adc) = all & ADC_SAMPTR2_SMP_MASK;
 }
 
-void adc_set_right_aligned(uint32_t adc)
-{
+void adc_set_right_aligned(uint32_t adc) {
 	ADC_CTLR2(adc) &= ~ADC_CTLR2_ALIGN;
 }
 
-void adc_set_external_trigger_regular(uint32_t adc, uint32_t trigger)
-{
+void adc_set_external_trigger_regular(uint32_t adc, uint32_t trigger) {
 	openwch_assert((trigger & ~ADC_CTLR2_EXTSEL_MASK) == 0);
 
 	ADC_CTLR2(adc) = (ADC_CTLR2(adc) & ~ADC_CTLR2_EXTSEL_MASK)
 		| (trigger & ADC_CTLR2_EXTSEL_MASK);
 }
 
-void adc_set_external_trigger_injected(uint32_t adc, uint32_t trigger)
-{
+void adc_set_external_trigger_injected(uint32_t adc, uint32_t trigger) {
 	openwch_assert((trigger & ~ADC_CTLR2_JEXTSEL_MASK) == 0);
 
 	ADC_CTLR2(adc) = (ADC_CTLR2(adc) & ~ADC_CTLR2_JEXTSEL_MASK)
 		| (trigger & ADC_CTLR2_JEXTSEL_MASK);
 }
 
-void adc_enable_external_trigger_regular(uint32_t adc)
-{
+void adc_enable_external_trigger_regular(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_EXTTRIG;
 }
 
-void adc_disable_external_trigger_regular(uint32_t adc)
-{
+void adc_disable_external_trigger_regular(uint32_t adc) {
 	ADC_CTLR2(adc) &= ~ADC_CTLR2_EXTTRIG;
 }
 
-uint16_t adc_read_regular(uint32_t adc)
-{
+uint16_t adc_read_regular(uint32_t adc) {
 	return (uint16_t)(ADC_RDATAR(adc) & ADC_RDATAR_DATA_MASK);
 }
 
-uint16_t adc_read_injected(uint32_t adc, uint8_t rank)
-{
+uint16_t adc_read_injected(uint32_t adc, uint8_t rank) {
 	switch (rank) {
 	case 1:
 		return (uint16_t)(ADC_IDATAR1(adc) & ADC_IDATAR_JDATA_MASK);
@@ -241,8 +229,7 @@ uint16_t adc_read_injected(uint32_t adc, uint8_t rank)
 	}
 }
 
-void adc_set_injected_offset(uint32_t adc, uint8_t rank, uint16_t offset)
-{
+void adc_set_injected_offset(uint32_t adc, uint8_t rank, uint16_t offset) {
 	uint32_t value;
 
 	openwch_assert(rank >= 1u);
@@ -267,13 +254,11 @@ void adc_set_injected_offset(uint32_t adc, uint8_t rank, uint16_t offset)
 	}
 }
 
-void adc_enable_dma(uint32_t adc)
-{
+void adc_enable_dma(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_DMA;
 }
 
-void adc_disable_dma(uint32_t adc)
-{
+void adc_disable_dma(uint32_t adc) {
 	ADC_CTLR2(adc) &= ~ADC_CTLR2_DMA;
 }
 
@@ -282,18 +267,15 @@ void adc_disable_dma(uint32_t adc)
  * reference, as on the STM32 parts the block derives from: a single bit
  * enables the pair, so both helpers touch the same bit.
  */
-void adc_enable_temperature_sensor(uint32_t adc)
-{
+void adc_enable_temperature_sensor(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_TSVREFE;
 }
 
-void adc_enable_vrefint(uint32_t adc)
-{
+void adc_enable_vrefint(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_TSVREFE;
 }
 
-void adc_reset_calibration(uint32_t adc)
-{
+void adc_reset_calibration(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_RSTCAL;
 
 	/* The hardware clears RSTCAL when the reset sequence has finished. */
@@ -302,8 +284,7 @@ void adc_reset_calibration(uint32_t adc)
 	}
 }
 
-void adc_start_calibration(uint32_t adc)
-{
+void adc_start_calibration(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_CAL;
 
 	/* The hardware clears CAL when the calibration has finished. */
@@ -312,13 +293,11 @@ void adc_start_calibration(uint32_t adc)
 	}
 }
 
-bool adc_is_calibration_complete(uint32_t adc)
-{
+bool adc_is_calibration_complete(uint32_t adc) {
 	return (ADC_CTLR2(adc) & ADC_CTLR2_CAL) == 0;
 }
 
-void adc_set_calibration_voltage(uint32_t adc, uint32_t calvol)
-{
+void adc_set_calibration_voltage(uint32_t adc, uint32_t calvol) {
 	openwch_assert(calvol == ADC_CALVOL_DISABLE
 		       || calvol == ADC_CALVOL_50PERCENT
 		       || calvol == ADC_CALVOL_75PERCENT);
@@ -327,9 +306,11 @@ void adc_set_calibration_voltage(uint32_t adc, uint32_t calvol)
 		| (calvol & ADC_CTLR1_CALVOLSELECT_MASK);
 }
 
-void adc_set_external_trigger_delay(uint32_t adc, uint32_t source,
-				    uint16_t delay)
-{
+void adc_set_external_trigger_delay(
+	uint32_t adc,
+	uint32_t source,
+	uint16_t delay
+) {
 	openwch_assert(source == ADC_DLYR_SOURCE_REGULAR
 		       || source == ADC_DLYR_SOURCE_INJECTED);
 	openwch_assert((delay & ~ADC_DLYR_DLYVLU_MASK) == 0);
@@ -340,46 +321,39 @@ void adc_set_external_trigger_delay(uint32_t adc, uint32_t source,
 		| ((uint32_t)delay & ADC_DLYR_DLYVLU_MASK);
 }
 
-void adc_enable_analog_watchdog_regular(uint32_t adc)
-{
+void adc_enable_analog_watchdog_regular(uint32_t adc) {
 	ADC_CTLR1(adc) |= ADC_CTLR1_AWDEN;
 }
 
-void adc_set_watchdog_high_threshold(uint32_t adc, uint16_t threshold)
-{
+void adc_set_watchdog_high_threshold(uint32_t adc, uint16_t threshold) {
 	openwch_assert((threshold & ~ADC_WDHTR_HT_MASK) == 0);
 
 	ADC_WDHTR(adc) = (uint32_t)threshold & ADC_WDHTR_HT_MASK;
 }
 
-void adc_set_watchdog_low_threshold(uint32_t adc, uint16_t threshold)
-{
+void adc_set_watchdog_low_threshold(uint32_t adc, uint16_t threshold) {
 	openwch_assert((threshold & ~ADC_WDLTR_LT_MASK) == 0);
 
 	ADC_WDLTR(adc) = (uint32_t)threshold & ADC_WDLTR_LT_MASK;
 }
 
-void adc_enable_irq(uint32_t adc, uint32_t irq)
-{
+void adc_enable_irq(uint32_t adc, uint32_t irq) {
 	openwch_assert((irq & ~ADC_IRQ_MASK) == 0);
 
 	ADC_CTLR1(adc) |= irq;
 }
 
-void adc_disable_irq(uint32_t adc, uint32_t irq)
-{
+void adc_disable_irq(uint32_t adc, uint32_t irq) {
 	openwch_assert((irq & ~ADC_IRQ_MASK) == 0);
 
 	ADC_CTLR1(adc) &= ~irq;
 }
 
-uint32_t adc_get_flag(uint32_t adc, uint32_t flag)
-{
+uint32_t adc_get_flag(uint32_t adc, uint32_t flag) {
 	return ADC_STATR(adc) & flag;
 }
 
-void adc_clear_flag(uint32_t adc, uint32_t flag)
-{
+void adc_clear_flag(uint32_t adc, uint32_t flag) {
 	/*
 	 * STATR is clear-on-write-0, so the bits to clear are written as 0
 	 * and every other bit as 1.  The reserved bits read as zero and

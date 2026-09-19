@@ -2454,12 +2454,22 @@ sub process {
 			     "Prefer dev_$level(... to dev_printk(KERN_$orig, ...\n" . $herecurr);
 		}
 
-# function brace can't be on same line, except for #defines of do while,
-# or if closed on same line
-		if (($line=~/$Type\s*$Ident\(.*\).*\s\{/) and
-		    !($line=~/\#\s*define.*do\s\{/) and !($line=~/}/)) {
+# libopenwch house style: the opening brace of a function definition belongs on
+# the same line as the closing parenthesis, and a parameter list too long for
+# one line is broken with ')' and '{' together on their own line.  This is the
+# opposite of the upstream kernel rule, so the check is inverted rather than
+# dropped: what is now an error is the lone '{' left on the line *after* a
+# function signature.  Rules for if/while/for braces are unaffected.
+#
+# Lines led by a control keyword (or '}' / 'else' / 'do') are excluded so that
+# this reports function definitions only; the kernel-style checks above and
+# below already cover control statements.
+		if (($line =~ /^.\s*\{\s*$/) and
+		    ($prevline =~ /\)\s*$/) and
+		    !($prevline =~ /^.\s*(?:\}|else|do)\s*$/) and
+		    !($prevline =~ /^.\s*(?:if|for|while|switch|else|do)\b/)) {
 			ERROR("OPEN_BRACE",
-			      "open brace '{' following function declarations go on the next line\n" . $herecurr);
+			      "open brace '{' for a function definition should be on the same line as the ')'\n" . $hereprev);
 		}
 
 # open braces for enum, union and struct go on the same line.
@@ -3231,7 +3241,11 @@ sub process {
 				my $cnt = statement_rawlines($block);
 
 				for (my $n = 0; $n < $cnt; $n++) {
-					$herectx .= raw_line($linenr, $n) . "\n";
+					# raw_line() returns undef once the index runs
+					# past the end of the buffer; concatenating that
+					# printed a Perl warning on every run.
+					my $rl = raw_line($linenr, $n);
+					$herectx .= (defined $rl ? $rl : "") . "\n";
 				}
 
 				WARN("BRACES",

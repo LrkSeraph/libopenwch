@@ -45,51 +45,44 @@ LGPL License Terms @ref lgpl_license
 BEGIN_DECLS
 
 /* Enable global interrupts (sets mstatus.MIE). */
-static inline void qingke_irq_enable(void)
-{
+static inline void qingke_irq_enable(void) {
 	OPENWCH_CSR_SET_NUM(0x300, CSR_MSTATUS_MIE);
 }
 
 /* Disable global interrupts (clears mstatus.MIE) and synchronise the
  * instruction stream, because the QingKe pipeline may have already fetched
  * instructions from the interrupt path. */
-static inline void qingke_irq_disable(void)
-{
+static inline void qingke_irq_disable(void) {
 	OPENWCH_CSR_CLEAR_NUM(0x300, CSR_MSTATUS_MIE);
 	qingke_fence_i();
 }
 
 /* Return the current mstatus value; pass it to qingke_irq_restore(). */
-static inline uint32_t qingke_irq_save(void)
-{
+static inline uint32_t qingke_irq_save(void) {
 	return mstatus_read();
 }
 
 /* Restore mstatus as saved by qingke_irq_save(). */
-static inline void qingke_irq_restore(uint32_t state)
-{
+static inline void qingke_irq_restore(uint32_t state) {
 	mstatus_write(state);
 }
 
 /* Disable interrupts and return the previous state. */
-static inline uint32_t qingke_irq_lock(void)
-{
+static inline uint32_t qingke_irq_lock(void) {
 	uint32_t state = qingke_irq_save();
 	qingke_irq_disable();
 	return state;
 }
 
 /* Re-enable interrupts if they were enabled before qingke_irq_lock(). */
-static inline void qingke_irq_unlock(uint32_t state)
-{
+static inline void qingke_irq_unlock(uint32_t state) {
 	if (state & CSR_MSTATUS_MIE) {
 		qingke_irq_enable();
 	}
 }
 
 /* Test whether global interrupts are currently enabled. */
-static inline bool qingke_irq_enabled(void)
-{
+static inline bool qingke_irq_enabled(void) {
 	return (mstatus_read() & CSR_MSTATUS_MIE) != 0;
 }
 

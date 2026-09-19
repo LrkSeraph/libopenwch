@@ -40,8 +40,7 @@
 #include <libopenwch/qingke/assert.h>
 
 /** Pins that actually exist on a port, for argument validation. */
-static uint32_t gpio_port_pin_mask(uint32_t gpioport)
-{
+static uint32_t gpio_port_pin_mask(uint32_t gpioport) {
 	if (gpioport == GPIOB_BASE) {
 		return (1u << GPIOB_PIN_COUNT) - 1u;
 	}
@@ -53,8 +52,7 @@ static uint32_t gpio_port_pin_mask(uint32_t gpioport)
 	return 0;
 }
 
-void gpio_set_mode(uint32_t gpioport, uint32_t mode, uint32_t gpios)
-{
+void gpio_set_mode(uint32_t gpioport, uint32_t mode, uint32_t gpios) {
 	/*
 	 * R32_Px_PD_DRV is overloaded: as an input it enables the pull-down,
 	 * as an output it selects 20 mA instead of 5 mA.  Rather than juggling
@@ -93,55 +91,46 @@ void gpio_set_mode(uint32_t gpioport, uint32_t mode, uint32_t gpios)
 	}
 }
 
-void gpio_set(uint32_t gpioport, uint32_t gpios)
-{
+void gpio_set(uint32_t gpioport, uint32_t gpios) {
 	GPIO_OUT(gpioport) |= gpios;
 }
 
-void gpio_clear(uint32_t gpioport, uint32_t gpios)
-{
+void gpio_clear(uint32_t gpioport, uint32_t gpios) {
 	/* R32_Px_CLR is write-1-to-clear, so no read-modify-write is needed and
 	 * clearing cannot disturb another pin. */
 	GPIO_CLR(gpioport) = gpios;
 }
 
-void gpio_toggle(uint32_t gpioport, uint32_t gpios)
-{
+void gpio_toggle(uint32_t gpioport, uint32_t gpios) {
 	GPIO_OUT(gpioport) ^= gpios;
 }
 
-uint32_t gpio_get(uint32_t gpioport, uint32_t gpios)
-{
+uint32_t gpio_get(uint32_t gpioport, uint32_t gpios) {
 	return GPIO_PIN(gpioport) & gpios;
 }
 
-uint32_t gpio_port_read(uint32_t gpioport)
-{
+uint32_t gpio_port_read(uint32_t gpioport) {
 	return GPIO_PIN(gpioport);
 }
 
-void gpio_port_write(uint32_t gpioport, uint32_t data)
-{
+void gpio_port_write(uint32_t gpioport, uint32_t data) {
 	GPIO_OUT(gpioport) = data;
 }
 
 /* --- Interrupts ---------------------------------------------------------- */
 
 /** R16_Px_INT_EN for a port. */
-static volatile uint16_t *gpio_irq_en_reg(uint32_t gpioport)
-{
+static volatile uint16_t *gpio_irq_en_reg(uint32_t gpioport) {
 	return (gpioport == GPIOB_BASE) ? &MMIO16(R16_PB_INT_EN)
 					: &MMIO16(R16_PA_INT_EN);
 }
 
-static volatile uint16_t *gpio_irq_mode_reg(uint32_t gpioport)
-{
+static volatile uint16_t *gpio_irq_mode_reg(uint32_t gpioport) {
 	return (gpioport == GPIOB_BASE) ? &MMIO16(R16_PB_INT_MODE)
 					: &MMIO16(R16_PA_INT_MODE);
 }
 
-static volatile uint16_t *gpio_irq_flag_reg(uint32_t gpioport)
-{
+static volatile uint16_t *gpio_irq_flag_reg(uint32_t gpioport) {
 	return (gpioport == GPIOB_BASE) ? &MMIO16(R16_PB_INT_IF)
 					: &MMIO16(R16_PA_INT_IF);
 }
@@ -157,8 +146,7 @@ static volatile uint16_t *gpio_irq_flag_reg(uint32_t gpioport)
 #define GPIO_IRQ_ALIAS_PINS	(GPIO22 | GPIO23)
 #define GPIO_IRQ_ALIAS_SHIFT	14
 
-static uint32_t gpio_irq_fold(uint32_t gpioport, uint32_t gpios)
-{
+static uint32_t gpio_irq_fold(uint32_t gpioport, uint32_t gpios) {
 	if (gpioport != GPIOB_BASE) {
 		return gpios;
 	}
@@ -176,8 +164,7 @@ static uint32_t gpio_irq_fold(uint32_t gpioport, uint32_t gpios)
 		| ((gpios & GPIO_IRQ_ALIAS_PINS) >> GPIO_IRQ_ALIAS_SHIFT);
 }
 
-void gpio_set_irq_mode(uint32_t gpioport, uint32_t gpios, uint32_t mode)
-{
+void gpio_set_irq_mode(uint32_t gpioport, uint32_t gpios, uint32_t mode) {
 	uint32_t mask = gpio_irq_fold(gpioport, gpios);
 
 	openwch_assert((gpios & ~gpio_port_pin_mask(gpioport)) == 0);
@@ -202,31 +189,26 @@ void gpio_set_irq_mode(uint32_t gpioport, uint32_t gpios, uint32_t mode)
 	*gpio_irq_en_reg(gpioport) |= (uint16_t)mask;
 }
 
-uint32_t gpio_get_irq_flag(uint32_t gpioport)
-{
+uint32_t gpio_get_irq_flag(uint32_t gpioport) {
 	return *gpio_irq_flag_reg(gpioport);
 }
 
-void gpio_clear_irq_flag(uint32_t gpioport, uint32_t gpios)
-{
+void gpio_clear_irq_flag(uint32_t gpioport, uint32_t gpios) {
 	/* R16_Px_INT_IF is RW1: write the mask to clear. */
 	*gpio_irq_flag_reg(gpioport) = (uint16_t)gpio_irq_fold(gpioport, gpios);
 }
 
 /* --- Alternate function and analog input --------------------------------- */
 
-void gpio_pin_remap(uint32_t remap)
-{
+void gpio_pin_remap(uint32_t remap) {
 	GPIO_PIN_ALTERNATE |= (uint16_t)remap;
 }
 
-void gpio_analog_enable(uint32_t analog)
-{
+void gpio_analog_enable(uint32_t analog) {
 	GPIO_PIN_ANALOG_IE |= (uint16_t)analog;
 }
 
-void gpio_analog_disable(uint32_t analog)
-{
+void gpio_analog_disable(uint32_t analog) {
 	GPIO_PIN_ANALOG_IE &= (uint16_t)~analog;
 }
 /**@}*/

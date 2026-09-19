@@ -114,13 +114,11 @@ BEGIN_DECLS
 #define intsyscr_write(v)	OPENWCH_CSR_WRITE_NUM(0x804, (v))
 
 /* Memory ordering helper used around peripheral register sequences. */
-static inline void qingke_fence_i(void)
-{
+static inline void qingke_fence_i(void) {
 	__asm__ volatile ("fence.i" ::: "memory");
 }
 
-static inline void qingke_nop(void)
-{
+static inline void qingke_nop(void) {
 	__asm__ volatile ("nop");
 }
 

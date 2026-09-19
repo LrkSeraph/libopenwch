@@ -1,18 +1,38 @@
 # libopenwch formatting
 #
-# The library follows the Linux kernel coding style, which libopencm3 also
-# uses.  Tabs are 8 columns wide; clang-format is configured to match that as
-# closely as it can, so that a stray `clang-format` run does not reformat the
-# whole tree.
+# The rules that matter are enforced by `make stylecheck` (scripts/checkpatch.pl,
+# house rules patched in); this file exists so that editors and clang-format
+# agree with it.
+#
+# House style for function definitions:
+#
+#     int foo(int a) {
+#     }
+#
+#     __attribute__((xxx))
+#     void bar(
+#     	int a,
+#     	int b
+#     ) {
+#     	foo(a);
+#     }
+#
+# clang-format cannot express the closing ") {" on a line of its own, so treat
+# `make stylecheck` as the authority and this file as a best effort.
+#
+# BreakAfterAttributes needs clang-format 17 or newer; older releases ignore it.
 BasedOnStyle: LLVM
 IndentWidth: 8
 TabWidth: 8
 UseTab: Always
 ColumnLimit: 80
-BreakBeforeBraces: Linux
+BreakBeforeBraces: Attach
+BreakAfterAttributes: Always
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: false
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false
 IndentCaseLabels: false
 PointerAlignment: Right
 AlignAfterOpenBracket: Align

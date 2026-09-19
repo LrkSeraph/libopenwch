@@ -46,15 +46,13 @@
 #define DELAY_LOOPS		600000u
 
 /** Busy-wait for a while.  `volatile` keeps the loop from being removed. */
-static void delay(volatile uint32_t loops)
-{
+static void delay(volatile uint32_t loops) {
 	while (loops--) {
 		__asm__ volatile ("nop");
 	}
 }
 
-int main(void)
-{
+int main(void) {
 	struct rcc_clock_scale clocks;
 
 	/* Run at 48 MHz from the internal 24 MHz RC oscillator and its PLL. */

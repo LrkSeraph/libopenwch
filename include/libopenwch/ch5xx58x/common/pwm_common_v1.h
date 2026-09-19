@@ -139,8 +139,7 @@ index within the data-register block, so the same constant addresses both.
  * rather than __builtin_ctz() on purpose: the builtin would make the library
  * depend on the libgcc __ctzsi2 helper.
  */
-static inline int pwm_channel_index(uint32_t channel)
-{
+static inline int pwm_channel_index(uint32_t channel) {
 	switch (channel) {
 	case PWM_CH4:
 		return 0;

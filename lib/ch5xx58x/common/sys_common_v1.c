@@ -45,38 +45,31 @@
 #include <libopenwch/qingke/pfic.h>
 #include <libopenwch/qingke/systick.h>
 
-void sys_reset(void)
-{
+void sys_reset(void) {
 	qingke_system_reset();
 }
 
-uint32_t sys_get_systick_count(void)
-{
+uint32_t sys_get_systick_count(void) {
 	return systick_get_value();
 }
 
-uint8_t sys_get_chip_id(void)
-{
+uint8_t sys_get_chip_id(void) {
 	return SYS_CHIP_ID;
 }
 
-sys_reset_status_t sys_get_reset_status(void)
-{
+sys_reset_status_t sys_get_reset_status(void) {
 	return (sys_reset_status_t)(SYS_RESET_STATUS & RB_RESET_FLAG);
 }
 
-uint8_t sys_reset_keep(void)
-{
+uint8_t sys_reset_keep(void) {
 	return SYS_GLOB_RESET_KEEP;
 }
 
-void sys_set_reset_keep(uint8_t value)
-{
+void sys_set_reset_keep(uint8_t value) {
 	SYS_GLOB_RESET_KEEP = value;
 }
 
-void sys_disable_all_irq(uint32_t *saved)
-{
+void sys_disable_all_irq(uint32_t *saved) {
 	openwch_assert(saved != NULL);
 
 	/*
@@ -93,8 +86,7 @@ void sys_disable_all_irq(uint32_t *saved)
 	qingke_fence_i();
 }
 
-void sys_recover_irq(uint32_t saved)
-{
+void sys_recover_irq(uint32_t saved) {
 	/* IENR is write-1-to-set, so this cannot clear anything. */
 	PFIC->ienr[0] = saved << 8;
 	PFIC->ienr[1] = saved >> 24;

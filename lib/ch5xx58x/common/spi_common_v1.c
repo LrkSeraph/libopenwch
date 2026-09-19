@@ -45,8 +45,7 @@
 #include <libopenwch/qingke/assert.h>
 
 /** Reject anything that is not one of the two SPI blocks. */
-static void spi_assert_valid(uint32_t spi)
-{
+static void spi_assert_valid(uint32_t spi) {
 	openwch_assert(spi == SPI0_BASE || spi == SPI1_BASE);
 }
 
@@ -55,15 +54,13 @@ static void spi_assert_valid(uint32_t spi)
  * as SPI0's MOSI_OE/MISO_OE, so the stored mode bit is the only thing that
  * tells the two roles apart.
  */
-static bool spi_is_slave(uint32_t spi)
-{
+static bool spi_is_slave(uint32_t spi) {
 	return (SPI_CTRL_MOD(spi) & RB_SPI_MODE_SLAVE) != 0;
 }
 
 /* --- Configuration ------------------------------------------------------- */
 
-void spi_set_clock_divider(uint32_t spi, uint8_t div)
-{
+void spi_set_clock_divider(uint32_t spi, uint8_t div) {
 	spi_assert_valid(spi);
 	openwch_assert(div != 0);
 
@@ -82,8 +79,7 @@ void spi_set_clock_divider(uint32_t spi, uint8_t div)
 }
 
 /** Apply the mode-0/mode-3 and bit-order part of the data mode. */
-static void spi_set_mode(uint32_t spi, spi_mode_t mode)
-{
+static void spi_set_mode(uint32_t spi, spi_mode_t mode) {
 	openwch_assert(mode >= SPI_MODE0_LSB && mode <= SPI_MODE3_MSB);
 
 	if (mode == SPI_MODE3_LSB || mode == SPI_MODE3_MSB) {
@@ -99,8 +95,7 @@ static void spi_set_mode(uint32_t spi, spi_mode_t mode)
 	}
 }
 
-void spi_init_master(uint32_t spi, uint8_t clock_div, spi_mode_t mode)
-{
+void spi_init_master(uint32_t spi, uint8_t clock_div, spi_mode_t mode) {
 	spi_assert_valid(spi);
 	openwch_assert(clock_div != 0);
 
@@ -116,8 +111,7 @@ void spi_init_master(uint32_t spi, uint8_t clock_div, spi_mode_t mode)
 	spi_set_mode(spi, mode);
 }
 
-void spi_init_slave(uint32_t spi, spi_mode_t mode)
-{
+void spi_init_slave(uint32_t spi, spi_mode_t mode) {
 	spi_assert_valid(spi);
 
 	SPI_CTRL_MOD(spi) = RB_SPI_ALL_CLEAR;
@@ -143,8 +137,7 @@ void spi_init_slave(uint32_t spi, spi_mode_t mode)
 
 /* --- Enable -------------------------------------------------------------- */
 
-void spi_enable(uint32_t spi)
-{
+void spi_enable(uint32_t spi) {
 	spi_assert_valid(spi);
 
 	if (spi_is_slave(spi)) {
@@ -154,8 +147,7 @@ void spi_enable(uint32_t spi)
 	}
 }
 
-void spi_disable(uint32_t spi)
-{
+void spi_disable(uint32_t spi) {
 	spi_assert_valid(spi);
 
 	SPI_CTRL_MOD(spi) &= (uint8_t)~SPI_CTRL_MOD_OE_MASK;
@@ -163,8 +155,7 @@ void spi_disable(uint32_t spi)
 
 /* --- Single byte --------------------------------------------------------- */
 
-void spi_send(uint32_t spi, uint8_t data)
-{
+void spi_send(uint32_t spi, uint8_t data) {
 	spi_assert_valid(spi);
 
 	SPI_CTRL_MOD(spi) &= (uint8_t)~RB_SPI_FIFO_DIR;
@@ -182,8 +173,7 @@ void spi_send(uint32_t spi, uint8_t data)
 	}
 }
 
-uint8_t spi_recv(uint32_t spi)
-{
+uint8_t spi_recv(uint32_t spi) {
 	uint8_t data;
 
 	spi_assert_valid(spi);
@@ -208,8 +198,7 @@ uint8_t spi_recv(uint32_t spi)
 	return data;
 }
 
-uint8_t spi_xfer(uint32_t spi, uint8_t data)
-{
+uint8_t spi_xfer(uint32_t spi, uint8_t data) {
 	/*
 	 * The CH58x FIFO is unidirectional for the duration of a transfer, so
 	 * a byte cannot be shifted in and out of BUFFER at the same time.
@@ -223,8 +212,7 @@ uint8_t spi_xfer(uint32_t spi, uint8_t data)
 /* --- Block transfer ------------------------------------------------------ */
 
 /** Push `len` bytes through the FIFO in the currently selected direction. */
-static void spi_fifo_write(uint32_t spi, const uint8_t *buf, uint16_t len)
-{
+static void spi_fifo_write(uint32_t spi, const uint8_t *buf, uint16_t len) {
 	uint16_t sent = 0;
 
 	while (sent < len) {
@@ -241,8 +229,7 @@ static void spi_fifo_write(uint32_t spi, const uint8_t *buf, uint16_t len)
 }
 
 /** Drain `len` bytes from the FIFO in the currently selected direction. */
-static void spi_fifo_read(uint32_t spi, uint8_t *buf, uint16_t len)
-{
+static void spi_fifo_read(uint32_t spi, uint8_t *buf, uint16_t len) {
 	uint16_t got = 0;
 
 	while (got < len) {
@@ -253,8 +240,7 @@ static void spi_fifo_read(uint32_t spi, uint8_t *buf, uint16_t len)
 	}
 }
 
-void spi_master_write(uint32_t spi, const uint8_t *buf, uint16_t len)
-{
+void spi_master_write(uint32_t spi, const uint8_t *buf, uint16_t len) {
 	spi_assert_valid(spi);
 	openwch_assert(buf != NULL || len == 0);
 	openwch_assert(len <= SPI_TOTAL_CNT_MAX);
@@ -266,8 +252,7 @@ void spi_master_write(uint32_t spi, const uint8_t *buf, uint16_t len)
 	spi_fifo_write(spi, buf, len);
 }
 
-void spi_master_read(uint32_t spi, uint8_t *buf, uint16_t len)
-{
+void spi_master_read(uint32_t spi, uint8_t *buf, uint16_t len) {
 	spi_assert_valid(spi);
 	openwch_assert(buf != NULL || len == 0);
 	openwch_assert(len <= SPI_TOTAL_CNT_MAX);
@@ -280,8 +265,7 @@ void spi_master_read(uint32_t spi, uint8_t *buf, uint16_t len)
 	spi_fifo_read(spi, buf, len);
 }
 
-void spi_write(uint32_t spi, const uint8_t *buf, uint16_t len)
-{
+void spi_write(uint32_t spi, const uint8_t *buf, uint16_t len) {
 	spi_assert_valid(spi);
 	openwch_assert(buf != NULL || len == 0);
 	openwch_assert(len <= SPI_TOTAL_CNT_MAX);
@@ -299,8 +283,7 @@ void spi_write(uint32_t spi, const uint8_t *buf, uint16_t len)
 	spi_fifo_write(spi, buf, len);
 }
 
-void spi_read(uint32_t spi, uint8_t *buf, uint16_t len)
-{
+void spi_read(uint32_t spi, uint8_t *buf, uint16_t len) {
 	spi_assert_valid(spi);
 	openwch_assert(buf != NULL || len == 0);
 	openwch_assert(len <= SPI_TOTAL_CNT_MAX);
@@ -318,8 +301,7 @@ void spi_read(uint32_t spi, uint8_t *buf, uint16_t len)
 
 /* --- DMA ----------------------------------------------------------------- */
 
-void spi_enable_rx_dma(uint32_t spi)
-{
+void spi_enable_rx_dma(uint32_t spi) {
 	spi_assert_valid(spi);
 
 	/* There is one DMA engine and one enable bit; FIFO_DIR says which way
@@ -328,8 +310,7 @@ void spi_enable_rx_dma(uint32_t spi)
 	SPI_CTRL_CFG(spi) |= RB_SPI_DMA_ENABLE;
 }
 
-void spi_enable_tx_dma(uint32_t spi)
-{
+void spi_enable_tx_dma(uint32_t spi) {
 	spi_assert_valid(spi);
 
 	SPI_CTRL_MOD(spi) &= (uint8_t)~RB_SPI_FIFO_DIR;
@@ -338,8 +319,7 @@ void spi_enable_tx_dma(uint32_t spi)
 
 /* --- Interrupts and flags ------------------------------------------------ */
 
-void spi_enable_irq(uint32_t spi, uint32_t irq)
-{
+void spi_enable_irq(uint32_t spi, uint32_t irq) {
 	spi_assert_valid(spi);
 	openwch_assert(irq != 0);
 	openwch_assert((irq & ~(uint32_t)SPI_IRQ_MASK) == 0);
@@ -347,24 +327,21 @@ void spi_enable_irq(uint32_t spi, uint32_t irq)
 	SPI_INTER_EN(spi) |= (uint8_t)(irq & SPI_IRQ_MASK);
 }
 
-void spi_disable_irq(uint32_t spi, uint32_t irq)
-{
+void spi_disable_irq(uint32_t spi, uint32_t irq) {
 	spi_assert_valid(spi);
 	openwch_assert((irq & ~(uint32_t)SPI_IRQ_MASK) == 0);
 
 	SPI_INTER_EN(spi) &= (uint8_t)~(irq & SPI_IRQ_MASK);
 }
 
-uint8_t spi_get_flag(uint32_t spi, uint32_t flag)
-{
+uint8_t spi_get_flag(uint32_t spi, uint32_t flag) {
 	spi_assert_valid(spi);
 	openwch_assert((flag & ~(uint32_t)SPI_FLAG_MASK) == 0);
 
 	return (uint8_t)(SPI_INT_FLAG(spi) & (flag & SPI_FLAG_MASK));
 }
 
-void spi_clear_flag(uint32_t spi, uint32_t flag)
-{
+void spi_clear_flag(uint32_t spi, uint32_t flag) {
 	spi_assert_valid(spi);
 	openwch_assert((flag & ~(uint32_t)SPI_FLAG_MASK) == 0);
 

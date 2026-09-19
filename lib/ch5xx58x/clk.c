@@ -47,8 +47,7 @@
 #define CLK_PLL_LOCK_LOOPS		2000u
 
 /** Burn a few cycles so the peripheral can act on the previous write. */
-static void clk_short_delay(uint32_t loops)
-{
+static void clk_short_delay(uint32_t loops) {
 	while (loops--) {
 		qingke_nop();
 		qingke_nop();
@@ -57,8 +56,7 @@ static void clk_short_delay(uint32_t loops)
 
 /* --- Clock module power -------------------------------------------------- */
 
-void clk_hse_enable(void)
-{
+void clk_hse_enable(void) {
 	if (HFCK_PWR_CTRL & CLK_XT32M_PON) {
 		return;
 	}
@@ -67,13 +65,11 @@ void clk_hse_enable(void)
 	clk_short_delay(CLK_XT32M_STARTUP_LOOPS);
 }
 
-void clk_hse_disable(void)
-{
+void clk_hse_disable(void) {
 	RWA_CLEAR_BITS(HFCK_PWR_CTRL, CLK_XT32M_PON);
 }
 
-void clk_pll_enable(void)
-{
+void clk_pll_enable(void) {
 	if (HFCK_PWR_CTRL & CLK_PLL_PON) {
 		return;
 	}
@@ -82,33 +78,27 @@ void clk_pll_enable(void)
 	clk_short_delay(CLK_PLL_LOCK_LOOPS);
 }
 
-void clk_pll_disable(void)
-{
+void clk_pll_disable(void) {
 	RWA_CLEAR_BITS(HFCK_PWR_CTRL, CLK_PLL_PON);
 }
 
-void clk_lse_enable(void)
-{
+void clk_lse_enable(void) {
 	RWA_SET_BITS(HFCK_PWR_CTRL, CLK_XT32K_PON);
 }
 
-void clk_lsi_enable(void)
-{
+void clk_lsi_enable(void) {
 	RWA_SET_BITS(HFCK_PWR_CTRL, CLK_LSI_PON);
 }
 
-void clk_lse_disable(void)
-{
+void clk_lse_disable(void) {
 	RWA_CLEAR_BITS(HFCK_PWR_CTRL, CLK_XT32K_PON);
 }
 
-void clk_lsi_disable(void)
-{
+void clk_lsi_disable(void) {
 	RWA_CLEAR_BITS(HFCK_PWR_CTRL, CLK_LSI_PON);
 }
 
-void clk_hse_set_current(clk_current_t current)
-{
+void clk_hse_set_current(clk_current_t current) {
 	uint8_t reg = XT32M_TUNE;
 
 	openwch_assert(current <= CLK_HSE_CURRENT_100MA);
@@ -117,8 +107,7 @@ void clk_hse_set_current(clk_current_t current)
 	RWA_WRITE8(XT32M_TUNE, reg);
 }
 
-void clk_hse_set_capacitance(clk_cap_t cap)
-{
+void clk_hse_set_capacitance(clk_cap_t cap) {
 	uint8_t reg = XT32M_TUNE;
 
 	openwch_assert(cap <= CLK_HSE_CAP_32PF);
@@ -127,8 +116,7 @@ void clk_hse_set_capacitance(clk_cap_t cap)
 	RWA_WRITE8(XT32M_TUNE, reg);
 }
 
-void clk_lse_set_current(clk_current_t current)
-{
+void clk_lse_set_current(clk_current_t current) {
 	uint8_t reg = MMIO8(SYS_BASE + 0x2e);
 
 	openwch_assert(current <= CLK_HSE_CURRENT_100MA);
@@ -137,8 +125,7 @@ void clk_lse_set_current(clk_current_t current)
 	RWA_WRITE8(MMIO8(SYS_BASE + 0x2e), reg);
 }
 
-void clk_lse_set_capacitance(clk_cap_t cap)
-{
+void clk_lse_set_capacitance(clk_cap_t cap) {
 	uint8_t reg = MMIO8(SYS_BASE + 0x2e);
 
 	openwch_assert(cap <= CLK_HSE_CAP_32PF);
@@ -147,8 +134,7 @@ void clk_lse_set_capacitance(clk_cap_t cap)
 	RWA_WRITE8(MMIO8(SYS_BASE + 0x2e), reg);
 }
 
-void clk_32k_select(uint32_t source)
-{
+void clk_32k_select(uint32_t source) {
 	/*
 	 * R8_CK32K_CONFIG selects between the 32.768 kHz crystal and the
 	 * internal RC.  Its documented values are 0 (LSI) and 0x80 (LSE).
@@ -158,8 +144,7 @@ void clk_32k_select(uint32_t source)
 
 /* --- System clock -------------------------------------------------------- */
 
-void clk_set_sys_clock(clk_source_t source)
-{
+void clk_set_sys_clock(clk_source_t source) {
 	uint8_t cfg = (uint8_t)source;
 
 	/*
@@ -208,8 +193,7 @@ void clk_set_sys_clock(clk_source_t source)
 	}
 }
 
-uint32_t clk_get_sys_clock(void)
-{
+uint32_t clk_get_sys_clock(void) {
 	uint32_t cfg = MMIO16(R16_CLK_SYS_CFG) & 0xffu;
 	uint32_t div = cfg & CLK_SYS_CFG_DIV_MASK;
 
@@ -227,8 +211,7 @@ uint32_t clk_get_sys_clock(void)
 	}
 }
 
-void clk_set_sys_clock_48mhz(void)
-{
+void clk_set_sys_clock_48mhz(void) {
 	clk_set_sys_clock(CLK_SOURCE_PLL_48MHZ);
 }
 /**@}*/

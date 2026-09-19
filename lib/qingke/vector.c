@@ -67,8 +67,8 @@ _Static_assert(OPENWCH_VECTOR_ENTRY_COUNT <= 64,
  * core has the pipeline control register (CH32V103/20x/30x, CH58x, CH59x)
  * override this in lib/<family>/common/vector_chipset.c.
  */
-__attribute__((weak)) void openwch_chipset_core_configure(void)
-{
+__attribute__((weak))
+void openwch_chipset_core_configure(void) {
 }
 
 /*
@@ -76,15 +76,14 @@ __attribute__((weak)) void openwch_chipset_core_configure(void)
  * code from RAM before .data is available (flash-controller reconfiguration)
  * override this.
  */
-__attribute__((weak)) void openwch_chipset_early_init(void)
-{
+__attribute__((weak))
+void openwch_chipset_early_init(void) {
 }
 
 /* Run the C++ static constructors, if any.  Mirrors libopencm3's reset path,
  * which always calls __libc_init_array(); here it is done directly so the
  * library does not depend on newlib. */
-static void openwch_run_constructors(void)
-{
+static void openwch_run_constructors(void) {
 	init_fn_t *fn;
 
 	for (fn = __preinit_array_start; fn < __preinit_array_end; fn++) {
@@ -101,8 +100,7 @@ static void openwch_run_constructors(void)
  * order of the initialisation steps is readable; the tiny assembly shim exists
  * only because gp must be loaded before any C code runs.
  */
-void _reset_entry(void)
-{
+void _reset_entry(void) {
 	openwch_reset_init();
 
 	/*
@@ -118,8 +116,7 @@ void _reset_entry(void)
 	}
 }
 
-void openwch_reset_init(void)
-{
+void openwch_reset_init(void) {
 	uint32_t *src, *dst;
 
 	/* Copy .data from its load address in flash to its run address in RAM. */
@@ -158,22 +155,19 @@ void openwch_reset_init(void)
 	openwch_run_constructors();
 }
 
-void openwch_vector_set(uint8_t irq, vector_table_entry_t handler)
-{
+void openwch_vector_set(uint8_t irq, vector_table_entry_t handler) {
 	openwch_assert(irq >= OPENWCH_VECTOR_EXC_COUNT);
 	openwch_assert(irq < OPENWCH_VECTOR_EXC_COUNT + OPENWCH_IRQ_COUNT);
 	vector_table.handler[irq - OPENWCH_VECTOR_EXC_COUNT] = handler;
 }
 
-vector_table_entry_t openwch_vector_get(uint8_t irq)
-{
+vector_table_entry_t openwch_vector_get(uint8_t irq) {
 	openwch_assert(irq >= OPENWCH_VECTOR_EXC_COUNT);
 	openwch_assert(irq < OPENWCH_VECTOR_EXC_COUNT + OPENWCH_IRQ_COUNT);
 	return vector_table.handler[irq - OPENWCH_VECTOR_EXC_COUNT];
 }
 
-const char *openwch_irq_name(uint8_t irq)
-{
+const char *openwch_irq_name(uint8_t irq) {
 	uint32_t i;
 
 	for (i = 0; i < OPENWCH_IRQ_TABLE_SIZE; i++) {

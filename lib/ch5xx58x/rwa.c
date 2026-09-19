@@ -46,13 +46,11 @@
  */
 static uint32_t rwa_saved_state;
 
-void rwa_open(void)
-{
+void rwa_open(void) {
 	rwa_saved_state = rwa_unlock();
 }
 
-void rwa_close(void)
-{
+void rwa_close(void) {
 	rwa_lock(rwa_saved_state);
 	rwa_saved_state = 0;
 }

@@ -47,8 +47,7 @@
 #include <libopenwch/ch32v0/flash.h>
 #include <libopenwch/qingke/assert.h>
 
-enum flash_status flash_wait_for_last_operation(uint32_t flash)
-{
+enum flash_status flash_wait_for_last_operation(uint32_t flash) {
 	while (FLASH_STATR(flash) & FLASH_STATR_BSY) {
 		;
 	}
@@ -60,36 +59,30 @@ enum flash_status flash_wait_for_last_operation(uint32_t flash)
 	return FLASH_STATUS_COMPLETE;
 }
 
-uint32_t flash_get_status_flags(uint32_t flash)
-{
+uint32_t flash_get_status_flags(uint32_t flash) {
 	return FLASH_STATR(flash);
 }
 
-void flash_clear_status_flags(uint32_t flash)
-{
+void flash_clear_status_flags(uint32_t flash) {
 	/* EOP and WRPRTERR are rc_w1; write a one to clear. */
 	FLASH_STATR(flash) = FLASH_STATR_EOP | FLASH_STATR_WRPRTERR;
 }
 
-void flash_unlock(uint32_t flash)
-{
+void flash_unlock(uint32_t flash) {
 	FLASH_KEYR(flash) = FLASH_KEYR_KEY1;
 	FLASH_KEYR(flash) = FLASH_KEYR_KEY2;
 }
 
-void flash_lock(uint32_t flash)
-{
+void flash_lock(uint32_t flash) {
 	FLASH_CTLR(flash) |= FLASH_CTLR_LOCK;
 }
 
-void flash_unlock_option_bytes(uint32_t flash)
-{
+void flash_unlock_option_bytes(uint32_t flash) {
 	FLASH_OBKEYR(flash) = FLASH_OBKEYR_KEY1;
 	FLASH_OBKEYR(flash) = FLASH_OBKEYR_KEY2;
 }
 
-enum flash_status flash_erase_page(uint32_t flash, uint32_t address)
-{
+enum flash_status flash_erase_page(uint32_t flash, uint32_t address) {
 	enum flash_status status;
 
 	openwch_assert((address & (FLASH_PAGE_SIZE - 1u)) == 0);
@@ -110,8 +103,7 @@ enum flash_status flash_erase_page(uint32_t flash, uint32_t address)
 	return status;
 }
 
-enum flash_status flash_erase_all_pages(uint32_t flash)
-{
+enum flash_status flash_erase_all_pages(uint32_t flash) {
 	enum flash_status status;
 
 	status = flash_wait_for_last_operation(flash);
@@ -129,9 +121,11 @@ enum flash_status flash_erase_all_pages(uint32_t flash)
 	return status;
 }
 
-enum flash_status flash_program_halfword(uint32_t flash, uint32_t address,
-					 uint16_t data)
-{
+enum flash_status flash_program_halfword(
+	uint32_t flash,
+	uint32_t address,
+	uint16_t data
+) {
 	enum flash_status status;
 
 	openwch_assert((address & 0x1u) == 0);
@@ -151,9 +145,11 @@ enum flash_status flash_program_halfword(uint32_t flash, uint32_t address,
 	return status;
 }
 
-enum flash_status flash_program_word(uint32_t flash, uint32_t address,
-				     uint32_t data)
-{
+enum flash_status flash_program_word(
+	uint32_t flash,
+	uint32_t address,
+	uint32_t data
+) {
 	enum flash_status status;
 
 	openwch_assert((address & 0x1u) == 0);
@@ -178,8 +174,7 @@ enum flash_status flash_program_word(uint32_t flash, uint32_t address,
 	return status;
 }
 
-void flash_set_latency(uint32_t flash, uint32_t latency)
-{
+void flash_set_latency(uint32_t flash, uint32_t latency) {
 	/*
 	 * The latency field lives in the flash access-control register.  There
 	 * is only one flash controller, so the base argument is accepted for
@@ -193,9 +188,11 @@ void flash_set_latency(uint32_t flash, uint32_t latency)
 			| (latency & FLASH_ACTLR_LATENCY_MASK);
 }
 
-enum flash_status flash_program_option_bytes(uint32_t flash, uint32_t address,
-					     uint16_t data)
-{
+enum flash_status flash_program_option_bytes(
+	uint32_t flash,
+	uint32_t address,
+	uint16_t data
+) {
 	enum flash_status status;
 
 	openwch_assert((address & 0x1u) == 0);
@@ -217,13 +214,14 @@ enum flash_status flash_program_option_bytes(uint32_t flash, uint32_t address,
 	return status;
 }
 
-uint32_t flash_get_option_bytes(uint32_t flash)
-{
+uint32_t flash_get_option_bytes(uint32_t flash) {
 	return FLASH_OBR(flash);
 }
 
-enum flash_status flash_enable_write_protection(uint32_t flash, uint32_t pages)
-{
+enum flash_status flash_enable_write_protection(
+	uint32_t flash,
+	uint32_t pages
+) {
 	enum flash_status status;
 
 	status = flash_wait_for_last_operation(flash);
@@ -257,21 +255,18 @@ enum flash_status flash_enable_write_protection(uint32_t flash, uint32_t pages)
 
 /* --- Fast (buffered) page program ---------------------------------------- */
 
-void flash_unlock_fast(uint32_t flash)
-{
+void flash_unlock_fast(uint32_t flash) {
 	flash_unlock(flash);
 
 	FLASH_MODEKEYR(flash) = FLASH_MODEKEYR_KEY1;
 	FLASH_MODEKEYR(flash) = FLASH_MODEKEYR_KEY2;
 }
 
-void flash_lock_fast(uint32_t flash)
-{
+void flash_lock_fast(uint32_t flash) {
 	FLASH_CTLR(flash) |= FLASH_CTLR_FLOCK;
 }
 
-void flash_buf_reset(uint32_t flash)
-{
+void flash_buf_reset(uint32_t flash) {
 	FLASH_CTLR(flash) |= FLASH_CTLR_PAGE_PG;
 	FLASH_CTLR(flash) |= FLASH_CTLR_BUF_RST;
 
@@ -282,8 +277,7 @@ void flash_buf_reset(uint32_t flash)
 	FLASH_CTLR(flash) &= ~FLASH_CTLR_PAGE_PG;
 }
 
-void flash_buf_load(uint32_t flash, uint32_t address, uint32_t data)
-{
+void flash_buf_load(uint32_t flash, uint32_t address, uint32_t data) {
 	openwch_assert((address & 0x3u) == 0);
 
 	FLASH_CTLR(flash) |= FLASH_CTLR_PAGE_PG;
@@ -297,8 +291,7 @@ void flash_buf_load(uint32_t flash, uint32_t address, uint32_t data)
 	FLASH_CTLR(flash) &= ~FLASH_CTLR_PAGE_PG;
 }
 
-void flash_erase_page_fast(uint32_t flash, uint32_t address)
-{
+void flash_erase_page_fast(uint32_t flash, uint32_t address) {
 	openwch_assert((address & (FLASH_PAGE_SIZE - 1u)) == 0);
 
 	FLASH_CTLR(flash) |= FLASH_CTLR_PAGE_ER;
@@ -312,8 +305,7 @@ void flash_erase_page_fast(uint32_t flash, uint32_t address)
 	FLASH_CTLR(flash) &= ~FLASH_CTLR_PAGE_ER;
 }
 
-void flash_program_page_fast(uint32_t flash, uint32_t address)
-{
+void flash_program_page_fast(uint32_t flash, uint32_t address) {
 	openwch_assert((address & (FLASH_PAGE_SIZE - 1u)) == 0);
 
 	FLASH_CTLR(flash) |= FLASH_CTLR_PAGE_PG;

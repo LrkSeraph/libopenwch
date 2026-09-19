@@ -47,8 +47,7 @@
 /** Largest value the 12.4 divider can represent. */
 #define USART_BRR_MAX_DIVIDER		0xffffu
 
-void usart_set_baudrate(uint32_t usart, uint32_t baud)
-{
+void usart_set_baudrate(uint32_t usart, uint32_t baud) {
 	struct rcc_clock_scale clocks;
 	uint32_t divider;
 
@@ -78,8 +77,7 @@ void usart_set_baudrate(uint32_t usart, uint32_t baud)
 	USART_BRR(usart) = (uint16_t)divider;
 }
 
-void usart_set_databits(uint32_t usart, uint8_t bits)
-{
+void usart_set_databits(uint32_t usart, uint8_t bits) {
 	uint16_t reg = USART_CTLR1(usart);
 
 	if (bits == 9) {
@@ -92,8 +90,7 @@ void usart_set_databits(uint32_t usart, uint8_t bits)
 	USART_CTLR1(usart) = reg;
 }
 
-void usart_set_stopbits(uint32_t usart, uint8_t stopbits)
-{
+void usart_set_stopbits(uint32_t usart, uint8_t stopbits) {
 	uint16_t reg = USART_CTLR2(usart);
 
 	openwch_assert((stopbits & ~0x3u) == 0);
@@ -103,8 +100,7 @@ void usart_set_stopbits(uint32_t usart, uint8_t stopbits)
 	USART_CTLR2(usart) = reg;
 }
 
-void usart_set_parity(uint32_t usart, uint8_t parity)
-{
+void usart_set_parity(uint32_t usart, uint8_t parity) {
 	uint16_t reg = USART_CTLR1(usart);
 
 	switch (parity) {
@@ -125,8 +121,7 @@ void usart_set_parity(uint32_t usart, uint8_t parity)
 	USART_CTLR1(usart) = reg;
 }
 
-void usart_set_mode(uint32_t usart, uint32_t mode)
-{
+void usart_set_mode(uint32_t usart, uint32_t mode) {
 	uint16_t reg = USART_CTLR1(usart);
 
 	reg = (uint16_t)((reg & ~(USART_CTLR1_RE | USART_CTLR1_TE))
@@ -134,8 +129,7 @@ void usart_set_mode(uint32_t usart, uint32_t mode)
 	USART_CTLR1(usart) = reg;
 }
 
-void usart_set_flow_control(uint32_t usart, uint32_t flowcontrol)
-{
+void usart_set_flow_control(uint32_t usart, uint32_t flowcontrol) {
 	uint16_t reg = USART_CTLR3(usart);
 
 	reg = (uint16_t)((reg & ~(USART_CTLR3_RTSE | USART_CTLR3_CTSE))
@@ -143,8 +137,7 @@ void usart_set_flow_control(uint32_t usart, uint32_t flowcontrol)
 	USART_CTLR3(usart) = reg;
 }
 
-void usart_set_clock(uint32_t usart, uint32_t clock)
-{
+void usart_set_clock(uint32_t usart, uint32_t clock) {
 	uint16_t reg = USART_CTLR2(usart);
 
 	reg = (uint16_t)((reg & ~(USART_CTLR2_CLKEN | USART_CTLR2_CPOL
@@ -154,41 +147,34 @@ void usart_set_clock(uint32_t usart, uint32_t clock)
 	USART_CTLR2(usart) = reg;
 }
 
-void usart_enable(uint32_t usart)
-{
+void usart_enable(uint32_t usart) {
 	USART_CTLR1(usart) |= USART_CTLR1_UE;
 }
 
-void usart_disable(uint32_t usart)
-{
+void usart_disable(uint32_t usart) {
 	USART_CTLR1(usart) &= ~USART_CTLR1_UE;
 }
 
-void usart_send(uint32_t usart, uint16_t data)
-{
+void usart_send(uint32_t usart, uint16_t data) {
 	USART_DATAR(usart) = (uint16_t)(data & USART_DATAR_DR_MASK);
 }
 
-uint16_t usart_recv(uint32_t usart)
-{
+uint16_t usart_recv(uint32_t usart) {
 	return (uint16_t)(USART_DATAR(usart) & USART_DATAR_DR_MASK);
 }
 
-void usart_wait_send_ready(uint32_t usart)
-{
+void usart_wait_send_ready(uint32_t usart) {
 	while (!(USART_STATR(usart) & USART_STATR_TXE)) {
 		;
 	}
 }
 
-void usart_send_blocking(uint32_t usart, uint16_t data)
-{
+void usart_send_blocking(uint32_t usart, uint16_t data) {
 	usart_wait_send_ready(usart);
 	usart_send(usart, data);
 }
 
-void usart_write(uint32_t usart, const uint8_t *data, uint32_t len)
-{
+void usart_write(uint32_t usart, const uint8_t *data, uint32_t len) {
 	uint32_t i;
 
 	for (i = 0; i < len; i++) {
@@ -196,8 +182,7 @@ void usart_write(uint32_t usart, const uint8_t *data, uint32_t len)
 	}
 }
 
-uint16_t usart_recv_blocking(uint32_t usart)
-{
+uint16_t usart_recv_blocking(uint32_t usart) {
 	while (!(USART_STATR(usart) & USART_STATR_RXNE)) {
 		;
 	}
@@ -205,13 +190,11 @@ uint16_t usart_recv_blocking(uint32_t usart)
 	return usart_recv(usart);
 }
 
-uint16_t usart_get_flag(uint32_t usart, uint16_t flag)
-{
+uint16_t usart_get_flag(uint32_t usart, uint16_t flag) {
 	return (uint16_t)(USART_STATR(usart) & flag);
 }
 
-void usart_clear_flag(uint32_t usart, uint16_t flag)
-{
+void usart_clear_flag(uint32_t usart, uint16_t flag) {
 	/*
 	 * STATR is a mix of read-only status bits and rc_w0 bits.  Only the
 	 * clearable ones may be written; writing a 1 to the others is a no-op,
@@ -220,43 +203,35 @@ void usart_clear_flag(uint32_t usart, uint16_t flag)
 	USART_STATR(usart) = (uint16_t)(flag & (USART_STATR_CTS | USART_STATR_LBD));
 }
 
-void usart_enable_rx_interrupt(uint32_t usart)
-{
+void usart_enable_rx_interrupt(uint32_t usart) {
 	USART_CTLR1(usart) |= USART_CTLR1_RXNEIE;
 }
 
-void usart_disable_rx_interrupt(uint32_t usart)
-{
+void usart_disable_rx_interrupt(uint32_t usart) {
 	USART_CTLR1(usart) &= ~USART_CTLR1_RXNEIE;
 }
 
-void usart_enable_tx_interrupt(uint32_t usart)
-{
+void usart_enable_tx_interrupt(uint32_t usart) {
 	USART_CTLR1(usart) |= USART_CTLR1_TXEIE;
 }
 
-void usart_disable_tx_interrupt(uint32_t usart)
-{
+void usart_disable_tx_interrupt(uint32_t usart) {
 	USART_CTLR1(usart) &= ~USART_CTLR1_TXEIE;
 }
 
-void usart_enable_rx_dma(uint32_t usart)
-{
+void usart_enable_rx_dma(uint32_t usart) {
 	USART_CTLR3(usart) |= USART_CTLR3_DMAR;
 }
 
-void usart_disable_rx_dma(uint32_t usart)
-{
+void usart_disable_rx_dma(uint32_t usart) {
 	USART_CTLR3(usart) &= ~USART_CTLR3_DMAR;
 }
 
-void usart_enable_tx_dma(uint32_t usart)
-{
+void usart_enable_tx_dma(uint32_t usart) {
 	USART_CTLR3(usart) |= USART_CTLR3_DMAT;
 }
 
-void usart_disable_tx_dma(uint32_t usart)
-{
+void usart_disable_tx_dma(uint32_t usart) {
 	USART_CTLR3(usart) &= ~USART_CTLR3_DMAT;
 }
 /**@}*/

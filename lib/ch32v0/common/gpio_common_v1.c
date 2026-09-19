@@ -46,8 +46,11 @@
  * and the register is 32 bits wide -- which is exactly 8 pins, the width of a
  * CH32V00x port.
  */
-static void gpio_nibble_apply(volatile uint32_t *reg, uint8_t nibble, uint16_t gpios)
-{
+static void gpio_nibble_apply(
+	volatile uint32_t *reg,
+	uint8_t nibble,
+	uint16_t gpios
+) {
 	uint32_t value = *reg;
 	unsigned pin;
 
@@ -63,8 +66,7 @@ static void gpio_nibble_apply(volatile uint32_t *reg, uint8_t nibble, uint16_t g
 	*reg = value;
 }
 
-void gpio_set_mode(uint32_t gpioport, uint8_t mode, uint16_t gpios)
-{
+void gpio_set_mode(uint32_t gpioport, uint8_t mode, uint16_t gpios) {
 	openwch_assert((mode & ~GPIO_CFGLR_NIBBLE_MASK) == 0);
 	openwch_assert((gpios & ~GPIO_ALL) == 0);
 
@@ -88,40 +90,33 @@ void gpio_set_mode(uint32_t gpioport, uint8_t mode, uint16_t gpios)
 	}
 }
 
-void gpio_set(uint32_t gpioport, uint16_t gpios)
-{
+void gpio_set(uint32_t gpioport, uint16_t gpios) {
 	GPIO_BSHR(gpioport) = gpios;
 }
 
-void gpio_clear(uint32_t gpioport, uint16_t gpios)
-{
+void gpio_clear(uint32_t gpioport, uint16_t gpios) {
 	GPIO_BCR(gpioport) = gpios;
 }
 
-uint16_t gpio_get(uint32_t gpioport, uint16_t gpios)
-{
+uint16_t gpio_get(uint32_t gpioport, uint16_t gpios) {
 	return (uint16_t)(GPIO_INDR(gpioport) & gpios);
 }
 
-void gpio_toggle(uint32_t gpioport, uint16_t gpios)
-{
+void gpio_toggle(uint32_t gpioport, uint16_t gpios) {
 	/* OUTDR is read/write, and BSHR/BCR are write-only, so a
 	 * read-modify-write of OUTDR is the portable way to toggle. */
 	GPIO_OUTDR(gpioport) ^= gpios;
 }
 
-uint16_t gpio_port_read(uint32_t gpioport)
-{
+uint16_t gpio_port_read(uint32_t gpioport) {
 	return (uint16_t)GPIO_INDR(gpioport);
 }
 
-void gpio_port_write(uint32_t gpioport, uint16_t data)
-{
+void gpio_port_write(uint32_t gpioport, uint16_t data) {
 	GPIO_OUTDR(gpioport) = data;
 }
 
-void gpio_port_config_lock(uint32_t gpioport, uint16_t gpios)
-{
+void gpio_port_config_lock(uint32_t gpioport, uint16_t gpios) {
 	uint32_t reg;
 
 	openwch_assert((gpios & ~GPIO_ALL) == 0);
@@ -154,19 +149,16 @@ void gpio_port_config_lock(uint32_t gpioport, uint16_t gpios)
  * program the whole field, so switching remap never leaves a stale bit behind.
  */
 
-void gpio_primary_remap(uint32_t remap)
-{
+void gpio_primary_remap(uint32_t remap) {
 	AFIO_PCFR1 |= remap;
 }
 
-void gpio_secondary_remap(uint32_t remap)
-{
+void gpio_secondary_remap(uint32_t remap) {
 	AFIO_PCFR1 &= ~remap;
 }
 
 /** Program a 2-bit remap field inside AFIO_PCFR1. */
-static void gpio_remap_field(uint32_t mask, uint32_t shift, uint32_t value)
-{
+static void gpio_remap_field(uint32_t mask, uint32_t shift, uint32_t value) {
 	uint32_t reg = AFIO_PCFR1;
 
 	reg &= ~mask;
@@ -174,8 +166,7 @@ static void gpio_remap_field(uint32_t mask, uint32_t shift, uint32_t value)
 	AFIO_PCFR1 = reg;
 }
 
-void gpio_usart1_remap(uint32_t remap)
-{
+void gpio_usart1_remap(uint32_t remap) {
 	uint32_t reg = AFIO_PCFR1;
 
 	/* USART1_RM is bit 2, USART1REMAP1 is bit 21; together they form
@@ -190,8 +181,7 @@ void gpio_usart1_remap(uint32_t remap)
 	AFIO_PCFR1 = reg;
 }
 
-void gpio_i2c1_remap(uint32_t remap)
-{
+void gpio_i2c1_remap(uint32_t remap) {
 	uint32_t reg = AFIO_PCFR1;
 
 	reg &= ~(AFIO_PCFR1_I2C1_RM | AFIO_PCFR1_I2C1_REMAP1);
@@ -204,14 +194,12 @@ void gpio_i2c1_remap(uint32_t remap)
 	AFIO_PCFR1 = reg;
 }
 
-void gpio_tim1_remap(uint32_t remap)
-{
+void gpio_tim1_remap(uint32_t remap) {
 	openwch_assert(remap <= 3);
 	gpio_remap_field(AFIO_PCFR1_TIM1_RM_MASK, AFIO_PCFR1_TIM1_RM_SHIFT, remap);
 }
 
-void gpio_tim2_remap(uint32_t remap)
-{
+void gpio_tim2_remap(uint32_t remap) {
 	openwch_assert(remap <= 3);
 	gpio_remap_field(AFIO_PCFR1_TIM2_RM_MASK, AFIO_PCFR1_TIM2_RM_SHIFT, remap);
 }
@@ -223,8 +211,7 @@ void gpio_tim2_remap(uint32_t remap)
  * than in the EXTI driver) matches where libopencm3 puts it: the register is
  * part of the GPIO alternate-function block.
  */
-void gpio_exti_select_source(uint32_t exti_line, uint32_t gpioport)
-{
+void gpio_exti_select_source(uint32_t exti_line, uint32_t gpioport) {
 	unsigned pin;
 	uint32_t source;
 

@@ -46,9 +46,14 @@
 
 /* --- Initialisation ------------------------------------------------------ */
 
-void spi_init_master(uint32_t spi, uint32_t br, uint32_t cpol, uint32_t cpha,
-		uint32_t dff, uint32_t lsbfirst)
-{
+void spi_init_master(
+	uint32_t spi,
+	uint32_t br,
+	uint32_t cpol,
+	uint32_t cpha,
+	uint32_t dff,
+	uint32_t lsbfirst
+) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert(br <= (SPI_CTLR1_BR_MASK >> SPI_CTLR1_BR_SHIFT));
@@ -69,9 +74,13 @@ void spi_init_master(uint32_t spi, uint32_t br, uint32_t cpol, uint32_t cpha,
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_init_slave(uint32_t spi, uint32_t cpol, uint32_t cpha, uint32_t dff,
-		uint32_t lsbfirst)
-{
+void spi_init_slave(
+	uint32_t spi,
+	uint32_t cpol,
+	uint32_t cpha,
+	uint32_t dff,
+	uint32_t lsbfirst
+) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert((cpol & (uint32_t)~SPI_CTLR1_CPOL) == 0);
@@ -96,20 +105,17 @@ void spi_init_slave(uint32_t spi, uint32_t cpol, uint32_t cpha, uint32_t dff,
 
 /* --- Enable -------------------------------------------------------------- */
 
-void spi_enable(uint32_t spi)
-{
+void spi_enable(uint32_t spi) {
 	SPI_CTLR1(spi) |= SPI_CTLR1_SPE;
 }
 
-void spi_disable(uint32_t spi)
-{
+void spi_disable(uint32_t spi) {
 	SPI_CTLR1(spi) &= (uint16_t)~SPI_CTLR1_SPE;
 }
 
 /* --- Data ---------------------------------------------------------------- */
 
-void spi_send(uint32_t spi, uint16_t data)
-{
+void spi_send(uint32_t spi, uint16_t data) {
 	while (!(SPI_STATR(spi) & SPI_STATR_TXE)) {
 		;
 	}
@@ -117,8 +123,7 @@ void spi_send(uint32_t spi, uint16_t data)
 	SPI_DATAR(spi) = (uint16_t)(data & SPI_DATAR_DR_MASK);
 }
 
-uint16_t spi_recv(uint32_t spi)
-{
+uint16_t spi_recv(uint32_t spi) {
 	while (!(SPI_STATR(spi) & SPI_STATR_RXNE)) {
 		;
 	}
@@ -126,8 +131,7 @@ uint16_t spi_recv(uint32_t spi)
 	return (uint16_t)(SPI_DATAR(spi) & SPI_DATAR_DR_MASK);
 }
 
-uint16_t spi_xfer(uint32_t spi, uint16_t data)
-{
+uint16_t spi_xfer(uint32_t spi, uint16_t data) {
 	spi_send(spi, data);
 
 	while (!(SPI_STATR(spi) & SPI_STATR_RXNE)) {
@@ -139,8 +143,7 @@ uint16_t spi_xfer(uint32_t spi, uint16_t data)
 
 /* --- Configuration ------------------------------------------------------- */
 
-void spi_set_baudrate_prescaler(uint32_t spi, uint32_t br)
-{
+void spi_set_baudrate_prescaler(uint32_t spi, uint32_t br) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert(br <= (SPI_CTLR1_BR_MASK >> SPI_CTLR1_BR_SHIFT));
@@ -150,8 +153,7 @@ void spi_set_baudrate_prescaler(uint32_t spi, uint32_t br)
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_set_clock_polarity(uint32_t spi, uint32_t cpol)
-{
+void spi_set_clock_polarity(uint32_t spi, uint32_t cpol) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert((cpol & (uint32_t)~SPI_CTLR1_CPOL) == 0);
@@ -160,8 +162,7 @@ void spi_set_clock_polarity(uint32_t spi, uint32_t cpol)
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_set_clock_phase(uint32_t spi, uint32_t cpha)
-{
+void spi_set_clock_phase(uint32_t spi, uint32_t cpha) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert((cpha & (uint32_t)~SPI_CTLR1_CPHA) == 0);
@@ -170,8 +171,7 @@ void spi_set_clock_phase(uint32_t spi, uint32_t cpha)
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_set_dff(uint32_t spi, uint32_t dff)
-{
+void spi_set_dff(uint32_t spi, uint32_t dff) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert((dff & (uint32_t)~SPI_CTLR1_DFF) == 0);
@@ -180,8 +180,7 @@ void spi_set_dff(uint32_t spi, uint32_t dff)
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_set_bit_order(uint32_t spi, uint32_t order)
-{
+void spi_set_bit_order(uint32_t spi, uint32_t order) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert((order & (uint32_t)~SPI_CTLR1_LSBFIRST) == 0);
@@ -193,35 +192,29 @@ void spi_set_bit_order(uint32_t spi, uint32_t order)
 
 /* --- Slave select -------------------------------------------------------- */
 
-void spi_enable_software_slave_management(uint32_t spi)
-{
+void spi_enable_software_slave_management(uint32_t spi) {
 	SPI_CTLR1(spi) |= SPI_CTLR1_SSM;
 }
 
-void spi_set_nss_high(uint32_t spi)
-{
+void spi_set_nss_high(uint32_t spi) {
 	SPI_CTLR1(spi) |= SPI_CTLR1_SSI;
 }
 
-void spi_set_nss_low(uint32_t spi)
-{
+void spi_set_nss_low(uint32_t spi) {
 	SPI_CTLR1(spi) &= (uint16_t)~SPI_CTLR1_SSI;
 }
 
-void spi_enable_ss_output(uint32_t spi)
-{
+void spi_enable_ss_output(uint32_t spi) {
 	SPI_CTLR2(spi) |= SPI_CTLR2_SSOE;
 }
 
 /* --- Bidirectional (single-wire simplex) mode ---------------------------- */
 
-void spi_set_bidirectional_mode(uint32_t spi)
-{
+void spi_set_bidirectional_mode(uint32_t spi) {
 	SPI_CTLR1(spi) |= SPI_CTLR1_BIDIMODE;
 }
 
-void spi_set_bidirectional_transmit_only(uint32_t spi)
-{
+void spi_set_bidirectional_transmit_only(uint32_t spi) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	/* Bidirectional mode with the data line driven (transmit only). */
@@ -231,8 +224,7 @@ void spi_set_bidirectional_transmit_only(uint32_t spi)
 
 /* --- CRC ----------------------------------------------------------------- */
 
-void spi_set_crc_length(uint32_t spi, uint32_t len)
-{
+void spi_set_crc_length(uint32_t spi, uint32_t len) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	/*
@@ -246,67 +238,56 @@ void spi_set_crc_length(uint32_t spi, uint32_t len)
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_enable_crc(uint32_t spi)
-{
+void spi_enable_crc(uint32_t spi) {
 	SPI_CTLR1(spi) |= SPI_CTLR1_CRCEN;
 }
 
-void spi_disable_crc(uint32_t spi)
-{
+void spi_disable_crc(uint32_t spi) {
 	SPI_CTLR1(spi) &= (uint16_t)~SPI_CTLR1_CRCEN;
 }
 
-void spi_set_crc_polynomial(uint32_t spi, uint16_t polynomial)
-{
+void spi_set_crc_polynomial(uint32_t spi, uint16_t polynomial) {
 	SPI_CRCR(spi) = polynomial;
 }
 
-uint16_t spi_get_tx_crc(uint32_t spi)
-{
+uint16_t spi_get_tx_crc(uint32_t spi) {
 	return SPI_TCRCR(spi);
 }
 
-uint16_t spi_get_rx_crc(uint32_t spi)
-{
+uint16_t spi_get_rx_crc(uint32_t spi) {
 	return SPI_RCRCR(spi);
 }
 
 /* --- DMA ----------------------------------------------------------------- */
 
-void spi_enable_rx_dma(uint32_t spi)
-{
+void spi_enable_rx_dma(uint32_t spi) {
 	SPI_CTLR2(spi) |= SPI_CTLR2_RXDMAEN;
 }
 
-void spi_enable_tx_dma(uint32_t spi)
-{
+void spi_enable_tx_dma(uint32_t spi) {
 	SPI_CTLR2(spi) |= SPI_CTLR2_TXDMAEN;
 }
 
 /* --- Interrupts and flags ------------------------------------------------ */
 
-void spi_enable_irq(uint32_t spi, uint32_t irq)
-{
+void spi_enable_irq(uint32_t spi, uint32_t irq) {
 	openwch_assert((irq & (uint32_t)~SPI_IRQ_MASK) == 0);
 	openwch_assert(irq != 0);
 
 	SPI_CTLR2(spi) |= (uint16_t)(irq & SPI_IRQ_MASK);
 }
 
-void spi_disable_irq(uint32_t spi, uint32_t irq)
-{
+void spi_disable_irq(uint32_t spi, uint32_t irq) {
 	openwch_assert((irq & (uint32_t)~SPI_IRQ_MASK) == 0);
 
 	SPI_CTLR2(spi) &= (uint16_t)~(irq & SPI_IRQ_MASK);
 }
 
-uint16_t spi_get_flag(uint32_t spi, uint16_t flag)
-{
+uint16_t spi_get_flag(uint32_t spi, uint16_t flag) {
 	return (uint16_t)(SPI_STATR(spi) & flag);
 }
 
-void spi_clear_flag(uint32_t spi, uint16_t flag)
-{
+void spi_clear_flag(uint32_t spi, uint16_t flag) {
 	/*
 	 * CRCERR is the only plain rc_w0 flag.  OVR is cleared by reading
 	 * DATAR and then STATR, UDR by reading STATR and MODF by reading STATR

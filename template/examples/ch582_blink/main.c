@@ -47,8 +47,7 @@
 #define LED_PORT		GPIOB
 #define LED_PIN			GPIO4
 
-int main(void)
-{
+int main(void) {
 	uint32_t sysclk;
 
 	/* 60 MHz from the PLL.  This powers XT32M first. */

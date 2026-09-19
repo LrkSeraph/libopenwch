@@ -38,9 +38,11 @@
 #include <libopenwch/ch32v0/exti.h>
 #include <libopenwch/qingke/assert.h>
 
-void exti_set_trigger(uint32_t exti, uint32_t line,
-		      enum exti_trigger_type trigger)
-{
+void exti_set_trigger(
+	uint32_t exti,
+	uint32_t line,
+	enum exti_trigger_type trigger
+) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 	openwch_assert(line != 0);
 
@@ -63,51 +65,44 @@ void exti_set_trigger(uint32_t exti, uint32_t line,
 	}
 }
 
-void exti_enable_request(uint32_t exti, uint32_t line)
-{
+void exti_enable_request(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	EXTI_INTENR(exti) |= line;
 }
 
-void exti_disable_request(uint32_t exti, uint32_t line)
-{
+void exti_disable_request(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	EXTI_INTENR(exti) &= ~line;
 }
 
-void exti_reset_request(uint32_t exti, uint32_t line)
-{
+void exti_reset_request(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	/* INTFR is rc_w1: write a one to the bit to clear it. */
 	EXTI_INTFR(exti) = line;
 }
 
-uint32_t exti_get_flag_status(uint32_t exti, uint32_t line)
-{
+uint32_t exti_get_flag_status(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	return EXTI_INTFR(exti) & line;
 }
 
-void exti_trigger_software(uint32_t exti, uint32_t line)
-{
+void exti_trigger_software(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	EXTI_SWIEVR(exti) |= line;
 }
 
-void exti_enable_event(uint32_t exti, uint32_t line)
-{
+void exti_enable_event(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	EXTI_EVENR(exti) |= line;
 }
 
-void exti_disable_event(uint32_t exti, uint32_t line)
-{
+void exti_disable_event(uint32_t exti, uint32_t line) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 
 	EXTI_EVENR(exti) &= ~line;

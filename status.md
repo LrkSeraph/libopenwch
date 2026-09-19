@@ -13,7 +13,7 @@
 |---|---|
 | 当前阶段 | **P3 完成；P4 软件部分完成，硬件在环受阻** |
 | 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ P5: 0% |
-| 最近更新 | CI 收敛轮：GitHub Actions 暴露并修复 4 个真实缺陷——`apitest` 未按 `TARGETS` 收敛、工作流在 job 级误用 `runner` 上下文导致整个工作流校验失败、冒烟测试隐式依赖 newlib（Debian 工具链根本没有）、模板引用了不存在的 `lib/mini_libc.a`。现补齐按族构建的 **mini-libc**，并新增 CI job 在无 newlib 工具链上验证 freestanding 路径。累计 **518 个公开函数**，两族均 0 警告 0 重名 0 命名违规 |
+| 最近更新 | 风格统一轮：全树重排为 house style（函数定义 `{` 与 `)` 同行、属性独立成行、参数表按 80 列断开且无尾随逗号）；`checkpatch.pl` 的括号规则反转为强制新风格，`make stylecheck` 成为门禁并接入 CI。此前 CI 收敛轮修复 4 个真实缺陷
 | 构建状态 | ✅ `make` 全绿：两族库归档 + 两族 mini-libc 归档，共 **4 个归档** |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
 | 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0**；CI **8/8 全绿** |
@@ -370,6 +370,16 @@ P3 已全部完成，见上一节。P4 待办：
 | 全示例双模式 | 4 个示例 × {默认, `LIBOPENWCH_NOSTDLIB=1`} | ✅ 8/8 构建成功 |
 | 干净克隆完整回归 | `git clone` → `make` / `genlinktests` / `apitest` / 示例 | ✅ 4 个归档、6/6、链接通过、8/8 |
 | **GitHub Actions 全绿** | run `35454506264`（`48a7f0b`） | ✅ 8/8 job 通过：3 工具链（debian / xpack / plain-elf）× 2 族 + 双族单次 make + 无 newlib freestanding |
+| 风格重排规模 | 变换脚本统计 | ✅ 555 个函数定义（533 个并括号 / 22 个断参），共 42 个文件 |
+| 尾随逗号合法性 | `-std=c99` 与 `-std=c23` 编译 | ✅ 均为语法错误（`expected declaration specifiers ... before ')' token`），故本风格**不含**尾随逗号 |
+| 重排后构建 | `make` | ✅ 0 警告 0 错误，4 个归档 |
+| 公开 API 未变 | `nm --defined-only lib/*.a` | ✅ 518（316+202），与重排前完全一致 |
+| 风格门禁（正向） | `make stylecheck` | ✅ `STYLE clean`，退出码 0 |
+| 风格门禁（反向） | 人为还原一处旧式括号后 `make stylecheck` | ✅ 报 `ERROR: open brace '{' for a function definition should be on the same line as the ')'` 并退出非零（make 退出码 2） |
+| 无工具链也可查风格 | `make stylecheck PREFIX=/nonexistent-tc-` | ✅ clean（checkpatch 为 Perl；生成头文件用 Python，不需要编译器） |
+| 生成器风格不回退 | `make clean && make` 后查生成文件 | ✅ `blocking_handler()` 与别名属性均为 house style |
+| 生成代码自动跳过 | `make stylecheck` | ✅ 由 irq2nvic_h 生成的文件被跳过，风格须改生成器 |
+| checkpatch 补丁可加载 | `perl -c scripts/checkpatch.pl` | ✅ syntax OK；并修掉一处 `raw_line()` 未定义值导致的 Perl 警告 |
 
 ---
 
@@ -388,3 +398,4 @@ P3 已全部完成，见上一节。P4 待办：
 | 第 8 轮（发布轮） | 新增 `LICENSE`（LGPL-3.0 文本，作为 GitHub 识别入口）与 `COPYING.GPL2`——`scripts/checkpatch.pl` 文件头声明的是 **GPL-2.0**，而仓库此前只随附了 `COPYING.GPL3`；`NOTICE`/`README.md` 同步说明该布局。推送至 `git@github.com:LrkSeraph/libopenwch.git`。**发现并修正一个严重缺陷**：`.gitignore` 中用于忽略*生成*头文件的 `include/libopenwch/*/nvic.h` 通配，同时匹配了**手写**的 `qingke/nvic.h` 和整个 `dispatch/` 目录（后者此前 **0 个文件**被跟踪），导致**干净克隆无法构建**（`fatal error: libopenwch/qingke/nvic.h: No such file or directory`）；本地一直未暴露，是因为未跟踪文件仍留在磁盘上而 `make clean` 不会删除它们。改为对这两个路径取反，并核实 `make clean` 仍会删除生成文件、保留手写文件。另修正 CI 的 xpack 版本号（xpack 版本有第四段：`14.2.0-3` 不存在，实为 `14.2.0-3.1`），并把 bin 目录改为用 `find` 定位而非硬编码 |
 | 第 9 轮（CI 收敛轮） | GitHub Actions 连续暴露并修复 4 个真实缺陷：**(1)** `apitest` 无条件遍历两族，`make TARGETS=ch32v0` 之后必然链接失败（`cannot find -lopenwch_ch5xx58x`）——改为 `APITEST_DIRS` 由 `TARGETS` 推导，并让 `apitest` 依赖 `lib`。**(2)** 工作流把 `${{ runner.temp }}` 用在 job 级 `env`，而 `runner` 上下文在 job 级并不存在，导致**整个工作流校验失败**（表现为「以文件路径命名的 run + 0 个 job」，极易误读为构建失败）。**(3)** **Debian/Ubuntu 的 `gcc-riscv64-unknown-elf` 完全不附带 newlib**（`rv32e`/`rv32imac` 多库都没有），冒烟测试原先只加 `-nostartfiles`，于是隐式请求 `-lc`/`-lgloss` 而失败；改为 `-nostdlib`。此处一度误判为「库完全 freestanding」——那是**基于被 `head -20` 截断的 `nm` 输出**得出的错误结论；实际 `openwch_reset_init` 的 `.data`/`.bss` 循环在 GCC 13.2 下会生成 `memcpy`/`memset` 调用（GCC 15 则内联），故该依赖**随编译器而变**，必须显式满足：冒烟测试与模板 freestanding 模式均改为链接按族 mini-libc。**(4)** 模板的 `LIBOPENWCH_NOSTDLIB=1` 引用了一个**从未存在**的 `lib/mini_libc.a`；现补齐为按族构建的真实 mini-libc（12 个字符串/内存函数，独立归档，`-fno-builtin` 防自递归），并新增 CI job 在无 newlib 的工具链上验证该路径。另外把 CI 失败详情写入 step summary 与 error annotation，因为下载原始 job 日志需要仓库管理员权限 |
 | 第 10 轮（CI 收敛轮·续） | CI 增加 `nostdlib` job：在 Debian 无 newlib 工具链上构建库、跑冒烟测试、并以 `LIBOPENWCH_NOSTDLIB=1` 构建模板示例 |
+| 第 11 轮（风格统一轮） | 按用户指定的 house style 重排全树：函数定义的 `{` 与 `)` **同行**；作用于整个函数的 `__attribute__` **单独一行**并置于返回类型之前；参数表超过 80 列则**每行一个参数**、`) {` 独占一行，且**末尾不加逗号**——C 标准不允许，已实测 `-std=c99` 与 `-std=c23` 均报语法错误。共重排 555 个函数定义（533 个并括号 + 22 个断参）、42 个文件。**反转** `scripts/checkpatch.pl` 的 `OPEN_BRACE` 规则（现在报错的是「把 `{` 留在签名下一行」），并按项目已知的有意写法 `--ignore` 了 8 类误报（VOLATILE / NEW_TYPEDEFS / CAMELCASE / COMPLEX_MACRO / SPACING / AVOID_EXTERNS / STORAGE_CLASS / BRACES），顺带修掉 checkpatch 中一处 `raw_line()` 未定义值引起的 Perl 警告。`make stylecheck` 由「仅报告」改为**门禁**（有发现即退出非零，并列出全部问题文件），新增 CI `style` job。`scripts/irq2nvic_h` 同步改为生成 house style，以免重新生成后风格回退。`.clang-format`、`HACKING`、`AGENTS.md` 更新；README 移除 libopencm3↔libopenwch 对照块 |

@@ -43,13 +43,11 @@
  * "unknown", in which case the delays fall back to a calibrated busy loop. */
 static uint32_t systick_freq;
 
-void systick_set_reload(uint32_t value)
-{
+void systick_set_reload(uint32_t value) {
 	SYSTICK->cmp = value;
 }
 
-void systick_set_clock_source(uint32_t source)
-{
+void systick_set_clock_source(uint32_t source) {
 	if (source) {
 		SYSTICK->ctlr |= SYSTICK_CTLR_CLKSRC;
 	} else {
@@ -57,38 +55,31 @@ void systick_set_clock_source(uint32_t source)
 	}
 }
 
-void systick_enable_counter(void)
-{
+void systick_enable_counter(void) {
 	SYSTICK->ctlr |= SYSTICK_CTLR_EN;
 }
 
-void systick_disable_counter(void)
-{
+void systick_disable_counter(void) {
 	SYSTICK->ctlr &= ~SYSTICK_CTLR_EN;
 }
 
-void systick_enable_interrupt(void)
-{
+void systick_enable_interrupt(void) {
 	SYSTICK->ctlr |= SYSTICK_CTLR_IE;
 }
 
-void systick_disable_interrupt(void)
-{
+void systick_disable_interrupt(void) {
 	SYSTICK->ctlr &= ~SYSTICK_CTLR_IE;
 }
 
-void systick_clear_interrupt(void)
-{
+void systick_clear_interrupt(void) {
 	SYSTICK->sr = 0;
 }
 
-uint32_t systick_get_value(void)
-{
+uint32_t systick_get_value(void) {
 	return SYSTICK->cnt;
 }
 
-uint64_t systick_get_counter(void)
-{
+uint64_t systick_get_counter(void) {
 	uint32_t lo, hi;
 
 	do {
@@ -99,13 +90,11 @@ uint64_t systick_get_counter(void)
 	return ((uint64_t)hi << 32) | lo;
 }
 
-void qingke_systick_set_frequency(uint32_t hz)
-{
+void qingke_systick_set_frequency(uint32_t hz) {
 	systick_freq = hz;
 }
 
-uint32_t qingke_systick_get_frequency(void)
-{
+uint32_t qingke_systick_get_frequency(void) {
 	return systick_freq;
 }
 
@@ -114,8 +103,7 @@ uint32_t qingke_systick_get_frequency(void)
  * independent of the counter width.  The comparison is done in signed
  * arithmetic so that a counter wrap is handled correctly.
  */
-static void systick_wait_ticks(uint32_t ticks)
-{
+static void systick_wait_ticks(uint32_t ticks) {
 	uint32_t start = SYSTICK->cnt;
 	uint32_t elapsed;
 
@@ -133,8 +121,7 @@ static void systick_wait_ticks(uint32_t ticks)
 	} while ((int32_t)(ticks - elapsed) > 0);
 }
 
-void qingke_delay_us(uint32_t us)
-{
+void qingke_delay_us(uint32_t us) {
 	if (systick_freq != 0) {
 		/* ticks = us * freq / 1000000, done without a 64-bit divide. */
 		uint64_t ticks = ((uint64_t)us * systick_freq) / 1000000u;
@@ -156,8 +143,7 @@ void qingke_delay_us(uint32_t us)
 	}
 }
 
-void qingke_delay_ms(uint32_t ms)
-{
+void qingke_delay_ms(uint32_t ms) {
 	while (ms--) {
 		qingke_delay_us(1000);
 	}

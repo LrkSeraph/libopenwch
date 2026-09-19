@@ -44,42 +44,35 @@
 #include <libopenwch/ch32v0/iwdg.h>
 #include <libopenwch/qingke/assert.h>
 
-void iwdg_write_access_enable(uint32_t iwdg)
-{
+void iwdg_write_access_enable(uint32_t iwdg) {
 	IWDG_CTLR(iwdg) = IWDG_KEY_WRITE_ACCESS_ENABLE;
 }
 
-void iwdg_write_access_disable(uint32_t iwdg)
-{
+void iwdg_write_access_disable(uint32_t iwdg) {
 	IWDG_CTLR(iwdg) = IWDG_KEY_WRITE_ACCESS_DISABLE;
 }
 
-void iwdg_set_prescaler(uint32_t iwdg, uint8_t prescaler)
-{
+void iwdg_set_prescaler(uint32_t iwdg, uint8_t prescaler) {
 	openwch_assert(prescaler <= IWDG_PSCR_DIV256);
 
 	IWDG_PSCR(iwdg) = (uint32_t)prescaler & IWDG_PSCR_PR_MASK;
 }
 
-void iwdg_set_reload(uint32_t iwdg, uint16_t reload)
-{
+void iwdg_set_reload(uint32_t iwdg, uint16_t reload) {
 	openwch_assert(reload <= IWDG_RLDR_RL_MASK);
 
 	IWDG_RLDR(iwdg) = (uint32_t)reload & IWDG_RLDR_RL_MASK;
 }
 
-void iwdg_reload_counter(uint32_t iwdg)
-{
+void iwdg_reload_counter(uint32_t iwdg) {
 	IWDG_CTLR(iwdg) = IWDG_KEY_RELOAD;
 }
 
-void iwdg_enable(uint32_t iwdg)
-{
+void iwdg_enable(uint32_t iwdg) {
 	IWDG_CTLR(iwdg) = IWDG_KEY_ENABLE;
 }
 
-uint32_t iwdg_get_flag(uint32_t iwdg, uint16_t flag)
-{
+uint32_t iwdg_get_flag(uint32_t iwdg, uint16_t flag) {
 	return IWDG_STATR(iwdg) & (uint32_t)flag;
 }
 /**@}*/

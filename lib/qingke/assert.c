@@ -35,19 +35,20 @@
 
 #include <libopenwch/qingke/assert.h>
 
-void __attribute__((weak)) openwch_assert_failed(void)
-{
+__attribute__((weak))
+void openwch_assert_failed(void) {
 	while (1) {
 		;
 	}
 }
 
-void __attribute__((weak)) openwch_assert_failed_verbose(
-		const char *file __attribute__((unused)),
-		int line __attribute__((unused)),
-		const char *func __attribute__((unused)),
-		const char *assert_expr __attribute__((unused)))
-{
+__attribute__((weak))
+void openwch_assert_failed_verbose(
+	const char *file __attribute__((unused)),
+	int line __attribute__((unused)),
+	const char *func __attribute__((unused)),
+	const char *assert_expr __attribute__((unused))
+) {
 	openwch_assert_failed();
 }
 /**@}*/

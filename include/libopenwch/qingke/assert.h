@@ -78,9 +78,15 @@ LGPL License Terms @ref lgpl_license
 
 BEGIN_DECLS
 
-void openwch_assert_failed(void) __attribute__((__noreturn__));
-void openwch_assert_failed_verbose(const char *file, int line, const char *func,
-		const char *assert_expr) __attribute__((__noreturn__));
+__attribute__((__noreturn__))
+void openwch_assert_failed(void);
+__attribute__((__noreturn__))
+void openwch_assert_failed_verbose(
+	const char *file,
+	int line,
+	const char *func,
+	const char *assert_expr
+);
 
 END_DECLS
 

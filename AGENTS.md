@@ -40,7 +40,30 @@
 5. **RWA 寄存器必须先解锁**。CH58x 的任何 RWA 寄存器写入必须经 `rwa_unlock()`/安全访问封装，
    不得裸写。
 6. **寄存器宏命名贴近 WCH 手册**（`HACKING` 要求），例如 `USART_CTLR1_UE`、`GPIO_CFGLR`。
-7. **提交前跑 `make stylecheck`**（`scripts/checkpatch.pl`，Linux 内核风格）。
+7. **提交前跑 `make stylecheck`**（`scripts/checkpatch.pl`，已按本仓库风格打过补丁）。
+   这是**门禁**：有发现即返回非零。风格 = Linux 内核风格，**唯一例外**是函数定义：
+
+   ```c
+   int foo(int a) {
+   }
+
+   __attribute__((xxx))
+   void bar(
+   	int a,
+   	int b
+   ) {
+   	foo(a);
+   }
+   ```
+
+   要点：函数定义的 `{` 与 `)` **同行**；作用于整个函数的 `__attribute__` **单独一行**、
+   置于返回类型之前；参数表超 80 列则**每行一个参数**、`) {` 独占一行；**末尾不加逗号**
+   （C 标准不允许，会编译失败）。`if`/`while`/`for`/`switch` 仍按内核风格，`{` 与条件同行。
+   详见 `HACKING` 的「Braces on function definitions」。
+
+8. **不得手工编辑生成文件**。`lib/*/vector_handlers.c`、`lib/*/vector_names.c`、
+   `include/libopenwch/*/nvic.h`、`include/libopencmsis/*/irqhandlers.h` 由
+   `scripts/irq2nvic_h` 生成（`make stylecheck` 会跳过它们），要改风格请改生成器。
 
 ---
 

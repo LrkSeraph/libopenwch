@@ -56,8 +56,7 @@ void api_smoke(void);
  * test to succeed.  It deliberately does NOT call api_smoke(): doing so on
  * hardware would take the chip apart.
  */
-int main(void)
-{
+int main(void) {
 	/*
 	 * Take the address of the test body so that --gc-sections cannot
 	 * discard it.  The volatile pointer is never dereferenced: actually
@@ -72,8 +71,7 @@ int main(void)
 	}
 }
 
-void api_smoke(void)
-{
+void api_smoke(void) {
 	/* --- gpio / afio --- */
 	gpio_set_mode(GPIOA, GPIO_MODE_OUT_PP, GPIO1);
 	gpio_set(GPIOA, GPIO1);

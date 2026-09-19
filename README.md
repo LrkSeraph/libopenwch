@@ -7,16 +7,6 @@ register-level API with **lowercase_snake_case** names, a family/subfamily
 directory layout, and a `Makefile`-based build that generates the right linker
 script from the part number.
 
-```
-    libopencm3                    libopenwch
-    ----------                    ----------
-    arm-none-eabi-gcc      ->     riscv64-unknown-elf-gcc
-    cm3/  (Cortex-M core)  ->     qingke/  (WCH QingKe RISC-V core)
-    stm32/f1, efm32/tg     ->     ch32v0, ch5xx58x
-    nvic_enable_irq()      ->     nvic_enable_irq()   (PFIC-backed)
-    ld/devices.data        ->     ld/devices.data     (+ RISC-V keys)
-```
-
 ## Status
 
 Early incubation.  See `status.md` for the current progress, `phase.md` for the

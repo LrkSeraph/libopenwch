@@ -49,9 +49,11 @@
 
 /* --- Initialisation ------------------------------------------------------ */
 
-void adc_init_single_channel(uint32_t adc, adc_sample_clk_t sample_clk,
-			     adc_pga_t pga)
-{
+void adc_init_single_channel(
+	uint32_t adc,
+	adc_sample_clk_t sample_clk,
+	adc_pga_t pga
+) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(sample_clk <= ADC_SAMPLE_CLK_4MHZ);
 	openwch_assert(pga <= ADC_PGA_2);
@@ -66,9 +68,11 @@ void adc_init_single_channel(uint32_t adc, adc_sample_clk_t sample_clk,
 			     ((uint8_t)pga << ADC_PGA_GAIN_SHIFT)));
 }
 
-void adc_init_differential(uint32_t adc, adc_sample_clk_t sample_clk,
-			   adc_pga_t pga)
-{
+void adc_init_differential(
+	uint32_t adc,
+	adc_sample_clk_t sample_clk,
+	adc_pga_t pga
+) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(sample_clk <= ADC_SAMPLE_CLK_4MHZ);
 	openwch_assert(pga <= ADC_PGA_2);
@@ -83,8 +87,7 @@ void adc_init_differential(uint32_t adc, adc_sample_clk_t sample_clk,
 			     ((uint8_t)pga << ADC_PGA_GAIN_SHIFT)));
 }
 
-void adc_init_temperature(uint32_t adc)
-{
+void adc_init_temperature(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	RWA_CLEAR_BITS(ADC_TKEY_CFG(adc), RB_TKEY_PWR_ON);
@@ -103,8 +106,7 @@ void adc_init_temperature(uint32_t adc)
 			     (3u << ADC_PGA_GAIN_SHIFT)));
 }
 
-void adc_init_battery(uint32_t adc)
-{
+void adc_init_battery(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	RWA_CLEAR_BITS(ADC_TKEY_CFG(adc), RB_TKEY_PWR_ON);
@@ -122,16 +124,14 @@ void adc_init_battery(uint32_t adc)
 
 /* --- Configuration ------------------------------------------------------- */
 
-void adc_set_channel(uint32_t adc, adc_channel_t channel)
-{
+void adc_set_channel(uint32_t adc, adc_channel_t channel) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(channel <= ADC_CH_VTEMP);
 
 	ADC_CHANNEL(adc) = (uint8_t)channel;
 }
 
-void adc_set_sample_clock(uint32_t adc, adc_sample_clk_t clk)
-{
+void adc_set_sample_clock(uint32_t adc, adc_sample_clk_t clk) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(clk <= ADC_SAMPLE_CLK_4MHZ);
 
@@ -139,8 +139,7 @@ void adc_set_sample_clock(uint32_t adc, adc_sample_clk_t clk)
 		   (uint32_t)((uint32_t)clk << ADC_CLK_DIV_SHIFT));
 }
 
-void adc_set_pga(uint32_t adc, adc_pga_t pga)
-{
+void adc_set_pga(uint32_t adc, adc_pga_t pga) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(pga <= ADC_PGA_2);
 
@@ -150,23 +149,20 @@ void adc_set_pga(uint32_t adc, adc_pga_t pga)
 
 /* --- Single conversion --------------------------------------------------- */
 
-void adc_start(uint32_t adc)
-{
+void adc_start(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	/* Writing RB_ADC_START also clears RB_ADC_IF_EOC. */
 	RWA_WRITE8(ADC_CONVERT(adc), RB_ADC_START);
 }
 
-bool adc_is_ready(uint32_t adc)
-{
+bool adc_is_ready(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	return (ADC_INT_FLAG(adc) & RB_ADC_IF_EOC) != 0;
 }
 
-uint16_t adc_read(uint32_t adc)
-{
+uint16_t adc_read(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	return (uint16_t)(ADC_DATA(adc) & RB_ADC_DATA);
@@ -174,16 +170,18 @@ uint16_t adc_read(uint32_t adc)
 
 /* --- Auto conversion and DMA --------------------------------------------- */
 
-void adc_set_auto_cycle(uint32_t adc, uint8_t cycles)
-{
+void adc_set_auto_cycle(uint32_t adc, uint8_t cycles) {
 	openwch_assert(adc == ADC_BASE);
 
 	ADC_AUTO_CYCLE(adc) = cycles;
 }
 
-void adc_enable_dma(uint32_t adc, adc_dma_mode_t mode, uint16_t start,
-		    uint16_t end)
-{
+void adc_enable_dma(
+	uint32_t adc,
+	adc_dma_mode_t mode,
+	uint16_t start,
+	uint16_t end
+) {
 	uint8_t ctrl;
 
 	openwch_assert(adc == ADC_BASE);
@@ -204,8 +202,7 @@ void adc_enable_dma(uint32_t adc, adc_dma_mode_t mode, uint16_t start,
 				      RB_ADC_DMA_ENABLE);
 }
 
-void adc_disable_dma(uint32_t adc)
-{
+void adc_disable_dma(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	ADC_DMA_CTRL(adc) &= (uint8_t)~(RB_ADC_DMA_ENABLE | RB_ADC_IE_DMA_END);
@@ -213,8 +210,7 @@ void adc_disable_dma(uint32_t adc)
 
 /* --- Touch key ----------------------------------------------------------- */
 
-void adc_enable_touchkey(uint32_t adc)
-{
+void adc_enable_touchkey(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	/* WCH's TouchKey_ChSampInit(): buffered input at -6 dB, then power. */
@@ -224,15 +220,13 @@ void adc_enable_touchkey(uint32_t adc)
 	RWA_SET_BITS(ADC_TKEY_CFG(adc), RB_TKEY_PWR_ON);
 }
 
-void adc_disable_touchkey(uint32_t adc)
-{
+void adc_disable_touchkey(uint32_t adc) {
 	openwch_assert(adc == ADC_BASE);
 
 	RWA_CLEAR_BITS(ADC_TKEY_CFG(adc), RB_TKEY_PWR_ON);
 }
 
-uint16_t adc_read_touchkey(uint32_t adc, uint8_t charge, uint8_t discharge)
-{
+uint16_t adc_read_touchkey(uint32_t adc, uint8_t charge, uint8_t discharge) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(charge <= RB_TKEY_CHARG_CNT);
 	openwch_assert(discharge <= (RB_TKEY_DISCH_CNT >> ADC_TKEY_DISCH_SHIFT));
@@ -253,8 +247,7 @@ uint16_t adc_read_touchkey(uint32_t adc, uint8_t charge, uint8_t discharge)
 
 /* --- Conversion helpers -------------------------------------------------- */
 
-int adc_to_celsius(uint16_t raw)
-{
+int adc_to_celsius(uint16_t raw) {
 	uint32_t cal = MMIO32(ROM_CFG_TMP_25C);
 	uint32_t t_ref = (cal >> 16) & 0xffffu;
 	uint32_t adc_25 = cal & 0xffffu;

@@ -49,16 +49,14 @@
 #include <libopenwch/qingke/assert.h>
 
 /** True for the four UART block base addresses this family implements. */
-static inline bool uart_is_valid(uint32_t uart)
-{
+static inline bool uart_is_valid(uint32_t uart) {
 	return (uart == UART0) || (uart == UART1) ||
 	       (uart == UART2) || (uart == UART3);
 }
 
 /* --- Line format --------------------------------------------------------- */
 
-void uart_set_baudrate(uint32_t uart, uint32_t baud)
-{
+void uart_set_baudrate(uint32_t uart, uint32_t baud) {
 	uint32_t fsys;
 	uint32_t divisor;
 
@@ -88,8 +86,7 @@ void uart_set_baudrate(uint32_t uart, uint32_t baud)
 	UART_DL(uart) = (uint16_t)divisor;
 }
 
-void uart_set_databits(uint32_t uart, uint8_t bits)
-{
+void uart_set_databits(uint32_t uart, uint8_t bits) {
 	uint8_t lcr;
 
 	openwch_assert(uart_is_valid(uart));
@@ -105,8 +102,7 @@ void uart_set_databits(uint32_t uart, uint8_t bits)
 	UART_LCR(uart) = lcr;
 }
 
-void uart_set_stopbits(uint32_t uart, uint8_t bits)
-{
+void uart_set_stopbits(uint32_t uart, uint8_t bits) {
 	uint8_t lcr;
 
 	openwch_assert(uart_is_valid(uart));
@@ -123,8 +119,7 @@ void uart_set_stopbits(uint32_t uart, uint8_t bits)
 	UART_LCR(uart) = lcr;
 }
 
-void uart_set_parity(uint32_t uart, uart_parity_t parity)
-{
+void uart_set_parity(uint32_t uart, uart_parity_t parity) {
 	uint8_t lcr;
 
 	openwch_assert(uart_is_valid(uart));
@@ -162,16 +157,14 @@ void uart_set_parity(uint32_t uart, uart_parity_t parity)
 
 /* --- Enable -------------------------------------------------------------- */
 
-void uart_enable(uint32_t uart)
-{
+void uart_enable(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	/* No global enable exists: this is the TXD pin driver. */
 	UART_IER(uart) |= RB_IER_TXD_EN;
 }
 
-void uart_disable(uint32_t uart)
-{
+void uart_disable(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_IER(uart) &= (uint8_t)~RB_IER_TXD_EN;
@@ -179,22 +172,19 @@ void uart_disable(uint32_t uart)
 
 /* --- Data ---------------------------------------------------------------- */
 
-void uart_send(uint32_t uart, uint8_t data)
-{
+void uart_send(uint32_t uart, uint8_t data) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_THR(uart) = data;
 }
 
-uint8_t uart_recv(uint32_t uart)
-{
+uint8_t uart_recv(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	return UART_RBR(uart);
 }
 
-void uart_send_blocking(uint32_t uart, uint8_t data)
-{
+void uart_send_blocking(uint32_t uart, uint8_t data) {
 	openwch_assert(uart_is_valid(uart));
 
 	/* Wait until the transmitter FIFO has drained, then queue the byte. */
@@ -205,8 +195,7 @@ void uart_send_blocking(uint32_t uart, uint8_t data)
 	uart_send(uart, data);
 }
 
-uint8_t uart_recv_blocking(uint32_t uart)
-{
+uint8_t uart_recv_blocking(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	while ((UART_LSR(uart) & RB_LSR_DATA_RDY) == 0) {
@@ -216,8 +205,7 @@ uint8_t uart_recv_blocking(uint32_t uart)
 	return uart_recv(uart);
 }
 
-void uart_write(uint32_t uart, const uint8_t *buf, uint32_t len)
-{
+void uart_write(uint32_t uart, const uint8_t *buf, uint32_t len) {
 	uint32_t i;
 
 	openwch_assert(uart_is_valid(uart));
@@ -237,8 +225,7 @@ void uart_write(uint32_t uart, const uint8_t *buf, uint32_t len)
 	}
 }
 
-void uart_read(uint32_t uart, uint8_t *buf, uint32_t len)
-{
+void uart_read(uint32_t uart, uint8_t *buf, uint32_t len) {
 	uint32_t i;
 
 	openwch_assert(uart_is_valid(uart));
@@ -257,31 +244,27 @@ void uart_read(uint32_t uart, uint8_t *buf, uint32_t len)
  * do the same; the disable paths only clear their own enable bit.
  */
 
-void uart_enable_rx_interrupt(uint32_t uart)
-{
+void uart_enable_rx_interrupt(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_IER(uart) |= RB_IER_RECV_RDY;
 	UART_MCR(uart) |= RB_MCR_INT_OE;
 }
 
-void uart_disable_rx_interrupt(uint32_t uart)
-{
+void uart_disable_rx_interrupt(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_IER(uart) &= (uint8_t)~RB_IER_RECV_RDY;
 }
 
-void uart_enable_tx_interrupt(uint32_t uart)
-{
+void uart_enable_tx_interrupt(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_IER(uart) |= RB_IER_THR_EMPTY;
 	UART_MCR(uart) |= RB_MCR_INT_OE;
 }
 
-void uart_disable_tx_interrupt(uint32_t uart)
-{
+void uart_disable_tx_interrupt(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_IER(uart) &= (uint8_t)~RB_IER_THR_EMPTY;
@@ -297,15 +280,13 @@ void uart_disable_tx_interrupt(uint32_t uart)
  * an invented register bit.
  */
 
-void uart_enable_rx_dma(uint32_t uart)
-{
+void uart_enable_rx_dma(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	(void)uart;
 }
 
-void uart_disable_rx_dma(uint32_t uart)
-{
+void uart_disable_rx_dma(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	(void)uart;
@@ -313,23 +294,20 @@ void uart_disable_rx_dma(uint32_t uart)
 
 /* --- FIFO ---------------------------------------------------------------- */
 
-void uart_clear_rx_fifo(uint32_t uart)
-{
+void uart_clear_rx_fifo(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	/* Self-clearing strobe. */
 	UART_FCR(uart) |= RB_FCR_RX_FIFO_CLR;
 }
 
-void uart_clear_tx_fifo(uint32_t uart)
-{
+void uart_clear_tx_fifo(uint32_t uart) {
 	openwch_assert(uart_is_valid(uart));
 
 	UART_FCR(uart) |= RB_FCR_TX_FIFO_CLR;
 }
 
-void uart_set_fifo_trigger(uint32_t uart, uart_fifo_trigger_t level)
-{
+void uart_set_fifo_trigger(uint32_t uart, uart_fifo_trigger_t level) {
 	uint8_t fcr;
 
 	openwch_assert(uart_is_valid(uart));
@@ -343,8 +321,7 @@ void uart_set_fifo_trigger(uint32_t uart, uart_fifo_trigger_t level)
 
 /* --- Status -------------------------------------------------------------- */
 
-uint8_t uart_get_flag(uint32_t uart, uint8_t flag)
-{
+uint8_t uart_get_flag(uint32_t uart, uint8_t flag) {
 	openwch_assert(uart_is_valid(uart));
 
 	return (uint8_t)(UART_LSR(uart) & flag);

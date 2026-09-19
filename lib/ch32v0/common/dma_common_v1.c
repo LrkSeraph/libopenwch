@@ -48,13 +48,11 @@
 #include <libopenwch/qingke/assert.h>
 
 /** Validate the one-based channel number shared by every entry point. */
-static void dma_assert_channel(uint8_t channel)
-{
+static void dma_assert_channel(uint8_t channel) {
 	openwch_assert((channel >= DMA_CHANNEL1) && (channel <= DMA_CHANNEL7));
 }
 
-void dma_channel_reset(uint32_t dma, uint8_t channel)
-{
+void dma_channel_reset(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 
 	/* Clearing CFGR disables the channel and drops its configuration. */
@@ -65,68 +63,61 @@ void dma_channel_reset(uint32_t dma, uint8_t channel)
 	dma_clear_interrupt_pending_bit(dma, channel);
 }
 
-void dma_set_peripheral_address(uint32_t dma, uint8_t channel, uint32_t address)
-{
+void dma_set_peripheral_address(
+	uint32_t dma,
+	uint8_t channel,
+	uint32_t address
+) {
 	dma_assert_channel(channel);
 	DMA_PADDR(dma, channel) = address;
 }
 
-void dma_set_memory_address(uint32_t dma, uint8_t channel, uint32_t address)
-{
+void dma_set_memory_address(uint32_t dma, uint8_t channel, uint32_t address) {
 	dma_assert_channel(channel);
 	DMA_MADDR(dma, channel) = address;
 }
 
-void dma_set_number_of_data(uint32_t dma, uint8_t channel, uint16_t number)
-{
+void dma_set_number_of_data(uint32_t dma, uint8_t channel, uint16_t number) {
 	dma_assert_channel(channel);
 	DMA_CNTR(dma, channel) = number;
 }
 
-uint16_t dma_get_number_of_data(uint32_t dma, uint8_t channel)
-{
+uint16_t dma_get_number_of_data(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	return (uint16_t)(DMA_CNTR(dma, channel) & 0xffffu);
 }
 
-void dma_set_read_from_peripheral(uint32_t dma, uint8_t channel)
-{
+void dma_set_read_from_peripheral(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_DIR;
 }
 
-void dma_set_read_from_memory(uint32_t dma, uint8_t channel)
-{
+void dma_set_read_from_memory(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_DIR;
 }
 
-void dma_enable_memory_increment_mode(uint32_t dma, uint8_t channel)
-{
+void dma_enable_memory_increment_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_MINC;
 }
 
-void dma_disable_memory_increment_mode(uint32_t dma, uint8_t channel)
-{
+void dma_disable_memory_increment_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_MINC;
 }
 
-void dma_enable_peripheral_increment_mode(uint32_t dma, uint8_t channel)
-{
+void dma_enable_peripheral_increment_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_PINC;
 }
 
-void dma_disable_peripheral_increment_mode(uint32_t dma, uint8_t channel)
-{
+void dma_disable_peripheral_increment_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_PINC;
 }
 
-void dma_set_peripheral_size(uint32_t dma, uint8_t channel, uint32_t size)
-{
+void dma_set_peripheral_size(uint32_t dma, uint8_t channel, uint32_t size) {
 	uint32_t reg;
 
 	dma_assert_channel(channel);
@@ -138,8 +129,7 @@ void dma_set_peripheral_size(uint32_t dma, uint8_t channel, uint32_t size)
 	DMA_CFGR(dma, channel) = reg;
 }
 
-void dma_set_memory_size(uint32_t dma, uint8_t channel, uint32_t size)
-{
+void dma_set_memory_size(uint32_t dma, uint8_t channel, uint32_t size) {
 	uint32_t reg;
 
 	dma_assert_channel(channel);
@@ -151,26 +141,22 @@ void dma_set_memory_size(uint32_t dma, uint8_t channel, uint32_t size)
 	DMA_CFGR(dma, channel) = reg;
 }
 
-void dma_enable_circular_mode(uint32_t dma, uint8_t channel)
-{
+void dma_enable_circular_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_CIRC;
 }
 
-void dma_enable_mem2mem_mode(uint32_t dma, uint8_t channel)
-{
+void dma_enable_mem2mem_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_MEM2MEM;
 }
 
-void dma_disable_mem2mem_mode(uint32_t dma, uint8_t channel)
-{
+void dma_disable_mem2mem_mode(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_MEM2MEM;
 }
 
-void dma_set_priority(uint32_t dma, uint8_t channel, uint32_t priority)
-{
+void dma_set_priority(uint32_t dma, uint8_t channel, uint32_t priority) {
 	uint32_t reg;
 
 	dma_assert_channel(channel);
@@ -182,75 +168,63 @@ void dma_set_priority(uint32_t dma, uint8_t channel, uint32_t priority)
 	DMA_CFGR(dma, channel) = reg;
 }
 
-void dma_enable_transfer_complete_interrupt(uint32_t dma, uint8_t channel)
-{
+void dma_enable_transfer_complete_interrupt(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_TCIE;
 }
 
-void dma_disable_transfer_complete_interrupt(uint32_t dma, uint8_t channel)
-{
+void dma_disable_transfer_complete_interrupt(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_TCIE;
 }
 
-void dma_enable_half_transfer_interrupt(uint32_t dma, uint8_t channel)
-{
+void dma_enable_half_transfer_interrupt(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_HTIE;
 }
 
-void dma_disable_half_transfer_interrupt(uint32_t dma, uint8_t channel)
-{
+void dma_disable_half_transfer_interrupt(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_HTIE;
 }
 
-void dma_enable_transfer_error_interrupt(uint32_t dma, uint8_t channel)
-{
+void dma_enable_transfer_error_interrupt(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_TEIE;
 }
 
-void dma_disable_transfer_error_interrupt(uint32_t dma, uint8_t channel)
-{
+void dma_disable_transfer_error_interrupt(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_TEIE;
 }
 
-void dma_channel_enable(uint32_t dma, uint8_t channel)
-{
+void dma_channel_enable(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) |= DMA_CFGR_EN;
 }
 
-void dma_channel_disable(uint32_t dma, uint8_t channel)
-{
+void dma_channel_disable(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_CFGR(dma, channel) &= ~DMA_CFGR_EN;
 }
 
-uint32_t dma_get_flag(uint32_t dma, uint8_t channel, uint32_t flag)
-{
+uint32_t dma_get_flag(uint32_t dma, uint8_t channel, uint32_t flag) {
 	dma_assert_channel(channel);
 	return (DMA_INTFR(dma) >> DMA_FLAG_OFFSET(channel))
 		& (flag & DMA_FLAG_MASK);
 }
 
-void dma_clear_flag(uint32_t dma, uint8_t channel, uint32_t flag)
-{
+void dma_clear_flag(uint32_t dma, uint8_t channel, uint32_t flag) {
 	dma_assert_channel(channel);
 	DMA_INTFCR(dma) = (flag & DMA_FLAG_MASK) << DMA_FLAG_OFFSET(channel);
 }
 
-uint32_t dma_get_interrupt_status(uint32_t dma, uint8_t channel)
-{
+uint32_t dma_get_interrupt_status(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	return (DMA_INTFR(dma) >> DMA_FLAG_OFFSET(channel)) & DMA_FLAG_MASK;
 }
 
-void dma_clear_interrupt_pending_bit(uint32_t dma, uint8_t channel)
-{
+void dma_clear_interrupt_pending_bit(uint32_t dma, uint8_t channel) {
 	dma_assert_channel(channel);
 	DMA_INTFCR(dma) = DMA_FLAG_MASK << DMA_FLAG_OFFSET(channel);
 }

@@ -41,8 +41,7 @@
 /**
  * Print an unsigned value in decimal without pulling in printf.
  */
-static void console_putu(uint32_t value)
-{
+static void console_putu(uint32_t value) {
 	char buf[10];
 	int i = 0;
 
@@ -61,15 +60,13 @@ static void console_putu(uint32_t value)
 	}
 }
 
-static void console_puts(const char *s)
-{
+static void console_puts(const char *s) {
 	while (*s) {
 		uart_send_blocking(UART1, (uint8_t)*s++);
 	}
 }
 
-int main(void)
-{
+int main(void) {
 	uint32_t sysclk;
 
 	/* 60 MHz from the PLL.  This powers XT32M first. */

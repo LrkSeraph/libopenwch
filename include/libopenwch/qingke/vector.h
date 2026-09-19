@@ -140,7 +140,8 @@ extern const char *const openwch_irq_names[];
 extern vector_table_entry_t _vector_base[];
 
 /** Entry point; defined in qingke/vector_chipset.S. */
-void _reset_entry(void) __attribute__((noreturn));
+__attribute__((noreturn))
+void _reset_entry(void);
 
 /** C part of the reset path, called from _reset_entry() with gp and sp set. */
 void openwch_reset_init(void);
