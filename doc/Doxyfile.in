@@ -1,0 +1,61 @@
+# Doxygen configuration for libopenwch.
+#
+# This file is a template: doc/Makefile substitutes @FAMILY@, @FAMILY_UPPER@
+# and @OUTPUT_DIR@ to produce one Doxyfile per family.  Keeping one template
+# rather than one file per family means a change to the settings cannot be
+# applied to some families and forgotten for others.
+
+PROJECT_NAME           = "libopenwch — @FAMILY@"
+PROJECT_BRIEF          = "libopencm3-style drivers for WCH RISC-V MCUs"
+PROJECT_NUMBER         = 0.1.0
+
+OUTPUT_DIRECTORY       = @OUTPUT_DIR@
+HTML_OUTPUT            = html
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+
+# Only the library's own headers and sources; the application template and the
+# tests are not part of the documented API.
+INPUT                  = ../include/libopenwch ../lib
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.c
+EXCLUDE_PATTERNS       = */common/*
+
+# The family this run documents.  Selecting it makes the dispatch headers pick
+# the right branch instead of warning about an undefined family.
+PREDEFINED             = @FAMILY_UPPER@=1 \
+                         __attribute__(x)= \
+                         OPENWCH_INTERRUPT= \
+                         OPENWCH_HIGH_CODE= \
+                         OPENWCH_NAKED= \
+                         OPENWCH_WEAK= \
+                         OPENWCH_USED= \
+                         RWA_INLINE=
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+SEARCH_INCLUDES        = YES
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = YES
+WARN_AS_ERROR          = NO
+
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = NO
+HIDE_UNDOC_MEMBERS     = NO
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+ALPHABETICAL_INDEX     = YES
+SORT_MEMBER_DOCS       = NO
+SORT_BRIEF_DOCS        = NO
+JAVADOC_AUTOBRIEF      = YES
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TAB_SIZE               = 8

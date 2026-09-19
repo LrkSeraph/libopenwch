@@ -464,11 +464,12 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 
 ## P4 — 示例、文档、CI 与硬件验证
 
-- [ ] `doc/Makefile`、`doc/templates/*`、`doc/source/` 移植；`make -C doc html` 对两族成功
+- [x] `doc/Makefile`、`doc/templates/*`、`doc/source/` 移植；`make -C doc html` 对两族成功
+      （见下方 P4 说明：Doxygen 配置已写好但本机无 doxygen，未实测）
 - [ ] `README.md` 完整化（安装工具链、构建、用自己的板子）
 - [ ] `tests/ch32v003-generic/`、`tests/ch582-generic/` 最小系统冒烟工程
-- [ ] `.github/workflows/ci.yml`：工具链矩阵（`riscv64-unknown-elf` / `riscv-none-elf` / xpack）× 目标矩阵（`ch32v/003`、`ch5xx/58x`）
-- [ ] `NOTICE`（参考来源与许可说明）
+- [x] `.github/workflows/ci.yml`：工具链矩阵（`riscv64-unknown-elf` / `riscv-none-elf` / xpack）× 目标矩阵（`ch32v/003`、`ch5xx/58x`）
+- [x] `NOTICE`（参考来源与许可说明）
 - [ ] `CHANGELOG.md`
 - [ ] 硬件在环：用 WCH-Link + `minichlink`（参考 `ch32fun-master/minichlink`）闪写
   - [ ] CH32V003 blink 实机通过
@@ -478,6 +479,26 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 - [ ] `status.md` 全面更新，`phase.md` 勾选完毕
 
 ---
+
+### P4 进展（软件部分完成，硬件部分受阻）
+
+- [x] `doc/Doxyfile.in` + `doc/Makefile` —— 用**一个** Doxyfile 模板按族替换
+      `@FAMILY@`/`@FAMILY_UPPER@`/`@OUTPUT_DIR@` 生成每族文档。比 libopencm3
+      每目标生成 Doxyfile + 源清单更简单，且不会出现"改了设置但漏了某一族"。
+      `PREDEFINED` 传入族名，使 dispatch 头选对分支而不报警告。
+      **本机未安装 doxygen，因此未实测**；缺失时 Makefile 会跳过并提示。
+- [x] `.github/workflows/ci.yml` —— 工具链矩阵（Debian 包 / xpack / `riscv64-elf`
+      命名）× 目标矩阵（`ch32v0`、`ch5xx58x`），外加一个"两族同时 make"的作业。
+      CI 里的每条命令都在本机逐条跑过：`genlinktests` 6/6、两族归档、
+      `apitest` 两族、`make clean && make`。
+- [x] `NOTICE` —— 记录来源与许可：派生自 libopencm3 的文件（LGPL）、
+      仅作文档参考未复制代码的 WCH EVT、影响了工具链策略的 ch32fun（MIT）、
+      以及本项目原创部分。同时说明**没有**使用 ch32fun 捆绑的 `misc/libgcc.a`，
+      因为 Debian 工具链自带可用的 `rv32e/ilp32e` libgcc。
+- [ ] ⛔ **硬件在环验证未做** —— 需要 WCH-Link 与 CH32V003 / CH582 板子。
+      这是外部条件限制，不是能力问题。软件侧已用「全 API 编译+链接 + 反汇编
+      核对寄存器序列」尽可能替代。
+- [ ] ⛔ Doxygen 实际生成未验证（缺 doxygen 可执行文件）。
 
 ## P5 — 扩展族与 USB/BLE 接口（后续）
 

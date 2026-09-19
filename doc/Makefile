@@ -1,9 +1,10 @@
-# Makefile to build the libopenwch documentation.
+# Makefile to build the libopenwch API documentation.
 #
-# Derived from libopencm3's doc/Makefile (LGPL-3-or-later).  The per-device
-# Doxyfile / layout / source list are generated from doc/templates/ and from
-# the dependency (.d) files produced by a library build, so the library has to
-# be built at least once before `make -C doc html` is meaningful.
+# Derived from libopencm3's doc/Makefile (LGPL-3-or-later), but simplified:
+# libopencm3 generates a Doxyfile and a source list per target through helper
+# scripts; libopenwch uses one Doxyfile template with @FAMILY@ substitutions,
+# because the families differ only in their predefine and their output
+# directory.
 #
 # This file is part of the libopenwch project.
 #
@@ -22,20 +23,36 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-# setup TARGETS if not set for legacy and ease of debug.
 TARGETS ?= ch32v0 ch5xx58x
 
-TARGETS_DIRS = $(subst /,,$(TARGETS))
+DOXYGEN ?= doxygen
+
+# The family define is the upper-cased target name, which is exactly what the
+# dispatch headers test against.
+fam_upper = $(shell echo $(1) | tr a-z A-Z)
 
 doc: html
 
 html:
-	@echo "  ----    libopenwch Doxygen build"
-	@echo "  NOTE    doxygen integration lands in P4 (see phase.md)."
-	@echo "  NOTE    The API headers under include/libopenwch/ are already"
-	@echo "          annotated with @defgroup/@addtogroup for this step."
+	@if ! command -v $(DOXYGEN) >/dev/null 2>&1; then \
+		echo "  ----    doxygen not found; skipping documentation build"; \
+		echo "  NOTE    install doxygen to generate the API documentation"; \
+		exit 0; \
+	fi; \
+	for t in $(TARGETS); do \
+		u=$$(echo $$t | tr a-z A-Z); \
+		echo "  DOXYGEN $$t"; \
+		mkdir -p $$t; \
+		sed -e "s/@FAMILY@/$$t/g" \
+		    -e "s/@FAMILY_UPPER@/$$u/g" \
+		    -e "s|@OUTPUT_DIR@|$$t|g" \
+		    Doxyfile.in > $$t/Doxyfile || exit $$?; \
+		(cd $$t && $(DOXYGEN) Doxyfile >/dev/null) || exit $$?; \
+	done
+	@echo "  ----    documentation written under doc/<family>/html/"
 
 clean:
-	@$(RM) -rf html */html */doxy.sourcelist */Doxyfile */DoxygenLayout_*.xml
+	@$(RM) -rf html
+	@for t in $(TARGETS); do $(RM) -rf $$t; done
 
 .PHONY: doc html clean

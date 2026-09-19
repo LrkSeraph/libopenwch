@@ -1,0 +1,110 @@
+# Continuous integration for libopenwch.
+#
+# The matrix has two axes on purpose:
+#
+#   toolchain — libopenwch must build with any bare-metal RISC-V GCC, not just
+#               the one the maintainer happens to have.  The three entries
+#               cover the Debian/Kali package, the xpack build that ch32fun
+#               recommends, and the vendor-neutral `riscv64-elf` naming.
+#
+#   target    — every family must build, and the two families must be able to
+#               build in the same `make` invocation, which is what catches an
+#               accidental cross-family dependency.
+#
+# The API smoke tests are run for both families: they compile every public
+# function with the library's own strict warning set plus -Werror and link the
+# result, so a broken prototype or a missing object fails CI rather than a
+# user's board.
+
+name: build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.target }} on ${{ matrix.toolchain.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - name: debian
+            prefix: riscv64-unknown-elf
+            install: apt
+          - name: xpack
+            prefix: riscv-none-elf
+            install: xpack
+          - name: plain-elf
+            prefix: riscv64-elf
+            install: apt
+        target:
+          - ch32v0
+          - ch5xx58x
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the Debian toolchain
+        if: matrix.toolchain.install == 'apt'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-riscv64-unknown-elf
+          # The plain-elf prefix is not packaged; symlink the Debian one so
+          # that the probe chain exercises a different name.
+          if [ "${{ matrix.toolchain.prefix }}" = "riscv64-elf" ]; then
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-gcc       /usr/local/bin/riscv64-elf-gcc
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-ar        /usr/local/bin/riscv64-elf-ar
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-objcopy   /usr/local/bin/riscv64-elf-objcopy
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-objdump   /usr/local/bin/riscv64-elf-objdump
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-size      /usr/local/bin/riscv64-elf-size
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-nm        /usr/local/bin/riscv64-elf-nm
+            sudo ln -sf /usr/bin/riscv64-unknown-elf-as        /usr/local/bin/riscv64-elf-as
+          fi
+
+      - name: Install the xpack toolchain
+        if: matrix.toolchain.install == 'xpack'
+        run: |
+          npm install --no-save --prefix "$RUNNER_TEMP" xpm
+          "$RUNNER_TEMP/node_modules/.bin/xpm" install --global \
+            @xpack-dev-tools/riscv-none-elf-gcc@14.2.0-3
+          echo "$HOME/.local/xPacks/@xpack-dev-tools/riscv-none-elf-gcc/14.2.0-3/.content/bin" >> "$GITHUB_PATH"
+
+      - name: Report the toolchain
+        run: |
+          ${{ matrix.toolchain.prefix }}-gcc --version | head -1
+          ${{ matrix.toolchain.prefix }}-gcc -dumpversion
+
+      - name: Device database tests
+        run: make genlinktests PREFIX=${{ matrix.toolchain.prefix }}
+
+      - name: Build the library
+        run: make TARGETS=${{ matrix.target }} PREFIX=${{ matrix.toolchain.prefix }}
+
+      - name: API smoke test
+        run: make apitest PREFIX=${{ matrix.toolchain.prefix }}
+
+      - name: Report sizes
+        run: |
+          for a in lib/*.a; do
+            echo "== $a"
+            ${{ matrix.toolchain.prefix }}-size "$a" 2>/dev/null || \
+              ${{ matrix.toolchain.prefix }}-nm --defined-only "$a" | \
+              awk '$2=="T"' | wc -l | xargs echo "  public functions:"
+          done
+
+  all-targets:
+    name: both families in one make
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y gcc-riscv64-unknown-elf
+      # Building both in one invocation is what would catch a family-specific
+      # flag or header leaking into the shared build.
+      - run: make TARGETS="ch32v0 ch5xx58x"
+      - run: make apitest
+      - run: make clean && make

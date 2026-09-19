@@ -1,0 +1,102 @@
+libopenwch — provenance and licensing
+=====================================
+
+This file records where the code and the ideas in this repository came from,
+and under what terms.  It exists so that a downstream user can tell at a glance
+which parts are original, which are derived, and which were consulted as
+documentation only.
+
+License summary
+---------------
+
+  Library code                LGPL-3.0-or-later     COPYING.LGPL3
+  (include/, lib/, ld/, mk/)
+  scripts/checkpatch.pl       GPL-2.0               (see the file header)
+  Documentation and governance
+  (project.md, phase.md,       CC0-1.0 / public domain
+   status.md, AGENTS.md,       (original prose, no restriction intended)
+   README.md, NOTICE)
+
+Applications that merely link against libopenwch are unaffected by the LGPL;
+the same is true of libopencm3, from which this split is inherited.
+
+Derived from libopencm3 (LGPL-3.0-or-later)
+-------------------------------------------
+
+The build system, the directory conventions, parts of the linker script, and
+several scripts are derived from libopencm3 and remain under the LGPL:
+
+  Makefile                     structure: TARGETS recursion, failure stamps
+  lib/Makefile.include         archive rules
+  mk/gcc-config.mk             toolchain variable module
+  mk/gcc-rules.mk              %.elf/%.bin/%.hex/%.o rules
+  mk/genlink-config.mk         device -> library selection
+  mk/genlink-rules.mk          generated linker script rule
+  scripts/genlink.py           device database query tool
+  scripts/irq2nvic_h           IRQ header generator (heavily reworked)
+  scripts/genlinktest.sh       device database test harness
+  ld/linker.ld.S               generic linker script skeleton
+  ld/devices.data              device database format
+  include/libopencm3/**        header conventions, Doxygen style, MMIO macros
+  HACKING, HACKING_COMMON_DOC  coding rules and the new-family checklist
+  COPYING.LGPL3, COPYING.GPL3  taken verbatim
+
+The individual copyright notices in those files are retained.
+
+Consulted as documentation only — no code copied
+------------------------------------------------
+
+WCH's official EVT packages for the CH32V003 and the CH583 were read to
+establish register addresses, bit positions, field layouts, and the ordering of
+clock and flash sequences.  Register addresses and bit assignments are
+interface facts and are not copyrightable expression, but the EVT *code* is
+not, and none of it was copied: every function in this library is written
+against the reference manual's register descriptions and is deliberately named
+differently (the EVT uses CamelCase; this library does not).
+
+  ch32v003-main/EVT/EXAM/SRC/Peripheral/inc/ch32v00x*.h
+  ch32v003-main/EVT/EXAM/SRC/Core/core_riscv.h
+  ch32v003-main/EVT/EXAM/SRC/Startup/startup_ch32v00x.S
+  ch32v003-main/EVT/EXAM/SRC/Ld/Link.ld
+  ch583-main/EVT/EXAM/SRC/StdPeriphDriver/inc/CH583SFR.h
+  ch583-main/EVT/EXAM/SRC/StdPeriphDriver/CH58x_*.c, inc/CH58x_*.h
+  ch583-main/EVT/EXAM/SRC/Startup/startup_CH583.S
+  ch583-main/EVT/EXAM/SRC/Ld/Link.ld
+
+The QingKe (WCH RISC-V core) vector table format, the PFIC register layout, the
+`mtvec = base | 3` mode and the RWA safe-access protocol were all verified
+against those files.
+
+Influenced the toolchain strategy
+---------------------------------
+
+ch32fun is MIT licensed.  Its approach to the generic `riscv64-unknown-elf`
+toolchain shaped the toolchain probe chain in mk/gcc-config.mk and the
+`-nostdlib` / `-ffunction-sections` recipe used by the application template.
+No ch32fun source was copied.  The bundled `misc/libgcc.a` from ch32fun is
+NOT used: the Debian riscv64-unknown-elf toolchain ships a working
+`rv32e/ilp32e` libgcc, which the build probes for.
+
+  ch32fun-master/ch32fun/ch32fun.mk
+  ch32fun-master/ch32fun/ch32fun.ld
+  ch32fun-master/ch32fun/ch32fun.c
+  ch32fun-master/ch32fun/ch5xxhw.h
+  ch32fun-master/examples/template/
+  ch32fun-master/misc/CH32V003xx.svd
+
+The CH32V003 SVD file was used to resolve the AFIO remap bit layout and the
+DBGMCU question, where WCH's EVT and ch32fun's headers disagree with each
+other.
+
+Original work
+-------------
+
+Everything else is original to this project, in particular:
+
+  include/libopenwch/qingke/**       the RISC-V core layer
+  lib/qingke/**                      reset path, PFIC, SysTick
+  include/libopenwch/ch32v0/**       CH32V00x register maps and drivers
+  include/libopenwch/ch5xx58x/**     CH58x register maps and drivers
+  lib/ch32v0/**, lib/ch5xx58x/**     the driver implementations
+  template/**                        the application skeleton
+  tests/**                           the API smoke tests
