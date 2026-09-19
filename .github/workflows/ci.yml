@@ -68,11 +68,25 @@ jobs:
 
       - name: Install the xpack toolchain
         if: matrix.toolchain.install == 'xpack'
+        env:
+          # xpack versions carry a fourth field; "14.2.0-3" does not exist and
+          # is not the same release as "14.2.0-3.1".
+          XPACK_VERSION: 14.2.0-3.1
         run: |
           npm install --no-save --prefix "$RUNNER_TEMP" xpm
           "$RUNNER_TEMP/node_modules/.bin/xpm" install --global \
-            @xpack-dev-tools/riscv-none-elf-gcc@14.2.0-3
-          echo "$HOME/.local/xPacks/@xpack-dev-tools/riscv-none-elf-gcc/14.2.0-3/.content/bin" >> "$GITHUB_PATH"
+            "@xpack-dev-tools/riscv-none-elf-gcc@$XPACK_VERSION"
+          # The store layout is
+          #   <store>/@xpack-dev-tools/riscv-none-elf-gcc/<version>/.content/bin
+          # but the store root differs between platforms and xpm versions, so
+          # find the directory instead of assuming one.
+          bindir=$(find "$HOME/.local/xPacks" -maxdepth 5 -type d -name bin 2>/dev/null | head -n1)
+          if [ -z "$bindir" ]; then
+            echo "xpack installed but no bin/ directory was found" >&2
+            exit 1
+          fi
+          echo "xpack bin: $bindir"
+          echo "$bindir" >> "$GITHUB_PATH"
 
       - name: Report the toolchain
         run: |
