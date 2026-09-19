@@ -169,6 +169,14 @@ jobs:
         run: |
           make -C template/examples/blink LIBOPENWCH_NOSTDLIB=1 2>&1 | tee -a "$BUILD_LOG"
           make -C template/examples/ch582_blink LIBOPENWCH_NOSTDLIB=1 2>&1 | tee -a "$BUILD_LOG"
+      # The BLE example links WCH's closed-source stack, which is the only
+      # place in this repository where a prebuilt third-party binary is part
+      # of the link.  Building it here proves the vendored archive survives a
+      # fresh checkout and resolves on a toolchain with no newlib at all --
+      # the stack's own memcpy() comes from our mini-libc.
+      - name: Bluetooth LE example (LIBOPENWCH_BLE=1)
+        shell: bash
+        run: make -C template/examples/ch582_ble_advertise 2>&1 | tee -a "$BUILD_LOG"
       - name: Report the failure
         if: failure()
         run: |
