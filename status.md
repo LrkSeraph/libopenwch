@@ -13,10 +13,11 @@
 |---|---|
 | 当前阶段 | **P3 完成；P4 软件部分完成，硬件在环受阻** |
 | 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ P5: 0% |
-| 最近更新 | P4 软件部分：Doxygen 配置、CI 工作流（工具链×目标矩阵）、NOTICE。P3 完成：CH58x 12 个外设（202 个公开函数）、`tests/ch5xx58x/api_smoke.c`、`ch582_blink` 改为真正的 blink；累计 **518 个公开函数**，两族均 0 警告 0 重名 0 命名违规 |
+| 最近更新 | 发布与许可轮：新增 `LICENSE`（LGPL-3.0）与 `COPYING.GPL2`，仓库推送到 `github.com/LrkSeraph/libopenwch`；**修正一个只在干净克隆下暴露的构建中断缺陷**（`.gitignore` 误吞两个手写 `nvic.h`）。P4 软件部分：Doxygen 配置、CI 工作流（工具链×目标矩阵）、NOTICE。累计 **518 个公开函数**，两族均 0 警告 0 重名 0 命名违规 |
 | 构建状态 | ✅ `make` 全绿：`lib/libopenwch_ch32v0.a`、`lib/libopenwch_ch5xx58x.a` |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
-| 仓库状态 | ✅ 7 个提交；构建后工作区依然干净 |
+| 仓库状态 | ✅ 16 个提交；已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0** |
+| 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest` / 四个示例） |
 
 ### 可复现的验证命令与结果
 
@@ -90,6 +91,7 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 
 - [x] `.gitignore` / `.clang-format` / `HACKING` / `HACKING_COMMON_DOC` / `README.md`
 - [x] `COPYING.LGPL3` / `COPYING.GPL3` / `scripts/checkpatch.pl`（取自 libopencm3）
+- [x] `LICENSE`（LGPL-3.0，GitHub 识别入口）/ `COPYING.GPL2`（`checkpatch.pl` 实际所用版本）
 - [x] `mk/gcc-config.mk` — RISC-V 前缀探测链、工具链能力探测、`ZMMUL_OK`
 - [x] `mk/gcc-rules.mk` — `%.o`/`%.elf`/`%.bin`/`%.hex`/`%.srec`/`%.list`
 - [x] `mk/genlink-config.mk` — `MARCH`/`ZEXT`/`MABI`/`ZMMUL` → `ARCH_FLAGS`，
@@ -349,6 +351,13 @@ P3 已全部完成，见上一节。P4 待办：
 | CH582 UART echo | `make -C template/examples/ch582_uart_echo` | ✅ 2412 B |
 | `.highcode` 段可链接 | 最小复现 + `make apitest` | ✅ 修复后 `in_ram` 落在 0x20000000 |
 | RWA 解锁序列 | `objdump -d clk.o` | ✅ 8 个内联 `0x57`/`0xA8` 窗口 |
+| **干净克隆构建** | 空目录 `git clone` 后 `make TARGETS="ch32v0 ch5xx58x"` | ✅ 两族归档均生成（**修复前**报 `fatal error: libopenwch/qingke/nvic.h: No such file or directory`） |
+| 干净克隆完整验证 | 同上 + `make genlinktests` / `make apitest` / 四个示例 | ✅ genlinktests 6/6 OK、apitest 链接通过、示例 4/4 构建成功 |
+| `.gitignore` 语义 | `git check-ignore -v` 手写 vs 生成 `nvic.h` | ✅ 手写 `qingke/`+`dispatch/` 不被忽略；生成的族头文件仍被忽略 |
+| `make clean` 安全性 | `make clean` 后检查手写 `nvic.h` | ✅ `qingke/nvic.h`、`dispatch/nvic.h` 保留；生成的族头文件被删除；随后 `make` 仍全绿 |
+| GitHub 许可识别 | `api.github.com/repos/LrkSeraph/libopenwch` | ✅ `spdx_id: LGPL-3.0` |
+| 远程一致性 | `git rev-parse HEAD` vs `git rev-parse origin/master` | ✅ 一致（`f0b94f7`） |
+| 远程文件树 | `contents/include/libopenwch/dispatch` | ✅ `nvic.h` 已在远端（修复前该目录 0 文件） |
 
 ---
 
@@ -363,3 +372,5 @@ P3 已全部完成，见上一节。P4 待办：
 | 第 4 轮 | P2.6：新增 `template/` 应用骨架（rules/ + 两个示例 + VSCode 配置），提交 `7b0df2f`。模板暴露并修正 3 个库侧缺陷（`CC ?=` 失效、`ZMMUL_OK` 未在应用侧探测、族归档 ISA 标签过宽） |
 | 第 5 轮 | **P2 完成**：CH32V00x 15 个外设、316 个公开函数；新增 `tests/ch32v0/api_smoke.c` 与 `make apitest`。独立复核 6 个并行实现代理的产出，发现并修正 2 处实质错误：GPIO nibble 位域假设（穷举证明无解→改为不透明值）、DBGMCU 误按内存映射实现（实为 CSR 0x7c0）；另修正 `mk/gcc-config.mk` 的工具变量 `?=` 缺陷与写错的 AFIO remap 位（bit 15 而非 12） |
 | 第 6 轮 | **P3 完成**：CH58x 12 个外设（202 个公开函数）、`tests/ch5xx58x/api_smoke.c`、`ch582_blink` 改为真正的 blink。修正 `memorymap.h` 的 CH58x 身份/复位寄存器偏移（`R8_CHIP_ID`/`R8_GLOB_RESET_KEEP` 写错，由两个独立代理同时报出）与 `RWA` helper 必须 `always_inline` 的时序要求。两族合计 518 个公开函数，全部 0 警告、0 重名、0 命名违规 |
+| 第 7 轮 | **P4 软件部分**：`doc/`（单份 Doxygen 模板 + `@FAMILY@` 替换，缺 doxygen 时优雅跳过）、`.github/workflows/ci.yml`（3 工具链 × 2 族矩阵 + 双族单次 `make`）、`NOTICE`（来源与许可边界）；`template/` 补 `ch582_blink` 与 `ch582_uart_echo` 示例 |
+| 第 8 轮（发布轮） | 新增 `LICENSE`（LGPL-3.0 文本，作为 GitHub 识别入口）与 `COPYING.GPL2`——`scripts/checkpatch.pl` 文件头声明的是 **GPL-2.0**，而仓库此前只随附了 `COPYING.GPL3`；`NOTICE`/`README.md` 同步说明该布局。推送至 `git@github.com:LrkSeraph/libopenwch.git`。**发现并修正一个严重缺陷**：`.gitignore` 中用于忽略*生成*头文件的 `include/libopenwch/*/nvic.h` 通配，同时匹配了**手写**的 `qingke/nvic.h` 和整个 `dispatch/` 目录（后者此前 **0 个文件**被跟踪），导致**干净克隆无法构建**（`fatal error: libopenwch/qingke/nvic.h: No such file or directory`）；本地一直未暴露，是因为未跟踪文件仍留在磁盘上而 `make clean` 不会删除它们。改为对这两个路径取反，并核实 `make clean` 仍会删除生成文件、保留手写文件。另修正 CI 的 xpack 版本号（xpack 版本有第四段：`14.2.0-3` 不存在，实为 `14.2.0-3.1`），并把 bin 目录改为用 `find` 定位而非硬编码 |
