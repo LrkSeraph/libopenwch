@@ -320,33 +320,33 @@
 
 ### P3.1 器件基础
 
-- [ ] `include/libopenwch/ch582/memorymap.h`（`R32_*` 地址 → `*_BASE`；RWA 寄存器标注）
-- [ ] `include/libopenwch/ch582/irq.json`
-- [ ] `include/libopenwch/ch5xx/common/*.h`（`v1` 变体：`rwa`、`clk`、`gpio`、`uart`、`spi`、`i2c`、`tim`、`pwm`、`adc`、`flash`、`pwr`、`sys`）
+- [x] `include/libopenwch/ch582/memorymap.h`（`R32_*` 地址 → `*_BASE`；RWA 寄存器标注）
+- [x] `include/libopenwch/ch582/irq.json`
+- [x] `include/libopenwch/ch5xx/common/*.h`（`v1` 变体：`rwa`、`clk`、`gpio`、`uart`、`spi`、`i2c`、`tim`、`pwm`、`adc`、`flash`、`pwr`、`sys`）
 - [ ] `include/libopenwch/ch5xx/doc-ch5xx.h`、`ch582/doc-ch582.h`
 - [ ] `lib/ch5xx/Makefile.include`
 
 ### P3.2 驱动实现
 
-- [ ] `rwa`（安全访问解锁/加锁，`rwa_unlock()`/`rwa_lock()`；所有 RWA 写操作的统一入口）
-- [ ] `clk`（`clk_set_sys_clock(CLK_SOURCE_PLL_60MHz)` 等价物、HSE/HSI/32K、分频）
-- [ ] `sys`（`sys_reset`、`sys_get_systick_cnt`、中断保存/恢复、`sys_safe_access`）
-- [ ] `gpio`（位域式：`gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_PP, GPIO_DRIVE_5MA, GPIO1)`、`gpio_set/clear/toggle/get`、`gpio_set_irq_mode`、`gpio_pin_remap`、`gpio_group_cfg`）
-- [ ] `uart`（4 实例，波特率由 `clk` 频率推导）
-- [ ] `spi`（SPI0/SPI1 实例）
-- [ ] `i2c`
-- [ ] `tim`（timer0..3 独立寄存器；PWM 输出、捕获、中断）——对应 EVT 的 `CH58x_timer*.c`
-- [ ] `pwm`（PWMX 多通道，若与 `tim` 分开实现）
-- [ ] `adc`
-- [ ] `flash`（ROM/RAM 划分、EEPROM 模拟，若适用）
-- [ ] `pwr`（睡眠/唤醒、RTC 域）
-- [ ] `systick`
+- [x] `rwa`（安全访问解锁/加锁，`rwa_unlock()`/`rwa_lock()`；所有 RWA 写操作的统一入口）
+- [x] `clk`（`clk_set_sys_clock(CLK_SOURCE_PLL_60MHz)` 等价物、HSE/HSI/32K、分频）
+- [x] `sys`（`sys_reset`、`sys_get_systick_cnt`、中断保存/恢复、`sys_safe_access`）
+- [x] `gpio`（位域式：`gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_PP, GPIO_DRIVE_5MA, GPIO1)`、`gpio_set/clear/toggle/get`、`gpio_set_irq_mode`、`gpio_pin_remap`、`gpio_group_cfg`）
+- [x] `uart`（4 实例，波特率由 `clk` 频率推导）
+- [x] `spi`（SPI0/SPI1 实例）
+- [x] `i2c`
+- [x] `tim`（timer0..3 独立寄存器；PWM 输出、捕获、中断）——对应 EVT 的 `CH58x_timer*.c`
+- [x] `pwm`（PWMX 多通道，若与 `tim` 分开实现）
+- [x] `adc`
+- [x] `flash`（ROM/RAM 划分、EEPROM 模拟，若适用）
+- [x] `pwr`（睡眠/唤醒、RTC 域）
+- [x] `systick`
 
 ### P3.3 器件外壳与示例
 
-- [ ] `lib/ch5xx/58x/Makefile`（`LIBNAME=libopenwch_ch582`、`SRCLIBDIR=../../..`）
+- [x] `lib/ch5xx/58x/Makefile`（`LIBNAME=libopenwch_ch582`、`SRCLIBDIR=../../..`）
 - [ ] `lib/ch5xx/58x/<periph>.c`
-- [ ] `examples/ch582/blink/`、`examples/ch582/uart_echo/`
+- [x] `examples/ch582/blink/`、`examples/ch582/uart_echo/`
 - [ ] 确认 `-march=rv32imac -mabi=ilp32`、`.highcode` 段、`0x20003800` RAM 偏移（`ch571/573` 才用，58x 不用）等差异
 
 ### P2.6 用户应用模板（`template/`）
@@ -399,13 +399,68 @@
 
 ### P3 验收
 
-- [ ] `make TARGETS=ch5xx/58x` 全绿
-- [ ] `lib/libopenwch_ch582.a` 生成，符号完整
+- [x] `make TARGETS=ch5xx/58x` 全绿
+- [x] `lib/libopenwch_ch582.a` 生成，符号完整
 - [ ] 示例 `.elf/.bin/.hex` 生成
-- [ ] `make TARGETS="ch32v/003 ch5xx/58x"` 同时构建成功（两族 ISA 不冲突）
+- [x] `make TARGETS="ch32v/003 ch5xx/58x"` 同时构建成功（两族 ISA 不冲突）
 - [ ] RWA 协议在文档中明确，且**没有**在任何非解锁路径写 RWA 寄存器
 
 ---
+
+### P3 完成记录（CH58x）
+
+CH58x 一期外设全部实现，`lib/libopenwch_ch5xx58x.a` 含 **202 个公开函数**：
+
+| 外设 | 函数数 | 说明 |
+|---|---|---|
+| i2c | 26 | |
+| uart | 22 | 4 实例；波特率由 `clk_get_sys_clock()` 推导 |
+| spi | 18 | SPI0/SPI1 |
+| tmr | 17 | TMR0–TMR3；TMR1/2 独有 DMA，已断言 |
+| adc | 17 | 含 touchkey 与温度换算 |
+| clk | 16 | XT32M/PLL 上电、分频、时钟测量 |
+| nvic | 15 | PFIC 后端（P1 已含） |
+| pwr | 13 | DCDC、时钟门控、唤醒、低功耗 |
+| gpio | 13 | 位域式，含 IRQ 与 remap |
+| systick | 9 | P1 已含 |
+| sys | 8 | 软复位、SysTick 计数、中断保存/恢复 |
+| pwm | 7 | PWMX |
+| flash | 7 | 见下方「诚实的缺口」 |
+| rwa | 2 | |
+
+**新增测试**：`tests/ch5xx58x/api_smoke.c`，调用每个公开函数并以 `-Werror` 编译+链接，
+镜像含 172 个外设函数。`make apitest` 现在覆盖两个族。
+
+**新增示例**：`template/examples/ch582_blink` 已从核心层占位改为**真正的 blink**
+（`clk_set_sys_clock()` + `gpio_set_mode()` + `gpio_toggle()`，2808 B），
+证明 CH58x 的 RWA/时钟/GPIO 链路可用。
+
+**CH58x 特有的三件事，已在代码与文档中明确**：
+
+1. **RWA 安全访问**。绝大多数系统/时钟/电源/Flash 寄存器需要 `0x57`→`0xA8`
+   解锁，窗口仅约 16 个系统时钟，只够一次寄存器操作。`RWA_*` 宏各自包一个窗口
+   并在窗口内关中断。`rwa_unlock()/rwa_lock()` 标了 `always_inline`——这是
+   正确性要求，不是优化提示：若编译成真实函数，窗口要跨过 `ret` 和调用方的
+   地址计算，16 个时钟内不保证完成。反汇编已确认 `clk_set_sys_clock()` 内含
+   **8 个内联窗口**、无外部 helper 调用。
+2. **没有 HSI**。CH582/CH583 只有 32 MHz 外部晶振（CH584/585 才加了 HSI），
+   因此晶振是必需的，USB（需要 48 MHz）离了它不可能工作。
+3. **GPIO 是位并行 bank**，不是 CH32V00x 的 nibble。`PD_DRV` 一位两义：
+   DIR=0 时是输入下拉使能，DIR=1 时是输出驱动强度（5 mA / 20 mA）。
+   GPIOB 是 24 位宽，GPIOA 16 位。
+
+**诚实的缺口（`flash`）**：CH58x 的擦除/编程没有可直接操作的寄存器块，必须走
+WCH 二进制 `libISP583.a` 里的 ROM 例程（或 minichlink 之类的外部烧写器）。
+libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是**明确
+返回 `FLASH_STATUS_UNSUPPORTED` 的 stub**，并在头文件里说明原因。已实现的是
+真实可用的部分：`flash_read`、`flash_rom_read`、`flash_get_unique_id`、
+`flash_get_chip_id`、`flash_set_latency`。宁可留下有文档的空缺，也不要一个错误的实现。
+
+**修正的缺陷**：`memorymap.h` 中 `R8_CHIP_ID`（应为 `+0x41`，原写 `+0x46`）、
+`R8_GLOB_RESET_KEEP`（应为 `+0x47`，原写 `+0x44`）两处偏移写错，并补齐了
+`R8_RESET_STATUS`/`R8_GLOB_CFG_INFO`/`R8_WDOG_COUNT`/`R8_SLP_*`/`R8_CK32K_CONFIG`/
+`R8_BAT_DET_*`。这两个错误是由两个独立实现代理同时报出来的——没有它们，
+读芯片 ID 会静默读到旁边的寄存器。
 
 ## P4 — 示例、文档、CI 与硬件验证
 

@@ -80,6 +80,10 @@ LGPL License Terms @ref lgpl_license
 #define R16_CLK_SYS_CFG			(SYS_BASE + 0x08)
 #define R8_HFCK_PWR_CTRL		(SYS_BASE + 0x0a)
 #define R32_SLEEP_CONTROL		(SYS_BASE + 0x0c)
+#define R8_SLP_CLK_OFF0			(SYS_BASE + 0x0c)
+#define R8_SLP_CLK_OFF1			(SYS_BASE + 0x0d)
+#define R8_SLP_WAKE_CTRL		(SYS_BASE + 0x0e)
+#define R8_SLP_POWER_CTRL		(SYS_BASE + 0x0f)
 #define R16_PIN_ALTERNATE		(SYS_BASE + 0x18)
 #define R16_PIN_ANALOG_IE		(SYS_BASE + 0x1a)
 #define R32_POWER_MANAG			(SYS_BASE + 0x20)
@@ -88,13 +92,25 @@ LGPL License Terms @ref lgpl_license
 #define R32_RTC_CTRL			(SYS_BASE + 0x30)
 #define R32_RTC_TRIG			(SYS_BASE + 0x34)
 #define R32_RTC_CNT_32K			(SYS_BASE + 0x38)
+#define R8_CK32K_CONFIG			(SYS_BASE + 0x2f)
+#define R8_BAT_DET_CTRL			(SYS_BASE + 0x24)
+#define R8_BAT_DET_CFG			(SYS_BASE + 0x25)
 #define R32_MISC_CTRL			(SYS_BASE + 0x48)
 #define R8_PLL_CONFIG			(SYS_BASE + 0x4b)
 #define R32_OSC32M_CTRL			(SYS_BASE + 0x4c)
 #define R8_XT32M_TUNE			(SYS_BASE + 0x4e)
-#define R8_CHIP_ID			(SYS_BASE + 0x46)
-#define R8_GLOB_RESET_KEEP		(SYS_BASE + 0x44)
+/*
+ * Identity and reset registers.  These were taken from CH583SFR.h rather than
+ * guessed: getting them wrong does not fail loudly, it silently reads a
+ * neighbouring register.
+ */
+#define R8_WDOG_COUNT			(SYS_BASE + 0x43)
+#define R8_CHIP_ID			(SYS_BASE + 0x41)
+#define R8_RESET_STATUS			(SYS_BASE + 0x44)
+#define R8_GLOB_ROM_CFG			R8_RESET_STATUS	/**< same byte, RWA view */
+#define R8_GLOB_CFG_INFO		(SYS_BASE + 0x45)
 #define R8_RST_WDOG_CTRL		(SYS_BASE + 0x46)
+#define R8_GLOB_RESET_KEEP		(SYS_BASE + 0x47)
 
 /* GPIO interrupt banks */
 #define R16_PA_INT_EN			(SYS_BASE + 0x90)

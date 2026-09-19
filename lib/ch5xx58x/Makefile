@@ -60,16 +60,16 @@ OBJS += vector_handlers.o vector_names.o
 ## Peripheral drivers.  Every object listed here must have a source file in
 ## this directory or in ./common/.
 ##
-# P3 plan: uncomment each line as its source file lands.
 OBJS += rwa.o clk.o
 OBJS += gpio.o gpio_common_v1.o
-#OBJS += gpio.o
-#OBJS += uart.o
-#OBJS += spi.o
-#OBJS += i2c.o
-#OBJS += tim.o
-#OBJS += pwm.o
-#OBJS += adc.o
+OBJS += adc.o adc_common_v1.o flash.o flash_common_v1.o
+OBJS += tmr.o tmr_common_v1.o
+OBJS += pwm.o pwm_common_v1.o
+OBJS += pwr.o pwr_common_v1.o
+OBJS += spi.o spi_common_v1.o
+OBJS += i2c.o i2c_common_v1.o
+OBJS += uart.o uart_common_v1.o
+OBJS += sys.o sys_common_v1.o
 
 ##
 ## Compile flags: RV32IMAC, no float ABI.

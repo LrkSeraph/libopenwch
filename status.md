@@ -11,12 +11,12 @@
 
 | 项 | 值 |
 |---|---|
-| 当前阶段 | **P2 完成，进入 P3（CH58x 外设驱动）** |
-| 阶段进度 | P0: 100% ｜ P1: 100% ｜ **P2: 100%**（15 个外设 + 应用模板 + API 测试）｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
-| 最近更新 | P2 全部完成：CH32V00x 15 个外设（316 个公开函数）、`tests/ch32v0/api_smoke.c` 全 API 编译+链接测试、3 个模板示例；并修正 GPIO nibble 与 DBGMCU 寄存器定位两处实质性错误 |
+| 当前阶段 | **P3 完成；两族一期外设均已交付** |
+| 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ **P3: 100%** ｜ P4: 进行中 ｜ P5: 0% |
+| 最近更新 | P3 完成：CH58x 12 个外设（202 个公开函数）、`tests/ch5xx58x/api_smoke.c`、`ch582_blink` 改为真正的 blink；累计 **518 个公开函数**，两族均 0 警告 0 重名 0 命名违规 |
 | 构建状态 | ✅ `make` 全绿：`lib/libopenwch_ch32v0.a`、`lib/libopenwch_ch5xx58x.a` |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
-| 仓库状态 | ✅ 6 个提交；构建后工作区依然干净 |
+| 仓库状态 | ✅ 7 个提交；构建后工作区依然干净 |
 
 ### 可复现的验证命令与结果
 
@@ -179,6 +179,23 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 - 归档无重复全局符号
 - 全部公开函数名符合 `^[a-z][a-z0-9_]*$`
 
+### P3 — CH58x 外设驱动（完成，100%）
+
+- [x] `memorymap.h`（SFR 平坦窗口）、`rwa`（安全访问）、`clk`、`gpio`
+- [x] `sys`、`pwr`、`flash`、`uart`（4 实例）、`spi`（2 实例）、`i2c`
+- [x] `tmr`（4 实例）、`pwm`（PWMX）、`adc`（含 touchkey）
+- [x] `lib/ch5xx58x/Makefile` 的 `OBJS` 全部启用（29 个目标）
+- [x] `tests/ch5xx58x/api_smoke.c`（172 个外设函数链接进镜像）
+- [x] `template/examples/ch582_blink` 改为真正的 blink
+
+CH58x 共 **202 个公开函数**。两族合计 **518 个**。
+
+**诚实的缺口**：`flash` 的擦除/编程需要 WCH 的二进制 `libISP583.a`（ROM 例程）
+或外部烧写器，libopenwch 不链接它，因此这两个函数是明确返回
+`FLASH_STATUS_UNSUPPORTED` 的 stub，并在头文件说明。可读部分
+（`flash_read`/`flash_rom_read`/`flash_get_unique_id`/`flash_get_chip_id`/
+`flash_set_latency`）是真实实现。
+
 ### 相对初版规划的设计修正
 
 实现中发现并修正的问题已详细记录在 `phase.md` 的「P0 实现记录」一节，摘要：
@@ -204,7 +221,16 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
     寄存器，芯片版本/型号在 `0x1ffff7c4`；CH32V003 的 SVD 里根本没有 DBGMCU
     外设节点。原先按 `DBGMCU_BASE=0xe0042000` 的内存映射实现是错的，已重写。
     位定义存在**未解决的分歧**（见「已知问题」K4）
-12. **AFIO remap 位定义取自 SVD 而非 EVT 的打包 token**。EVT 把"值/位号/半字选择/
+12. **CH58x 的 RWA helper 必须 `always_inline`**。若编译成真实函数，16 个系统时钟的
+    解锁窗口要跨过 `ret`、返回和调用方的地址计算才轮到寄存器写入，不保证完成。
+    反汇编确认 `clk_set_sys_clock()` 内联了 8 个窗口、没有外部 helper 调用
+13. **`memorymap.h` 的 CH58x 身份/复位寄存器偏移写错了**：`R8_CHIP_ID` 应为
+    `SYS_BASE+0x41`（原写 `+0x46`，那是 `R8_RST_WDOG_CTRL`），
+    `R8_GLOB_RESET_KEEP` 应为 `+0x47`（原写 `+0x44`）。两个独立的实现代理同时报出
+    了这个问题。已按 `CH583SFR.h` 修正并补齐 `R8_RESET_STATUS`/`R8_GLOB_CFG_INFO`/
+    `R8_WDOG_COUNT`/`R8_SLP_*`/`R8_CK32K_CONFIG`/`R8_BAT_DET_*`。
+    教训：这类偏移写错不会编译报错，只会静默读到旁边的寄存器
+14. **AFIO remap 位定义取自 SVD 而非 EVT 的打包 token**。EVT 把"值/位号/半字选择/
     类别"打包进一个 32 位 token 再运行时解包，极易出错；libopenwch 改为直接暴露
     SVD 中的字段，并为 USART1/I2C1/TIM1/TIM2 提供 2-bit 字段级 helper。
     这一改动同时修正了原先写错的 `AFIO_PCFR1_PA1_PA2_REMAP`（应为 bit 15，不是 12）
@@ -215,11 +241,13 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 
 P2 已全部完成，见上一节。CH58x 侧（P3）尚未开始：
 
-- ⬜ `lib/ch5xx58x/` 的 `rwa.c`（RWA 安全访问，其余全部依赖它）、`clk.c`、`sys.c`
-- ⬜ `gpio.c`、`uart.c`、`spi.c`、`i2c.c`、`tim.c`、`pwm.c`、`adc.c`、`flash.c`、`pwr.c`
-- ⬜ `include/libopenwch/ch5xx58x/common/*.h` 与设备头
-- ⬜ `tests/ch5xx58x/api_smoke.c`
-- ⬜ `template/examples/ch582_blink` 换成真正的 blink（需要 `clk` + `gpio`）
+P3 已全部完成，见上一节。P4 待办：
+
+- ⬜ Doxygen：把 `doc/Makefile` 接上真的 doxygen，生成两族文档
+- ⬜ CI：GitHub Actions 工具链矩阵 + 目标矩阵
+- ⬜ `NOTICE`（参考来源与许可说明）
+- ⬜ `tests/` 里的链接冒烟测试（目前链接脚本测试在 `ld/tests/`，API 测试在 `tests/`）
+- ⬜ 硬件在环验证（**需用户提供 WCH-Link + 板子**）
 
 ---
 
@@ -294,6 +322,11 @@ P2 已全部完成，见上一节。CH58x 侧（P3）尚未开始：
 | 重复全局符号 | `nm` + `uniq -d` | ✅ 无 |
 | `mk/gcc-config.mk` 工具解析 | `make -f probe.mk` | ✅ `riscv64-unknown-elf-gcc`（修复前是 `cc`） |
 | DBGMCU 指令 | `objdump -d dbgmcu_common_v1.o` | ✅ `csrr/csrw 0x7c0`、`lw 0x1ffff7c4` |
+| RWA 解锁序列 | `objdump -d clk.o` | ✅ 8 个内联 `0x57`/`0xA8` 窗口，无外部 helper |
+| CH58x 全 API 编译+链接 | `make apitest` | ✅ 172 个外设函数链接进镜像 |
+| 两族函数总数 | `nm --defined-only lib/*.a` | ✅ ch32v0=316，ch5xx58x=202，合计 518 |
+| 两族归档审计 | 重名符号 / 命名违规 | ✅ 均为 0 |
+| CH582 真 blink | `make -C template/examples/ch582_blink` | ✅ 2808 B |
 
 ---
 
@@ -307,3 +340,4 @@ P2 已全部完成，见上一节。CH58x 侧（P3）尚未开始：
 | 第 3 轮 | P2.1–P2.2：`ch32v0/memorymap.h` + `gpio` + `rcc`，提交 `8026add`。发现 GPIO nibble 不是 `(MODE,CNF)` 位域（穷举无解），改为不透明值，`gpio_set_mode()` 签名有意偏离 libopencm3 |
 | 第 4 轮 | P2.6：新增 `template/` 应用骨架（rules/ + 两个示例 + VSCode 配置），提交 `7b0df2f`。模板暴露并修正 3 个库侧缺陷（`CC ?=` 失效、`ZMMUL_OK` 未在应用侧探测、族归档 ISA 标签过宽） |
 | 第 5 轮 | **P2 完成**：CH32V00x 15 个外设、316 个公开函数；新增 `tests/ch32v0/api_smoke.c` 与 `make apitest`。独立复核 6 个并行实现代理的产出，发现并修正 2 处实质错误：GPIO nibble 位域假设（穷举证明无解→改为不透明值）、DBGMCU 误按内存映射实现（实为 CSR 0x7c0）；另修正 `mk/gcc-config.mk` 的工具变量 `?=` 缺陷与写错的 AFIO remap 位（bit 15 而非 12） |
+| 第 6 轮 | **P3 完成**：CH58x 12 个外设（202 个公开函数）、`tests/ch5xx58x/api_smoke.c`、`ch582_blink` 改为真正的 blink。修正 `memorymap.h` 的 CH58x 身份/复位寄存器偏移（`R8_CHIP_ID`/`R8_GLOB_RESET_KEEP` 写错，由两个独立代理同时报出）与 `RWA` helper 必须 `always_inline` 的时序要求。两族合计 518 个公开函数，全部 0 警告、0 重名、0 命名违规 |
