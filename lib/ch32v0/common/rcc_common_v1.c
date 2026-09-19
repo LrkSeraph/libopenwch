@@ -45,13 +45,13 @@
 #include <libopenwch/qingke/assert.h>
 
 /* Timeout for oscillator start-up, in loop iterations. */
-#define RCC_OSC_TIMEOUT			0x2000u
+#define RCC_OSC_TIMEOUT 0x2000u
 
 /* Burned-in factory PLL trim, applied when it has been programmed. */
-#define RCC_VENDOR_CFG0_PLL_TRIM	(*(volatile uint8_t *)VENDOR_CFG0_BASE)
+#define RCC_VENDOR_CFG0_PLL_TRIM (*(volatile uint8_t *)VENDOR_CFG0_BASE)
 
 /* The nominal HSI trim when no factory value is available. */
-#define RCC_HSITRIM_NOMINAL		0x10u
+#define RCC_HSITRIM_NOMINAL 0x10u
 
 /* --- Oscillator control -------------------------------------------------- */
 
@@ -133,11 +133,8 @@ uint32_t rcc_get_sysclk_frequency(void) {
 }
 
 /** Compute the frequency of an HCLK/APBx output from the HPRE/PPRE encoding. */
-static uint32_t rcc_apply_prescaler(
-	uint32_t freq,
-	uint32_t reg,
-	uint32_t shift
-) {
+static uint32_t
+rcc_apply_prescaler(uint32_t freq, uint32_t reg, uint32_t shift) {
 	uint32_t code = (reg >> shift) & 0x7u;
 
 	if (code < 0x4u) {
@@ -183,8 +180,10 @@ void rcc_get_clocks_freq(struct rcc_clock_scale *clocks) {
 		clocks->hclk = sysclk >> (hpre - 0x7u);
 	}
 
-	clocks->pclk1 = rcc_apply_prescaler(clocks->hclk, cfgr0, RCC_CFGR0_PPRE1_SHIFT);
-	clocks->pclk2 = rcc_apply_prescaler(clocks->hclk, cfgr0, RCC_CFGR0_PPRE2_SHIFT);
+	clocks->pclk1 =
+	    rcc_apply_prescaler(clocks->hclk, cfgr0, RCC_CFGR0_PPRE1_SHIFT);
+	clocks->pclk2 =
+	    rcc_apply_prescaler(clocks->hclk, cfgr0, RCC_CFGR0_PPRE2_SHIFT);
 
 	switch ((cfgr0 & RCC_CFGR0_ADCPRE_MASK) >> RCC_CFGR0_ADCPRE_SHIFT) {
 	case RCC_CFGR0_ADCPRE_DIV2:
@@ -205,23 +204,23 @@ void rcc_get_clocks_freq(struct rcc_clock_scale *clocks) {
 /* --- Prescalers ---------------------------------------------------------- */
 
 void rcc_ahb_set_prescaler(uint32_t ppre) {
-	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_HPRE_MASK)
-		| ((ppre << RCC_CFGR0_HPRE_SHIFT) & RCC_CFGR0_HPRE_MASK);
+	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_HPRE_MASK) |
+		    ((ppre << RCC_CFGR0_HPRE_SHIFT) & RCC_CFGR0_HPRE_MASK);
 }
 
 void rcc_apb1_set_prescaler(uint32_t ppre) {
-	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_PPRE1_MASK)
-		| ((ppre << RCC_CFGR0_PPRE1_SHIFT) & RCC_CFGR0_PPRE1_MASK);
+	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_PPRE1_MASK) |
+		    ((ppre << RCC_CFGR0_PPRE1_SHIFT) & RCC_CFGR0_PPRE1_MASK);
 }
 
 void rcc_apb2_set_prescaler(uint32_t ppre) {
-	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_PPRE2_MASK)
-		| ((ppre << RCC_CFGR0_PPRE2_SHIFT) & RCC_CFGR0_PPRE2_MASK);
+	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_PPRE2_MASK) |
+		    ((ppre << RCC_CFGR0_PPRE2_SHIFT) & RCC_CFGR0_PPRE2_MASK);
 }
 
 void rcc_adc_set_prescaler(uint32_t ppre) {
-	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_ADCPRE_MASK)
-		| ((ppre << RCC_CFGR0_ADCPRE_SHIFT) & RCC_CFGR0_ADCPRE_MASK);
+	RCC_CFGR0 = (RCC_CFGR0 & ~RCC_CFGR0_ADCPRE_MASK) |
+		    ((ppre << RCC_CFGR0_ADCPRE_SHIFT) & RCC_CFGR0_ADCPRE_MASK);
 }
 
 void rcc_set_pll_source(uint32_t source) {
@@ -256,11 +255,11 @@ void rcc_clock_setup_hsi_48mhz(void) {
 	/* Factory PLL trim, when programmed. */
 	trim = RCC_VENDOR_CFG0_PLL_TRIM;
 	if (trim != 0xffu) {
-		RCC_CTLR = (RCC_CTLR & ~RCC_CTLR_HSITRIM_MASK)
-			| ((trim & 0x1fu) << RCC_CTLR_HSITRIM_SHIFT);
+		RCC_CTLR = (RCC_CTLR & ~RCC_CTLR_HSITRIM_MASK) |
+			   ((trim & 0x1fu) << RCC_CTLR_HSITRIM_SHIFT);
 	} else {
-		RCC_CTLR = (RCC_CTLR & ~RCC_CTLR_HSITRIM_MASK)
-			| (RCC_HSITRIM_NOMINAL << RCC_CTLR_HSITRIM_SHIFT);
+		RCC_CTLR = (RCC_CTLR & ~RCC_CTLR_HSITRIM_MASK) |
+			   (RCC_HSITRIM_NOMINAL << RCC_CTLR_HSITRIM_SHIFT);
 	}
 
 	/* Flash latency 1 is required above 24 MHz. */
@@ -274,8 +273,8 @@ void rcc_clock_setup_hsi_48mhz(void) {
 	rcc_wait_for_osc_ready(RCC_OSC_PLL);
 
 	rcc_set_sysclk_source(RCC_CFGR0_SW_PLL);
-	while (((RCC_CFGR0 & RCC_CFGR0_SWS_MASK) >> RCC_CFGR0_SWS_SHIFT)
-			!= RCC_CFGR0_SW_PLL) {
+	while (((RCC_CFGR0 & RCC_CFGR0_SWS_MASK) >> RCC_CFGR0_SWS_SHIFT) !=
+	       RCC_CFGR0_SW_PLL) {
 		;
 	}
 }
@@ -297,8 +296,8 @@ void rcc_clock_setup_hse_48mhz(void) {
 	rcc_wait_for_osc_ready(RCC_OSC_PLL);
 
 	rcc_set_sysclk_source(RCC_CFGR0_SW_PLL);
-	while (((RCC_CFGR0 & RCC_CFGR0_SWS_MASK) >> RCC_CFGR0_SWS_SHIFT)
-			!= RCC_CFGR0_SW_PLL) {
+	while (((RCC_CFGR0 & RCC_CFGR0_SWS_MASK) >> RCC_CFGR0_SWS_SHIFT) !=
+	       RCC_CFGR0_SW_PLL) {
 		;
 	}
 }
@@ -424,8 +423,8 @@ void rcc_clear_reset_flags(void) {
 }
 
 uint32_t rcc_get_reset_flags(void) {
-	return RCC_RSTSCKR & (RCC_RSTSCKR_PINRSTF | RCC_RSTSCKR_PORRSTF
-			| RCC_RSTSCKR_SFTRSTF | RCC_RSTSCKR_IWDGRSTF
-			| RCC_RSTSCKR_WWDGRSTF | RCC_RSTSCKR_LPWRRSTF);
+	return RCC_RSTSCKR & (RCC_RSTSCKR_PINRSTF | RCC_RSTSCKR_PORRSTF |
+			      RCC_RSTSCKR_SFTRSTF | RCC_RSTSCKR_IWDGRSTF |
+			      RCC_RSTSCKR_WWDGRSTF | RCC_RSTSCKR_LPWRRSTF);
 }
 /**@}*/

@@ -62,149 +62,144 @@ LGPL License Terms @ref lgpl_license
 /* --- Register accessors -------------------------------------------------- */
 
 /* Control register 1 (I2C_CTRL1) */
-#define I2C_CTRL1(i2c)			MMIO16((i2c) + 0x00)
+#define I2C_CTRL1(i2c) MMIO16((i2c) + 0x00)
 /* Control register 2 (I2C_CTRL2) */
-#define I2C_CTRL2(i2c)			MMIO16((i2c) + 0x04)
+#define I2C_CTRL2(i2c) MMIO16((i2c) + 0x04)
 /* Own address register 1 (I2C_OADDR1) */
-#define I2C_OADDR1(i2c)			MMIO16((i2c) + 0x08)
+#define I2C_OADDR1(i2c) MMIO16((i2c) + 0x08)
 /* Own address register 2 (I2C_OADDR2) */
-#define I2C_OADDR2(i2c)			MMIO16((i2c) + 0x0c)
+#define I2C_OADDR2(i2c) MMIO16((i2c) + 0x0c)
 /* Data register (I2C_DATAR) */
-#define I2C_DATAR(i2c)			MMIO16((i2c) + 0x10)
+#define I2C_DATAR(i2c) MMIO16((i2c) + 0x10)
 /* Status register 1 (I2C_STAR1) */
-#define I2C_STAR1(i2c)			MMIO16((i2c) + 0x14)
+#define I2C_STAR1(i2c) MMIO16((i2c) + 0x14)
 /* Status register 2 (I2C_STAR2) */
-#define I2C_STAR2(i2c)			MMIO16((i2c) + 0x18)
+#define I2C_STAR2(i2c) MMIO16((i2c) + 0x18)
 /* Packet error checking register (I2C_PEC); the high byte of STAR2 */
-#define I2C_PEC(i2c)			MMIO8((i2c) + 0x19)
+#define I2C_PEC(i2c) MMIO8((i2c) + 0x19)
 /* Clock control register (I2C_CKCFGR) */
-#define I2C_CKCFGR(i2c)			MMIO16((i2c) + 0x1c)
+#define I2C_CKCFGR(i2c) MMIO16((i2c) + 0x1c)
 /* Rise time register (I2C_RTR) */
-#define I2C_RTR(i2c)			MMIO16((i2c) + 0x20)
+#define I2C_RTR(i2c) MMIO16((i2c) + 0x20)
 
 /* --- CTRL1 bits ---------------------------------------------------------- */
 
-#define RB_I2C_PE			0x0001	/**< peripheral enable */
-#define RB_I2C_SMBUS			0x0002	/**< SMBus mode */
-#define RB_I2C_SMBTYPE			0x0008	/**< SMBus host type */
-#define RB_I2C_EBARP			0x0010	/**< ARP enable */
-#define RB_I2C_ENPEC			0x0020	/**< PEC calculation enable */
-#define RB_I2C_ENGC			0x0040	/**< general call enable */
-#define RB_I2C_NOSTRETCH		0x0080	/**< clock stretching disable (slave) */
-#define RB_I2C_START			0x0100	/**< start generation */
-#define RB_I2C_STOP			0x0200	/**< stop generation */
-#define RB_I2C_ACK			0x0400	/**< acknowledge enable */
-#define RB_I2C_POS			0x0800	/**< acknowledge/PEC position */
-#define RB_I2C_PEC			0x1000	/**< PEC transfer */
-#define RB_I2C_ALERT			0x2000	/**< SMBus alert pin */
-#define RB_I2C_SWRST			0x8000	/**< software reset */
+#define RB_I2C_PE 0x0001	/**< peripheral enable */
+#define RB_I2C_SMBUS 0x0002	/**< SMBus mode */
+#define RB_I2C_SMBTYPE 0x0008	/**< SMBus host type */
+#define RB_I2C_EBARP 0x0010	/**< ARP enable */
+#define RB_I2C_ENPEC 0x0020	/**< PEC calculation enable */
+#define RB_I2C_ENGC 0x0040	/**< general call enable */
+#define RB_I2C_NOSTRETCH 0x0080 /**< clock stretching disable (slave) */
+#define RB_I2C_START 0x0100	/**< start generation */
+#define RB_I2C_STOP 0x0200	/**< stop generation */
+#define RB_I2C_ACK 0x0400	/**< acknowledge enable */
+#define RB_I2C_POS 0x0800	/**< acknowledge/PEC position */
+#define RB_I2C_PEC 0x1000	/**< PEC transfer */
+#define RB_I2C_ALERT 0x2000	/**< SMBus alert pin */
+#define RB_I2C_SWRST 0x8000	/**< software reset */
 
 /* --- CTRL2 bits ---------------------------------------------------------- */
 
-#define RB_I2C_FREQ			0x003f	/**< FREQ[5:0], peripheral clock in MHz */
-#define RB_I2C_ITERREN			0x0100	/**< error interrupt enable */
-#define RB_I2C_ITEVTEN			0x0200	/**< event interrupt enable */
-#define RB_I2C_ITBUFEN			0x0400	/**< buffer interrupt enable */
+#define RB_I2C_FREQ 0x003f    /**< FREQ[5:0], peripheral clock in MHz */
+#define RB_I2C_ITERREN 0x0100 /**< error interrupt enable */
+#define RB_I2C_ITEVTEN 0x0200 /**< event interrupt enable */
+#define RB_I2C_ITBUFEN 0x0400 /**< buffer interrupt enable */
 /** The interrupt enable bits of CTRL2. */
-#define I2C_CTRL2_IT_MASK		(RB_I2C_ITERREN | RB_I2C_ITEVTEN \
-					| RB_I2C_ITBUFEN)
+#define I2C_CTRL2_IT_MASK (RB_I2C_ITERREN | RB_I2C_ITEVTEN | RB_I2C_ITBUFEN)
 
 /* --- OADDR1 bits --------------------------------------------------------- */
 
-#define RB_I2C_ADD0			0x0001	/**< address bit 0 in 10-bit mode */
-#define RB_I2C_ADD7_1			0x00fe	/**< address bits [7:1] */
-#define RB_I2C_ADD9_8			0x0300	/**< address bits [9:8] in 10-bit mode */
-#define RB_I2C_MUST1			0x4000	/**< reserved, always keep at 1 */
-#define RB_I2C_ADDMODE			0x8000	/**< 10-bit addressing mode */
+#define RB_I2C_ADD0 0x0001    /**< address bit 0 in 10-bit mode */
+#define RB_I2C_ADD7_1 0x00fe  /**< address bits [7:1] */
+#define RB_I2C_ADD9_8 0x0300  /**< address bits [9:8] in 10-bit mode */
+#define RB_I2C_MUST1 0x4000   /**< reserved, always keep at 1 */
+#define RB_I2C_ADDMODE 0x8000 /**< 10-bit addressing mode */
 
 /* --- OADDR2 bits --------------------------------------------------------- */
 
-#define RB_I2C_ENDUAL			0x0001	/**< dual addressing enable */
-#define RB_I2C_ADD2			0x00fe	/**< second address [7:1] */
+#define RB_I2C_ENDUAL 0x0001 /**< dual addressing enable */
+#define RB_I2C_ADD2 0x00fe   /**< second address [7:1] */
 
 /* --- DATAR --------------------------------------------------------------- */
 
-#define I2C_DATAR_MASK			0x00ffu
+#define I2C_DATAR_MASK 0x00ffu
 
 /* --- STAR1 bits ---------------------------------------------------------- */
 
-#define RB_I2C_SB			0x0001	/**< start bit generated (master) */
-#define RB_I2C_ADDR			0x0002	/**< address sent / matched */
-#define RB_I2C_BTF			0x0004	/**< byte transfer finished */
-#define RB_I2C_ADD10			0x0008	/**< 10-bit header sent (master) */
-#define RB_I2C_STOPF			0x0010	/**< stop detected (slave) */
-#define RB_I2C_RxNE			0x0040	/**< data register not empty */
-#define RB_I2C_TxE			0x0080	/**< data register empty */
-#define RB_I2C_BERR			0x0100	/**< bus error */
-#define RB_I2C_ARLO			0x0200	/**< arbitration lost */
-#define RB_I2C_AF			0x0400	/**< acknowledge failure */
-#define RB_I2C_OVR			0x0800	/**< overrun / underrun */
-#define RB_I2C_PECERR			0x1000	/**< PEC error in reception */
-#define RB_I2C_TIMEOUT			0x4000	/**< timeout / Tlow error */
-#define RB_I2C_SMBALERT			0x8000	/**< SMBus alert */
+#define RB_I2C_SB 0x0001       /**< start bit generated (master) */
+#define RB_I2C_ADDR 0x0002     /**< address sent / matched */
+#define RB_I2C_BTF 0x0004      /**< byte transfer finished */
+#define RB_I2C_ADD10 0x0008    /**< 10-bit header sent (master) */
+#define RB_I2C_STOPF 0x0010    /**< stop detected (slave) */
+#define RB_I2C_RxNE 0x0040     /**< data register not empty */
+#define RB_I2C_TxE 0x0080      /**< data register empty */
+#define RB_I2C_BERR 0x0100     /**< bus error */
+#define RB_I2C_ARLO 0x0200     /**< arbitration lost */
+#define RB_I2C_AF 0x0400       /**< acknowledge failure */
+#define RB_I2C_OVR 0x0800      /**< overrun / underrun */
+#define RB_I2C_PECERR 0x1000   /**< PEC error in reception */
+#define RB_I2C_TIMEOUT 0x4000  /**< timeout / Tlow error */
+#define RB_I2C_SMBALERT 0x8000 /**< SMBus alert */
 
 /*
  * The write-zero-to-clear flags of STAR1.  SB, ADDR, BTF and STOPF are
  * retired by reading STAR1 and then STAR2, which i2c_clear_flag() does, so
  * only these are written back.
  */
-#define I2C_STAR1_CLEAR_MASK		(RB_I2C_BERR | RB_I2C_ARLO | RB_I2C_AF \
-					| RB_I2C_OVR | RB_I2C_PECERR \
-					| RB_I2C_TIMEOUT | RB_I2C_SMBALERT)
+#define I2C_STAR1_CLEAR_MASK                                                   \
+	(RB_I2C_BERR | RB_I2C_ARLO | RB_I2C_AF | RB_I2C_OVR | RB_I2C_PECERR |  \
+	 RB_I2C_TIMEOUT | RB_I2C_SMBALERT)
 /** Every flag bit STAR1 defines. */
-#define I2C_STAR1_FLAG_MASK		(RB_I2C_SB | RB_I2C_ADDR | RB_I2C_BTF \
-					| RB_I2C_ADD10 | RB_I2C_STOPF \
-					| RB_I2C_RxNE | RB_I2C_TxE \
-					| RB_I2C_BERR | RB_I2C_ARLO \
-					| RB_I2C_AF | RB_I2C_OVR \
-					| RB_I2C_PECERR | RB_I2C_TIMEOUT \
-					| RB_I2C_SMBALERT)
+#define I2C_STAR1_FLAG_MASK                                                    \
+	(RB_I2C_SB | RB_I2C_ADDR | RB_I2C_BTF | RB_I2C_ADD10 | RB_I2C_STOPF |  \
+	 RB_I2C_RxNE | RB_I2C_TxE | RB_I2C_BERR | RB_I2C_ARLO | RB_I2C_AF |    \
+	 RB_I2C_OVR | RB_I2C_PECERR | RB_I2C_TIMEOUT | RB_I2C_SMBALERT)
 
 /* --- STAR2 bits ---------------------------------------------------------- */
 
-#define RB_I2C_MSL			0x0001	/**< 0 = slave, 1 = master */
-#define RB_I2C_BUSY			0x0002	/**< bus busy */
-#define RB_I2C_TRA			0x0004	/**< 0 = receiver, 1 = transmitter */
-#define RB_I2C_GENCALL			0x0010	/**< general call received (slave) */
-#define RB_I2C_SMBDEFAULT		0x0020	/**< SMBus default address (slave) */
-#define RB_I2C_SMBHOST			0x0040	/**< SMBus host header (slave) */
-#define RB_I2C_DUALF			0x0080	/**< dual flag (slave) */
-#define RB_I2C_PECX			0xff00	/**< PEC[7:0] */
+#define RB_I2C_MSL 0x0001	 /**< 0 = slave, 1 = master */
+#define RB_I2C_BUSY 0x0002	 /**< bus busy */
+#define RB_I2C_TRA 0x0004	 /**< 0 = receiver, 1 = transmitter */
+#define RB_I2C_GENCALL 0x0010	 /**< general call received (slave) */
+#define RB_I2C_SMBDEFAULT 0x0020 /**< SMBus default address (slave) */
+#define RB_I2C_SMBHOST 0x0040	 /**< SMBus host header (slave) */
+#define RB_I2C_DUALF 0x0080	 /**< dual flag (slave) */
+#define RB_I2C_PECX 0xff00	 /**< PEC[7:0] */
 
 /** Every flag bit STAR2 defines. */
-#define I2C_STAR2_FLAG_MASK		(RB_I2C_MSL | RB_I2C_BUSY | RB_I2C_TRA \
-					| RB_I2C_GENCALL | RB_I2C_SMBDEFAULT \
-					| RB_I2C_SMBHOST | RB_I2C_DUALF \
-					| RB_I2C_PECX)
+#define I2C_STAR2_FLAG_MASK                                                    \
+	(RB_I2C_MSL | RB_I2C_BUSY | RB_I2C_TRA | RB_I2C_GENCALL |              \
+	 RB_I2C_SMBDEFAULT | RB_I2C_SMBHOST | RB_I2C_DUALF | RB_I2C_PECX)
 
 /* --- CKCFGR bits --------------------------------------------------------- */
 
-#define RB_I2C_CCR			0x0fff	/**< CCR[11:0], SCL divider */
-#define RB_I2C_DUTY			0x4000	/**< fast mode duty cycle 16/9 */
-#define RB_I2C_F_S			0x8000	/**< 0 = standard mode, 1 = fast mode */
+#define RB_I2C_CCR 0x0fff  /**< CCR[11:0], SCL divider */
+#define RB_I2C_DUTY 0x4000 /**< fast mode duty cycle 16/9 */
+#define RB_I2C_F_S 0x8000  /**< 0 = standard mode, 1 = fast mode */
 
 /* --- RTR bits ------------------------------------------------------------ */
 
-#define RB_I2C_TRISE			0x003f	/**< TRISE[5:0], maximum rise time */
+#define RB_I2C_TRISE 0x003f /**< TRISE[5:0], maximum rise time */
 
 /* --- Bus speeds ---------------------------------------------------------- */
 
 /** @defgroup i2c_speed I2C Bus Speeds
 @ingroup i2c_defines
 @{*/
-#define I2C_SPEED_STANDARD		100000u	/**< 100 kHz */
-#define I2C_SPEED_FAST			400000u	/**< 400 kHz */
+#define I2C_SPEED_STANDARD 100000u /**< 100 kHz */
+#define I2C_SPEED_FAST 400000u	   /**< 400 kHz */
 /**@}*/
 
 /** Lowest peripheral clock the FREQ field can describe, in Hz. */
-#define I2C_MIN_CLOCK_FREQUENCY		2000000u
+#define I2C_MIN_CLOCK_FREQUENCY 2000000u
 /**
  * Highest peripheral clock the FREQ field can describe, in Hz.  FREQ is six
  * bits, so the ceiling is 63 MHz; the reference manual quotes a lower
  * "maximum" of 36 MHz, but WCH's own examples clock the block from a 60 MHz
  * PLL and the divider arithmetic is exact either way.
  */
-#define I2C_MAX_CLOCK_FREQUENCY		63000000u
+#define I2C_MAX_CLOCK_FREQUENCY 63000000u
 
 /* --- Interrupt sources --------------------------------------------------- */
 
@@ -213,9 +208,9 @@ LGPL License Terms @ref lgpl_license
 
 Masks for i2c_enable_interrupt() / i2c_disable_interrupt().
 @{*/
-#define I2C_IT_ERR			RB_I2C_ITERREN
-#define I2C_IT_EVT			RB_I2C_ITEVTEN
-#define I2C_IT_BUF			RB_I2C_ITBUFEN
+#define I2C_IT_ERR RB_I2C_ITERREN
+#define I2C_IT_EVT RB_I2C_ITEVTEN
+#define I2C_IT_BUF RB_I2C_ITBUFEN
 /**@}*/
 
 /* --- Flags --------------------------------------------------------------- */
@@ -228,30 +223,30 @@ STAR2 bit positions overlap in value, so i2c_get_flag() reads both registers
 and ORs whatever the mask selects; i2c_clear_flag() only acts on the STAR1
 bits that are actually clearable by a write.
 @{*/
-#define I2C_FLAG_SB			RB_I2C_SB
-#define I2C_FLAG_ADDR			RB_I2C_ADDR
-#define I2C_FLAG_BTF			RB_I2C_BTF
-#define I2C_FLAG_ADD10			RB_I2C_ADD10
-#define I2C_FLAG_STOPF			RB_I2C_STOPF
-#define I2C_FLAG_RXNE			RB_I2C_RxNE
-#define I2C_FLAG_TXE			RB_I2C_TxE
-#define I2C_FLAG_BERR			RB_I2C_BERR
-#define I2C_FLAG_ARLO			RB_I2C_ARLO
-#define I2C_FLAG_AF			RB_I2C_AF
-#define I2C_FLAG_OVR			RB_I2C_OVR
-#define I2C_FLAG_PECERR			RB_I2C_PECERR
-#define I2C_FLAG_TIMEOUT		RB_I2C_TIMEOUT
-#define I2C_FLAG_SMBALERT		RB_I2C_SMBALERT
-#define I2C_FLAG_MSL			RB_I2C_MSL
-#define I2C_FLAG_BUSY			RB_I2C_BUSY
-#define I2C_FLAG_TRA			RB_I2C_TRA
-#define I2C_FLAG_GENCALL		RB_I2C_GENCALL
-#define I2C_FLAG_SMBDEFAULT		RB_I2C_SMBDEFAULT
-#define I2C_FLAG_SMBHOST		RB_I2C_SMBHOST
-#define I2C_FLAG_DUALF			RB_I2C_DUALF
-#define I2C_FLAG_PEC			RB_I2C_PECX
+#define I2C_FLAG_SB RB_I2C_SB
+#define I2C_FLAG_ADDR RB_I2C_ADDR
+#define I2C_FLAG_BTF RB_I2C_BTF
+#define I2C_FLAG_ADD10 RB_I2C_ADD10
+#define I2C_FLAG_STOPF RB_I2C_STOPF
+#define I2C_FLAG_RXNE RB_I2C_RxNE
+#define I2C_FLAG_TXE RB_I2C_TxE
+#define I2C_FLAG_BERR RB_I2C_BERR
+#define I2C_FLAG_ARLO RB_I2C_ARLO
+#define I2C_FLAG_AF RB_I2C_AF
+#define I2C_FLAG_OVR RB_I2C_OVR
+#define I2C_FLAG_PECERR RB_I2C_PECERR
+#define I2C_FLAG_TIMEOUT RB_I2C_TIMEOUT
+#define I2C_FLAG_SMBALERT RB_I2C_SMBALERT
+#define I2C_FLAG_MSL RB_I2C_MSL
+#define I2C_FLAG_BUSY RB_I2C_BUSY
+#define I2C_FLAG_TRA RB_I2C_TRA
+#define I2C_FLAG_GENCALL RB_I2C_GENCALL
+#define I2C_FLAG_SMBDEFAULT RB_I2C_SMBDEFAULT
+#define I2C_FLAG_SMBHOST RB_I2C_SMBHOST
+#define I2C_FLAG_DUALF RB_I2C_DUALF
+#define I2C_FLAG_PEC RB_I2C_PECX
 /** Every bit i2c_get_flag() understands. */
-#define I2C_FLAG_MASK			(I2C_STAR1_FLAG_MASK | I2C_STAR2_FLAG_MASK)
+#define I2C_FLAG_MASK (I2C_STAR1_FLAG_MASK | I2C_STAR2_FLAG_MASK)
 /**@}*/
 
 BEGIN_DECLS

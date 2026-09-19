@@ -84,8 +84,8 @@ void i2c_set_clock_frequency(uint32_t i2c) {
 	/* FREQ is the peripheral clock in whole MHz; the caller does not get
 	 * to name it because the block is fed straight from the system
 	 * clock. */
-	I2C_CTRL2(i2c) = (uint16_t)((I2C_CTRL2(i2c) & (uint16_t)~RB_I2C_FREQ)
-			| ((sysclock / 1000000u) & RB_I2C_FREQ));
+	I2C_CTRL2(i2c) = (uint16_t)((I2C_CTRL2(i2c) & (uint16_t)~RB_I2C_FREQ) |
+				    ((sysclock / 1000000u) & RB_I2C_FREQ));
 }
 
 /* --- Initialisation ------------------------------------------------------ */
@@ -126,8 +126,7 @@ void i2c_init_master(uint32_t i2c, uint32_t speed) {
 		ckcfgr = (uint16_t)((ccr & RB_I2C_CCR) | RB_I2C_F_S);
 	}
 
-	I2C_RTR(i2c) = i2c_rise_time(sysclock,
-			speed > I2C_SPEED_STANDARD);
+	I2C_RTR(i2c) = i2c_rise_time(sysclock, speed > I2C_SPEED_STANDARD);
 	I2C_CKCFGR(i2c) = ckcfgr;
 
 	i2c_enable(i2c);
@@ -204,24 +203,25 @@ void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x7fu);
 
-	I2C_OADDR1(i2c) = (uint16_t)(RB_I2C_MUST1
-			| ((address << 1) & RB_I2C_ADD7_1));
+	I2C_OADDR1(i2c) =
+	    (uint16_t)(RB_I2C_MUST1 | ((address << 1) & RB_I2C_ADD7_1));
 }
 
 void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x3ffu);
 
-	I2C_OADDR1(i2c) = (uint16_t)(RB_I2C_MUST1 | RB_I2C_ADDMODE
-			| ((address << 1) & (RB_I2C_ADD9_8 | RB_I2C_ADD7_1)));
+	I2C_OADDR1(i2c) =
+	    (uint16_t)(RB_I2C_MUST1 | RB_I2C_ADDMODE |
+		       ((address << 1) & (RB_I2C_ADD9_8 | RB_I2C_ADD7_1)));
 }
 
 void i2c_enable_dual_address(uint32_t i2c, uint8_t address) {
 	i2c_assert_valid(i2c);
 	openwch_assert(address <= 0x7fu);
 
-	I2C_OADDR2(i2c) = (uint16_t)(((address << 1) & RB_I2C_ADD2)
-			| RB_I2C_ENDUAL);
+	I2C_OADDR2(i2c) =
+	    (uint16_t)(((address << 1) & RB_I2C_ADD2) | RB_I2C_ENDUAL);
 }
 
 void i2c_enable_general_call(uint32_t i2c) {
@@ -329,8 +329,8 @@ void i2c_clear_flag(uint32_t i2c, uint32_t flag) {
 	 * bit other than the requested ones leaves the rest untouched.
 	 */
 	if (flag & I2C_STAR1_CLEAR_MASK) {
-		I2C_STAR1(i2c) = (uint16_t)~((uint16_t)flag
-				& I2C_STAR1_CLEAR_MASK);
+		I2C_STAR1(i2c) =
+		    (uint16_t)~((uint16_t)flag & I2C_STAR1_CLEAR_MASK);
 	}
 }
 

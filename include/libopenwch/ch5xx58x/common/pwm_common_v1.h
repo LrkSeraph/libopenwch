@@ -62,33 +62,33 @@ LGPL License Terms @ref lgpl_license
 /* --- Register offsets ---------------------------------------------------- */
 
 /** Output enable, 8-bit, one bit per channel. */
-#define PWM_OUT_EN			0x00
+#define PWM_OUT_EN 0x00
 /** Output polarity, 8-bit, one bit per channel. */
-#define PWM_POLAR			0x01
+#define PWM_POLAR 0x01
 /** Configuration: data width, cycle selection, stagger, 8-bit. */
-#define PWM_CONFIG			0x02
+#define PWM_CONFIG 0x02
 /** Clock divisor, 8-bit: the channel clock is (div + 1) * Tsys. */
-#define PWM_CLOCK_DIV			0x03
+#define PWM_CLOCK_DIV 0x03
 /** Data for PWM4..PWM7, 8-bit each, increasing with the channel number. */
-#define PWM4_DATA_HOLD			0x04
-#define PWM5_DATA_HOLD			0x05
-#define PWM6_DATA_HOLD			0x06
-#define PWM7_DATA_HOLD			0x07
+#define PWM4_DATA_HOLD 0x04
+#define PWM5_DATA_HOLD 0x05
+#define PWM6_DATA_HOLD 0x06
+#define PWM7_DATA_HOLD 0x07
 /** Data for PWM8..PWM11, 8-bit each, increasing with the channel number. */
-#define PWM8_DATA_HOLD			0x08
-#define PWM9_DATA_HOLD			0x09
-#define PWM10_DATA_HOLD			0x0a
-#define PWM11_DATA_HOLD			0x0b
+#define PWM8_DATA_HOLD 0x08
+#define PWM9_DATA_HOLD 0x09
+#define PWM10_DATA_HOLD 0x0a
+#define PWM11_DATA_HOLD 0x0b
 /** Interrupt control, 8-bit. */
-#define PWM_INT_CTRL			0x0c
+#define PWM_INT_CTRL 0x0c
 
 /* --- Register accessors -------------------------------------------------- */
 
-#define PWM_OUT_EN_REG(pwm)		MMIO8((pwm) + PWM_OUT_EN)
-#define PWM_POLAR_REG(pwm)		MMIO8((pwm) + PWM_POLAR)
-#define PWM_CONFIG_REG(pwm)		MMIO8((pwm) + PWM_CONFIG)
-#define PWM_CLOCK_DIV_REG(pwm)		MMIO8((pwm) + PWM_CLOCK_DIV)
-#define PWM_INT_CTRL_REG(pwm)		MMIO8((pwm) + PWM_INT_CTRL)
+#define PWM_OUT_EN_REG(pwm) MMIO8((pwm) + PWM_OUT_EN)
+#define PWM_POLAR_REG(pwm) MMIO8((pwm) + PWM_POLAR)
+#define PWM_CONFIG_REG(pwm) MMIO8((pwm) + PWM_CONFIG)
+#define PWM_CLOCK_DIV_REG(pwm) MMIO8((pwm) + PWM_CLOCK_DIV)
+#define PWM_INT_CTRL_REG(pwm) MMIO8((pwm) + PWM_INT_CTRL)
 
 /*
  * The data registers are contiguous, in channel order, from PWM4_DATA_HOLD:
@@ -104,32 +104,32 @@ LGPL License Terms @ref lgpl_license
 The value is the channel's bit in OUT_EN and POLAR, which is also its 0-based
 index within the data-register block, so the same constant addresses both.
 @{*/
-#define PWM_CH4				(1u << 0)
-#define PWM_CH5				(1u << 1)
-#define PWM_CH6				(1u << 2)
-#define PWM_CH7				(1u << 3)
-#define PWM_CH8				(1u << 4)
-#define PWM_CH9				(1u << 5)
-#define PWM_CH10			(1u << 6)
-#define PWM_CH11			(1u << 7)
+#define PWM_CH4 (1u << 0)
+#define PWM_CH5 (1u << 1)
+#define PWM_CH6 (1u << 2)
+#define PWM_CH7 (1u << 3)
+#define PWM_CH8 (1u << 4)
+#define PWM_CH9 (1u << 5)
+#define PWM_CH10 (1u << 6)
+#define PWM_CH11 (1u << 7)
 /**@}*/
 
 /* WCH's own spelling, kept as an alias. */
-#define CH_PWM4				PWM_CH4
-#define CH_PWM5				PWM_CH5
-#define CH_PWM6				PWM_CH6
-#define CH_PWM7				PWM_CH7
-#define CH_PWM8				PWM_CH8
-#define CH_PWM9				PWM_CH9
-#define CH_PWM10			PWM_CH10
-#define CH_PWM11			PWM_CH11
+#define CH_PWM4 PWM_CH4
+#define CH_PWM5 PWM_CH5
+#define CH_PWM6 PWM_CH6
+#define CH_PWM7 PWM_CH7
+#define CH_PWM8 PWM_CH8
+#define CH_PWM9 PWM_CH9
+#define CH_PWM10 PWM_CH10
+#define CH_PWM11 PWM_CH11
 
-#define PWM_CH_ALL			0xffu
+#define PWM_CH_ALL 0xffu
 /** Width of a data register, in bits, at the widest cycle setting. */
-#define PWM_DATA_MASK			0xffu
+#define PWM_DATA_MASK 0xffu
 
 /** Data register offset for a channel given as its 0-based index. */
-#define PWM_DATA_OFFSET(index)		(PWM4_DATA_HOLD + (index))
+#define PWM_DATA_OFFSET(index) (PWM4_DATA_HOLD + (index))
 
 /**
  * 0-based data-register index of a single channel.
@@ -163,29 +163,29 @@ static inline int pwm_channel_index(uint32_t channel) {
 }
 
 /** Data register for one channel, given as a single-channel identifier. */
-#define PWM_DATA_REG(pwm, ch) \
+#define PWM_DATA_REG(pwm, ch)                                                  \
 	MMIO8((pwm) + PWM_DATA_OFFSET(pwm_channel_index(ch)))
 
 /* --- CONFIG fields ------------------------------------------------------- */
 
 /** @defgroup pwm_config_bits PWM CONFIG bits
 @{*/
-#define RB_PWM_CYCLE_SEL		0x01	/**< 0 = 2^n cycles, 1 = 2^n - 1 */
-#define RB_PWM_STAG_ST			0x02	/**< read only: stagger cycle status */
-#define RB_PWM_CYC_MOD			0x0c	/**< bits 3:2, data width */
-#define RB_PWM4_5_STAG_EN		0x10	/**< PWM4/PWM5 alternate output */
-#define RB_PWM6_7_STAG_EN		0x20	/**< PWM6/PWM7 alternate output */
-#define RB_PWM8_9_STAG_EN		0x40	/**< PWM8/PWM9 alternate output */
-#define RB_PWM10_11_STAG_EN		0x80	/**< PWM10/PWM11 alternate output */
+#define RB_PWM_CYCLE_SEL 0x01	 /**< 0 = 2^n cycles, 1 = 2^n - 1 */
+#define RB_PWM_STAG_ST 0x02	 /**< read only: stagger cycle status */
+#define RB_PWM_CYC_MOD 0x0c	 /**< bits 3:2, data width */
+#define RB_PWM4_5_STAG_EN 0x10	 /**< PWM4/PWM5 alternate output */
+#define RB_PWM6_7_STAG_EN 0x20	 /**< PWM6/PWM7 alternate output */
+#define RB_PWM8_9_STAG_EN 0x40	 /**< PWM8/PWM9 alternate output */
+#define RB_PWM10_11_STAG_EN 0x80 /**< PWM10/PWM11 alternate output */
 /**@}*/
 
 /* --- INT_CTRL fields ----------------------------------------------------- */
 
 /** @defgroup pwm_int_bits PWM INT_CTRL bits
 @{*/
-#define RB_PWM_IE_CYC			0x01	/**< enable the cycle-end interrupt */
-#define RB_PWM_CYC_PRE			0x02	/**< interrupt point: 1 = earlier */
-#define RB_PWM_IF_CYC			0x80	/**< cycle-end flag, write 1 to clear */
+#define RB_PWM_IE_CYC 0x01  /**< enable the cycle-end interrupt */
+#define RB_PWM_CYC_PRE 0x02 /**< interrupt point: 1 = earlier */
+#define RB_PWM_IF_CYC 0x80  /**< cycle-end flag, write 1 to clear */
 /**@}*/
 
 /* --- Cycle settings ------------------------------------------------------ */
@@ -196,24 +196,24 @@ Passed to pwm_set_cycle().  The value is exactly what goes into the
 RB_PWM_CYC_MOD / RB_PWM_CYCLE_SEL field of PWM_CONFIG.  Note that the cycle
 generator is shared by all eight channels.
 @{*/
-#define PWM_CYCLE_256			0x00	/**< 8-bit data, 256 clocks */
-#define PWM_CYCLE_255			0x01	/**< 8-bit data, 255 clocks */
-#define PWM_CYCLE_128			0x04	/**< 7-bit data, 128 clocks */
-#define PWM_CYCLE_127			0x05	/**< 7-bit data, 127 clocks */
-#define PWM_CYCLE_64			0x08	/**< 6-bit data, 64 clocks */
-#define PWM_CYCLE_63			0x09	/**< 6-bit data, 63 clocks */
-#define PWM_CYCLE_32			0x0c	/**< 5-bit data, 32 clocks */
-#define PWM_CYCLE_31			0x0d	/**< 5-bit data, 31 clocks */
+#define PWM_CYCLE_256 0x00 /**< 8-bit data, 256 clocks */
+#define PWM_CYCLE_255 0x01 /**< 8-bit data, 255 clocks */
+#define PWM_CYCLE_128 0x04 /**< 7-bit data, 128 clocks */
+#define PWM_CYCLE_127 0x05 /**< 7-bit data, 127 clocks */
+#define PWM_CYCLE_64 0x08  /**< 6-bit data, 64 clocks */
+#define PWM_CYCLE_63 0x09  /**< 6-bit data, 63 clocks */
+#define PWM_CYCLE_32 0x0c  /**< 5-bit data, 32 clocks */
+#define PWM_CYCLE_31 0x0d  /**< 5-bit data, 31 clocks */
 /** The bits of PWM_CONFIG that pwm_set_cycle() owns. */
-#define PWM_CYCLE_MASK			(RB_PWM_CYC_MOD | RB_PWM_CYCLE_SEL)
+#define PWM_CYCLE_MASK (RB_PWM_CYC_MOD | RB_PWM_CYCLE_SEL)
 /**@}*/
 
 /* --- Output polarity ----------------------------------------------------- */
 
 /** @defgroup pwm_polarity PWM Output Polarity
 @{*/
-#define PWM_POLARITY_ACTIVE_HIGH	0	/**< idle low, active high */
-#define PWM_POLARITY_ACTIVE_LOW		1	/**< idle high, active low */
+#define PWM_POLARITY_ACTIVE_HIGH 0 /**< idle low, active high */
+#define PWM_POLARITY_ACTIVE_LOW 1  /**< idle high, active low */
 /**@}*/
 
 BEGIN_DECLS

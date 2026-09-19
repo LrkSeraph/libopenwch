@@ -22,32 +22,61 @@ only place where this project departs from it:
 	int foo(int a) {
 	}
 
-An attribute that applies to the whole function goes on its own line, before
-the return type:
-
-	__attribute__((weak))
-	void bar(void) {
-	}
-
-A parameter list that does not fit within 80 columns is broken one parameter
-per line, with the closing `) {` on a line of its own.  Note there is **no**
-trailing comma after the last parameter: C does not permit one, in any
-standard, so a "trailing comma" style would not compile.
-
-	__attribute__((weak))
-	void baz(
-		int a,
-		int b
-	) {
-		foo(a);
-	}
-
 Control statements (`if`/`while`/`for`/`switch`) keep the kernel rule, with the
 brace on the same line as the condition.
 
-`make stylecheck` enforces all of this.  A function's opening brace left on the
-line after its signature is an error, and the check is a gate: it exits
-non-zero when anything is reported.
+Formatting is clang-format's job, not yours and not the reviewer's
+------------------------------------------------------------------
+
+`.clang-format` at the top of the tree is the authority on layout.  It runs
+from the pre-commit hook:
+
+	make hooks		# once per clone: git config core.hooksPath .githooks
+
+After that, `git commit` reformats the C sources you staged and re-stages
+them, so nothing arrives unformatted.  The hook is a **no-op when clang-format
+is not installed** -- a contributor without LLVM is not blocked, and the style
+is simply applied by whoever does have it.
+
+Formatting is deliberately not run in CI.  Formatting is a property of the
+commit, decided when the commit is made; a build farm that rewrites files
+after the fact only teaches people to ignore it.
+
+Two details are worth knowing because they look like mistakes and are not:
+
+  * When a signature does not fit in 80 columns, clang-format breaks after
+    the declaration specifiers and aligns the parameters under the open
+    parenthesis, leaving `)` on the last one:
+
+	__attribute__((weak)) void
+	bar(int aaaaaaaaaaaaaaaaaaaaaaaaaa,
+	    int bbbbbbbbbbbbbbbbbbbbbbbbbb) {
+		foo(a);
+	}
+
+  * `BreakAfterAttributes: Always` is set, but it applies to C++ `[[...]]`
+    attributes; GNU `__attribute__((...))` stays attached to the declaration.
+
+Do not hand-format around clang-format.  If the layout is wrong, the fix is an
+option in `.clang-format`, and then a re-run over the tree.
+
+Generated sources are excluded.  `include/libopenwch/*/nvic.h`,
+`lib/*/vector_handlers.c`, `lib/*/vector_names.c` and
+`include/libopencmsis/*/irqhandlers.h` come from `scripts/irq2nvic_h`, are not
+tracked, and are skipped by both the hook and `make stylecheck`.  Formatting
+them would mean either teaching the generator to shell out to clang-format --
+which makes the build depend on whether clang-format is installed -- or
+hand-matching its output.  The generator emits its own layout instead.  If the
+generated code is ugly, fix the generator.
+
+`make stylecheck` remains as a second opinion
+---------------------------------------------
+
+`scripts/checkpatch.pl` still runs, with the brace rule inverted to match the
+style above, and it is a gate (it exits non-zero when it reports anything).
+Its formatting-related checks are turned off: where the checker and the
+formatter disagree, the formatter wins.  See the `STYLECHECKIGNORE` comment in
+the `Makefile` for which checks are off and why.
 
 Amendments to the Linux kernel coding style (as in libopencm3)
 --------------------------------------------------------------

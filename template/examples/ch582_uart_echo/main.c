@@ -33,10 +33,10 @@
 #include <libopenwch/ch5xx58x/uart.h>
 #include <libopenwch/ch5xx58x/rwa.h>
 
-#define BAUD			115200
+#define BAUD 115200
 
 /* Set to GPIO_REMAP_UART1 to move the port to the alternate pin pair. */
-#define UART_PIN_REMAP		0
+#define UART_PIN_REMAP 0
 
 /**
  * Print an unsigned value in decimal without pulling in printf.

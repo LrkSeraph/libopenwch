@@ -31,22 +31,23 @@
 #endif
 
 #if defined(CH32V0)
-# include <libopenwch/ch32v0/nvic.h>
+#include <libopenwch/ch32v0/nvic.h>
 #elif defined(CH5XX58X)
-# include <libopenwch/ch5xx58x/nvic.h>
+#include <libopenwch/ch5xx58x/nvic.h>
 #elif defined(CH5XX57X)
-# include <libopenwch/ch5xx57x/nvic.h>
+#include <libopenwch/ch5xx57x/nvic.h>
 #elif defined(CH5XX59X)
-# include <libopenwch/ch5xx59x/nvic.h>
+#include <libopenwch/ch5xx59x/nvic.h>
 #elif defined(CH32V0V4)
-# include <libopenwch/ch32v0v4/nvic.h>
+#include <libopenwch/ch32v0v4/nvic.h>
 #elif defined(CH32X0)
-# include <libopenwch/ch32x0/nvic.h>
+#include <libopenwch/ch32x0/nvic.h>
 #elif defined(CH32L1)
-# include <libopenwch/ch32l1/nvic.h>
+#include <libopenwch/ch32l1/nvic.h>
 #else
-# warning "no IRQ definitions for the selected device; interrupts are unavailable"
-# define OPENWCH_IRQ_COUNT 0
-# define OPENWCH_IRQ_FIRST 16
-# define OPENWCH_IRQ_LAST 15
+#warning                                                                       \
+    "no IRQ definitions for the selected device; interrupts are unavailable"
+#define OPENWCH_IRQ_COUNT 0
+#define OPENWCH_IRQ_FIRST 16
+#define OPENWCH_IRQ_LAST 15
 #endif

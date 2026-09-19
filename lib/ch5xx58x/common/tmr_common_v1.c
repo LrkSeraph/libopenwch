@@ -104,14 +104,15 @@ uint32_t tmr_get_count(uint32_t tmr) {
 }
 
 void tmr_set_capture_mode(uint32_t tmr, uint32_t mode) {
-	openwch_assert(mode == TMR_CAPTURE_DISABLE || mode == TMR_CAPTURE_EDGE ||
-		       mode == TMR_CAPTURE_FALLING || mode == TMR_CAPTURE_RISING);
+	openwch_assert(
+	    mode == TMR_CAPTURE_DISABLE || mode == TMR_CAPTURE_EDGE ||
+	    mode == TMR_CAPTURE_FALLING || mode == TMR_CAPTURE_RISING);
 
 	/* Only bits 7:6 belong to the capture unit; MODE_IN / CAP_COUNT are the
 	 * caller's choice of tmr_set_mode(). */
-	TMR_CTRL_MOD_REG(tmr) = (uint8_t)((TMR_CTRL_MOD_REG(tmr)
-					   & (uint8_t)~RB_TMR_CAP_EDGE)
-					  | (mode & RB_TMR_CAP_EDGE));
+	TMR_CTRL_MOD_REG(tmr) =
+	    (uint8_t)((TMR_CTRL_MOD_REG(tmr) & (uint8_t)~RB_TMR_CAP_EDGE) |
+		      (mode & RB_TMR_CAP_EDGE));
 }
 
 uint32_t tmr_get_capture(uint32_t tmr) {
@@ -139,12 +140,13 @@ void tmr_disable_pwm(uint32_t tmr) {
 }
 
 void tmr_set_pwm_repeat(uint32_t tmr, uint32_t repeat) {
-	openwch_assert(repeat == TMR_PWM_REPEAT_1 || repeat == TMR_PWM_REPEAT_4 ||
-		       repeat == TMR_PWM_REPEAT_8 || repeat == TMR_PWM_REPEAT_16);
+	openwch_assert(
+	    repeat == TMR_PWM_REPEAT_1 || repeat == TMR_PWM_REPEAT_4 ||
+	    repeat == TMR_PWM_REPEAT_8 || repeat == TMR_PWM_REPEAT_16);
 
-	TMR_CTRL_MOD_REG(tmr) = (uint8_t)((TMR_CTRL_MOD_REG(tmr)
-					   & (uint8_t)~RB_TMR_PWM_REPEAT)
-					  | (repeat & RB_TMR_PWM_REPEAT));
+	TMR_CTRL_MOD_REG(tmr) =
+	    (uint8_t)((TMR_CTRL_MOD_REG(tmr) & (uint8_t)~RB_TMR_PWM_REPEAT) |
+		      (repeat & RB_TMR_PWM_REPEAT));
 }
 
 void tmr_enable_irq(uint32_t tmr, uint32_t irq) {

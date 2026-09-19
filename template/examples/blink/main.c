@@ -39,16 +39,16 @@
  * on PD1 (the LED is between PD1 and the 3.3 V rail, so driving the pin low
  * lights it).  Change these two lines for your own board.
  */
-#define LED_PORT		GPIOD
-#define LED_PIN			GPIO1
+#define LED_PORT GPIOD
+#define LED_PIN GPIO1
 
 /* Delay length, in loop iterations.  Roughly 250 ms at 48 MHz. */
-#define DELAY_LOOPS		600000u
+#define DELAY_LOOPS 600000u
 
 /** Busy-wait for a while.  `volatile` keeps the loop from being removed. */
 static void delay(volatile uint32_t loops) {
 	while (loops--) {
-		__asm__ volatile ("nop");
+		__asm__ volatile("nop");
 	}
 }
 

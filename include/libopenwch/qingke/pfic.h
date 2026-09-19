@@ -45,46 +45,46 @@ LGPL License Terms @ref lgpl_license
  */
 
 typedef struct {
-	volatile uint32_t isr[8];	/**< 0x000 interrupt state (read only) */
-	volatile uint32_t ipr[8];	/**< 0x020 interrupt pending (read only) */
-	volatile uint32_t ithresdr;	/**< 0x040 interrupt threshold */
-	volatile uint32_t reserved0;	/**< 0x044 */
-	volatile uint32_t cfgr;		/**< 0x048 configuration */
-	volatile uint32_t gisr;		/**< 0x04c global interrupt state */
-	volatile uint8_t  vtcfgr[4];	/**< 0x050 vector table free entries */
-	uint8_t  reserved1[12];		/**< 0x054 */
-	volatile uint32_t vtaddr[4];	/**< 0x060 fast interrupt addresses */
-	uint8_t  reserved2[0x90];	/**< 0x070 */
-	volatile uint32_t ienr[8];	/**< 0x100 set enable (write only) */
-	uint8_t  reserved3[0x60];	/**< 0x120 */
-	volatile uint32_t irer[8];	/**< 0x180 clear enable (write only) */
-	uint8_t  reserved4[0x60];	/**< 0x1a0 */
-	volatile uint32_t ipsr[8];	/**< 0x200 set pending (write only) */
-	uint8_t  reserved5[0x60];	/**< 0x220 */
-	volatile uint32_t iprr[8];	/**< 0x280 clear pending (write only) */
-	uint8_t  reserved6[0x60];	/**< 0x2a0 */
-	volatile uint32_t iactr[8];	/**< 0x300 active state (read only) */
-	uint8_t  reserved7[0xe0];	/**< 0x320 */
-	volatile uint8_t  iprior[256];	/**< 0x400 interrupt priority */
-	uint8_t  reserved8[0x810];	/**< 0x500 */
-	volatile uint32_t sctlr;	/**< 0xd10 system control */
+	volatile uint32_t isr[8];    /**< 0x000 interrupt state (read only) */
+	volatile uint32_t ipr[8];    /**< 0x020 interrupt pending (read only) */
+	volatile uint32_t ithresdr;  /**< 0x040 interrupt threshold */
+	volatile uint32_t reserved0; /**< 0x044 */
+	volatile uint32_t cfgr;	     /**< 0x048 configuration */
+	volatile uint32_t gisr;	     /**< 0x04c global interrupt state */
+	volatile uint8_t vtcfgr[4];  /**< 0x050 vector table free entries */
+	uint8_t reserved1[12];	     /**< 0x054 */
+	volatile uint32_t vtaddr[4]; /**< 0x060 fast interrupt addresses */
+	uint8_t reserved2[0x90];     /**< 0x070 */
+	volatile uint32_t ienr[8];   /**< 0x100 set enable (write only) */
+	uint8_t reserved3[0x60];     /**< 0x120 */
+	volatile uint32_t irer[8];   /**< 0x180 clear enable (write only) */
+	uint8_t reserved4[0x60];     /**< 0x1a0 */
+	volatile uint32_t ipsr[8];   /**< 0x200 set pending (write only) */
+	uint8_t reserved5[0x60];     /**< 0x220 */
+	volatile uint32_t iprr[8];   /**< 0x280 clear pending (write only) */
+	uint8_t reserved6[0x60];     /**< 0x2a0 */
+	volatile uint32_t iactr[8];  /**< 0x300 active state (read only) */
+	uint8_t reserved7[0xe0];     /**< 0x320 */
+	volatile uint8_t iprior[256]; /**< 0x400 interrupt priority */
+	uint8_t reserved8[0x810];     /**< 0x500 */
+	volatile uint32_t sctlr;      /**< 0xd10 system control */
 } pfic_reg_t;
 
-#define PFIC			((pfic_reg_t *)PFIC_BASE)
+#define PFIC ((pfic_reg_t *)PFIC_BASE)
 
 /* cfgr magic keys for privileged operations. */
-#define PFIC_KEY1		(0xfa050000u)
-#define PFIC_KEY2		(0xbcaf0000u)
-#define PFIC_KEY3		(0xbeef0000u)
+#define PFIC_KEY1 (0xfa050000u)
+#define PFIC_KEY2 (0xbcaf0000u)
+#define PFIC_KEY3 (0xbeef0000u)
 
 /* cfgr.SYS_RESET */
-#define PFIC_CFGR_SYS_RESET	(PFIC_KEY3 | (1 << 7))
+#define PFIC_CFGR_SYS_RESET (PFIC_KEY3 | (1 << 7))
 
 /* sctlr bits */
-#define PFIC_SCTLR_SLEEPONEXIT	(1 << 1)
-#define PFIC_SCTLR_SLEEPDEEP	(1 << 2)
-#define PFIC_SCTLR_WFE		(1 << 3)
-#define PFIC_SCTLR_EVENT	(1 << 5)
+#define PFIC_SCTLR_SLEEPONEXIT (1 << 1)
+#define PFIC_SCTLR_SLEEPDEEP (1 << 2)
+#define PFIC_SCTLR_WFE (1 << 3)
+#define PFIC_SCTLR_EVENT (1 << 5)
 
 #endif
 /**@}*/

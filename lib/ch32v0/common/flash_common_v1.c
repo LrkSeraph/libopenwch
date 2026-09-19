@@ -121,11 +121,8 @@ enum flash_status flash_erase_all_pages(uint32_t flash) {
 	return status;
 }
 
-enum flash_status flash_program_halfword(
-	uint32_t flash,
-	uint32_t address,
-	uint16_t data
-) {
+enum flash_status
+flash_program_halfword(uint32_t flash, uint32_t address, uint16_t data) {
 	enum flash_status status;
 
 	openwch_assert((address & 0x1u) == 0);
@@ -145,11 +142,8 @@ enum flash_status flash_program_halfword(
 	return status;
 }
 
-enum flash_status flash_program_word(
-	uint32_t flash,
-	uint32_t address,
-	uint32_t data
-) {
+enum flash_status
+flash_program_word(uint32_t flash, uint32_t address, uint32_t data) {
 	enum flash_status status;
 
 	openwch_assert((address & 0x1u) == 0);
@@ -184,15 +178,12 @@ void flash_set_latency(uint32_t flash, uint32_t latency) {
 	openwch_assert((latency & ~FLASH_ACTLR_LATENCY_MASK) == 0);
 	(void)flash;
 
-	FLASH_ACTLR = (FLASH_ACTLR & ~FLASH_ACTLR_LATENCY_MASK)
-			| (latency & FLASH_ACTLR_LATENCY_MASK);
+	FLASH_ACTLR = (FLASH_ACTLR & ~FLASH_ACTLR_LATENCY_MASK) |
+		      (latency & FLASH_ACTLR_LATENCY_MASK);
 }
 
-enum flash_status flash_program_option_bytes(
-	uint32_t flash,
-	uint32_t address,
-	uint16_t data
-) {
+enum flash_status
+flash_program_option_bytes(uint32_t flash, uint32_t address, uint16_t data) {
 	enum flash_status status;
 
 	openwch_assert((address & 0x1u) == 0);
@@ -218,10 +209,8 @@ uint32_t flash_get_option_bytes(uint32_t flash) {
 	return FLASH_OBR(flash);
 }
 
-enum flash_status flash_enable_write_protection(
-	uint32_t flash,
-	uint32_t pages
-) {
+enum flash_status flash_enable_write_protection(uint32_t flash,
+						uint32_t pages) {
 	enum flash_status status;
 
 	status = flash_wait_for_last_operation(flash);
@@ -243,7 +232,8 @@ enum flash_status flash_enable_write_protection(
 		status = flash_wait_for_last_operation(flash);
 	}
 
-	if ((status == FLASH_STATUS_COMPLETE) && (((pages >> 8) & 0xffu) != 0xffu)) {
+	if ((status == FLASH_STATUS_COMPLETE) &&
+	    (((pages >> 8) & 0xffu) != 0xffu)) {
 		FLASH_OB_WRPR1 = (uint16_t)((pages >> 8) & 0xffu);
 		status = flash_wait_for_last_operation(flash);
 	}

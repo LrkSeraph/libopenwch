@@ -94,15 +94,15 @@ LGPL License Terms @ref lgpl_license
  * any order.
  */
 #ifndef FLASH_CFG
-#define FLASH_CFG			MMIO8(R8_FLASH_CFG)
+#define FLASH_CFG MMIO8(R8_FLASH_CFG)
 #endif
 /* Flash data buffer (R8_FLASH_DATA, 0x40001804) */
 #ifndef FLASH_DATA
-#define FLASH_DATA			MMIO8(ROM_CTRL_BASE + 0x04)
+#define FLASH_DATA MMIO8(ROM_CTRL_BASE + 0x04)
 #endif
 /* Flash access control (R8_FLASH_CTRL, 0x40001806) */
 #ifndef FLASH_CTRL
-#define FLASH_CTRL			MMIO8(ROM_CTRL_BASE + 0x06)
+#define FLASH_CTRL MMIO8(ROM_CTRL_BASE + 0x06)
 #endif
 
 /*
@@ -113,21 +113,21 @@ LGPL License Terms @ref lgpl_license
  * header defines as R8_RST_WDOG_CTRL.  The real R8_CHIP_ID is one byte above
  * R8_SAFE_ACCESS_SIG, at 0x40001041.
  */
-#define FLASH_CHIP_ID_ADDR		(SYS_BASE + 0x41)
-#define FLASH_CHIP_ID			MMIO8(FLASH_CHIP_ID_ADDR)
+#define FLASH_CHIP_ID_ADDR (SYS_BASE + 0x41)
+#define FLASH_CHIP_ID MMIO8(FLASH_CHIP_ID_ADDR)
 
 /* Factory information, memory-mapped for reads. */
-#define FLASH_UNIQUE_ID_ADDR		ROM_CFG_MAC_ADDR
-#define FLASH_TEMP_CAL_ADDR		ROM_CFG_TMP_25C
+#define FLASH_UNIQUE_ID_ADDR ROM_CFG_MAC_ADDR
+#define FLASH_TEMP_CAL_ADDR ROM_CFG_TMP_25C
 
 /* --- Sizes --------------------------------------------------------------- */
 
 /** Data-flash (EEPROM) block size, in bytes. */
-#define FLASH_EEPROM_BLOCK_SIZE		256u
+#define FLASH_EEPROM_BLOCK_SIZE 256u
 /** Flash-ROM erase block size, in bytes. */
-#define FLASH_ROM_BLOCK_SIZE		4096u
+#define FLASH_ROM_BLOCK_SIZE 4096u
 /** Flash-ROM program granularity, in bytes. */
-#define FLASH_ROM_MIN_WRITE_SIZE	4u
+#define FLASH_ROM_MIN_WRITE_SIZE 4u
 
 /* --- Flash timing -------------------------------------------------------- */
 
@@ -140,10 +140,11 @@ These are those literals.
 
 @{*/
 typedef enum {
-	FLASH_LATENCY_PLL_FAST = 0x02,	/**< PLL clock path, 80 MHz */
-	FLASH_LATENCY_PLL = 0x52,	/**< PLL clock path, below 80 MHz */
-	FLASH_LATENCY_HSE = 0x51,	/**< XT32M divider path, 6.4 MHz and up */
-	FLASH_LATENCY_HSE_SLOW = 0x57,	/**< XT32M divider path, 4 MHz and down */
+	FLASH_LATENCY_PLL_FAST = 0x02, /**< PLL clock path, 80 MHz */
+	FLASH_LATENCY_PLL = 0x52,      /**< PLL clock path, below 80 MHz */
+	FLASH_LATENCY_HSE = 0x51, /**< XT32M divider path, 6.4 MHz and up */
+	FLASH_LATENCY_HSE_SLOW =
+	    0x57, /**< XT32M divider path, 4 MHz and down */
 } flash_latency_t;
 /**@}*/
 
@@ -154,10 +155,10 @@ typedef enum {
 
 @{*/
 enum flash_status {
-	FLASH_STATUS_COMPLETE = 0,	/**< operation finished, no error */
-	FLASH_STATUS_UNSUPPORTED,	/**< not implemented without libISP583.a */
-	FLASH_STATUS_BAD_ARGUMENT,	/**< address or length rejected */
-	FLASH_STATUS_VERIFY_ERROR,	/**< write read back differently */
+	FLASH_STATUS_COMPLETE = 0, /**< operation finished, no error */
+	FLASH_STATUS_UNSUPPORTED,  /**< not implemented without libISP583.a */
+	FLASH_STATUS_BAD_ARGUMENT, /**< address or length rejected */
+	FLASH_STATUS_VERIFY_ERROR, /**< write read back differently */
 };
 /**@}*/
 
@@ -216,8 +217,8 @@ enum flash_status flash_erase_page(uint32_t address);
  * ROM ISP entry point in libISP583.a, which libopenwch does not link.  See the
  * note at the top of this header.
  */
-enum flash_status flash_program(uint32_t address, const void *buf,
-				uint32_t len);
+enum flash_status
+flash_program(uint32_t address, const void *buf, uint32_t len);
 
 END_DECLS
 

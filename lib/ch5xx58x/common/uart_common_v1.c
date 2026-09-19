@@ -50,8 +50,8 @@
 
 /** True for the four UART block base addresses this family implements. */
 static inline bool uart_is_valid(uint32_t uart) {
-	return (uart == UART0) || (uart == UART1) ||
-	       (uart == UART2) || (uart == UART3);
+	return (uart == UART0) || (uart == UART1) || (uart == UART2) ||
+	       (uart == UART3);
 }
 
 /* --- Line format --------------------------------------------------------- */

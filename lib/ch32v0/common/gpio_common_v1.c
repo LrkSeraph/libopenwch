@@ -46,11 +46,8 @@
  * and the register is 32 bits wide -- which is exactly 8 pins, the width of a
  * CH32V00x port.
  */
-static void gpio_nibble_apply(
-	volatile uint32_t *reg,
-	uint8_t nibble,
-	uint16_t gpios
-) {
+static void
+gpio_nibble_apply(volatile uint32_t *reg, uint8_t nibble, uint16_t gpios) {
 	uint32_t value = *reg;
 	unsigned pin;
 
@@ -196,12 +193,14 @@ void gpio_i2c1_remap(uint32_t remap) {
 
 void gpio_tim1_remap(uint32_t remap) {
 	openwch_assert(remap <= 3);
-	gpio_remap_field(AFIO_PCFR1_TIM1_RM_MASK, AFIO_PCFR1_TIM1_RM_SHIFT, remap);
+	gpio_remap_field(AFIO_PCFR1_TIM1_RM_MASK, AFIO_PCFR1_TIM1_RM_SHIFT,
+			 remap);
 }
 
 void gpio_tim2_remap(uint32_t remap) {
 	openwch_assert(remap <= 3);
-	gpio_remap_field(AFIO_PCFR1_TIM2_RM_MASK, AFIO_PCFR1_TIM2_RM_SHIFT, remap);
+	gpio_remap_field(AFIO_PCFR1_TIM2_RM_MASK, AFIO_PCFR1_TIM2_RM_SHIFT,
+			 remap);
 }
 
 /* --- EXTI line source selection ------------------------------------------ */

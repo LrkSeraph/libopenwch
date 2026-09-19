@@ -42,7 +42,7 @@ LGPL License Terms @ref lgpl_license
  * internal LSI oscillator, so it keeps running in the low-power modes unless
  * the debug unit is told otherwise.
  */
-#define IWDG				IWDG_BASE
+#define IWDG IWDG_BASE
 
 #include <libopenwch/ch32v0/common/iwdg_common_v1.h>
 

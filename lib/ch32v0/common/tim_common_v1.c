@@ -53,24 +53,24 @@
  * bits, and whether the advanced complementary output exists.
  */
 struct tim_channel_desc {
-	uint8_t chctlr;			/**< 0 = CHCTLR1, 1 = CHCTLR2 */
-	uint8_t ccxs_shift;		/**< bit position of CCxS in the CHCTLR */
-	uint16_t ccer_mask;		/**< CCxE | CCxP | CCxNE | CCxNP */
-	uint8_t has_complementary;	/**< OCxN output exists */
+	uint8_t chctlr;		   /**< 0 = CHCTLR1, 1 = CHCTLR2 */
+	uint8_t ccxs_shift;	   /**< bit position of CCxS in the CHCTLR */
+	uint16_t ccer_mask;	   /**< CCxE | CCxP | CCxNE | CCxNP */
+	uint8_t has_complementary; /**< OCxN output exists */
 };
 
 static const struct tim_channel_desc tim_channels[4] = {
-	{ 0, TIM_CHCTLR1_CC1S_SHIFT, TIM_CCER_CC1E | TIM_CCER_CC1P
-			| TIM_CCER_CC1NE | TIM_CCER_CC1NP, 1 },
-	{ 0, TIM_CHCTLR1_CC2S_SHIFT, TIM_CCER_CC2E | TIM_CCER_CC2P
-			| TIM_CCER_CC2NE | TIM_CCER_CC2NP, 1 },
-	{ 1, TIM_CHCTLR2_CC3S_SHIFT, TIM_CCER_CC3E | TIM_CCER_CC3P
-			| TIM_CCER_CC3NE | TIM_CCER_CC3NP, 1 },
-	{ 1, TIM_CHCTLR2_CC4S_SHIFT, TIM_CCER_CC4E | TIM_CCER_CC4P, 0 },
+    {0, TIM_CHCTLR1_CC1S_SHIFT,
+     TIM_CCER_CC1E | TIM_CCER_CC1P | TIM_CCER_CC1NE | TIM_CCER_CC1NP, 1},
+    {0, TIM_CHCTLR1_CC2S_SHIFT,
+     TIM_CCER_CC2E | TIM_CCER_CC2P | TIM_CCER_CC2NE | TIM_CCER_CC2NP, 1},
+    {1, TIM_CHCTLR2_CC3S_SHIFT,
+     TIM_CCER_CC3E | TIM_CCER_CC3P | TIM_CCER_CC3NE | TIM_CCER_CC3NP, 1},
+    {1, TIM_CHCTLR2_CC4S_SHIFT, TIM_CCER_CC4E | TIM_CCER_CC4P, 0},
 };
 
 /** Number of capture/compare channels on both timers. */
-#define TIM_CHANNEL_COUNT		4
+#define TIM_CHANNEL_COUNT 4
 
 /**
  * Validate a channel identifier and return it as a table index.
@@ -88,7 +88,8 @@ static unsigned int tim_channel_index(uint32_t ic) {
 /** Access the capture/compare control register that holds a channel. */
 static uint16_t tim_chctlr_read(uint32_t tim, uint32_t ic) {
 	return (tim_channels[tim_channel_index(ic)].chctlr == 0)
-			? TIM_CHCTLR1(tim) : TIM_CHCTLR2(tim);
+		   ? TIM_CHCTLR1(tim)
+		   : TIM_CHCTLR2(tim);
 }
 
 static void tim_chctlr_write(uint32_t tim, uint32_t ic, uint16_t value) {
@@ -155,12 +156,12 @@ void timer_set_mode(uint32_t tim, uint32_t mode) {
 	 * DIR, OPM, UDIS and URS.  Everything else in CTLR1 (CEN, ARPE, CKD)
 	 * is owned by its own setter.
 	 */
-	reg = (uint16_t)((reg & ~(TIM_CTLR1_CMS_MASK | TIM_CTLR1_DIR
-					| TIM_CTLR1_OPM | TIM_CTLR1_UDIS
-					| TIM_CTLR1_URS))
-			| (mode & (TIM_CTLR1_CMS_MASK | TIM_CTLR1_DIR
-					| TIM_CTLR1_OPM | TIM_CTLR1_UDIS
-					| TIM_CTLR1_URS)));
+	reg = (uint16_t)((reg &
+			  ~(TIM_CTLR1_CMS_MASK | TIM_CTLR1_DIR | TIM_CTLR1_OPM |
+			    TIM_CTLR1_UDIS | TIM_CTLR1_URS)) |
+			 (mode &
+			  (TIM_CTLR1_CMS_MASK | TIM_CTLR1_DIR | TIM_CTLR1_OPM |
+			   TIM_CTLR1_UDIS | TIM_CTLR1_URS)));
 	TIM_CTLR1(tim) = reg;
 }
 
@@ -193,8 +194,8 @@ void timer_set_alignment(uint32_t tim, uint32_t alignment) {
 
 	openwch_assert((alignment & ~TIM_CTLR1_CMS_MASK) == 0);
 
-	reg = (uint16_t)((reg & ~TIM_CTLR1_CMS_MASK)
-			| (alignment & TIM_CTLR1_CMS_MASK));
+	reg = (uint16_t)((reg & ~TIM_CTLR1_CMS_MASK) |
+			 (alignment & TIM_CTLR1_CMS_MASK));
 	TIM_CTLR1(tim) = reg;
 }
 
@@ -203,8 +204,7 @@ void timer_set_direction(uint32_t tim, uint32_t direction) {
 
 	openwch_assert((direction & ~TIM_CTLR1_DIR) == 0);
 
-	reg = (uint16_t)((reg & ~TIM_CTLR1_DIR)
-			| (direction & TIM_CTLR1_DIR));
+	reg = (uint16_t)((reg & ~TIM_CTLR1_DIR) | (direction & TIM_CTLR1_DIR));
 	TIM_CTLR1(tim) = reg;
 }
 
@@ -219,12 +219,12 @@ void timer_disable_preload(uint32_t tim) {
 void timer_set_clock_division(uint32_t tim, enum tim_clock_division ckd) {
 	uint16_t reg = TIM_CTLR1(tim);
 
-	openwch_assert((ckd == TIM_CKD_DIV1) || (ckd == TIM_CKD_DIV2)
-			|| (ckd == TIM_CKD_DIV4));
+	openwch_assert((ckd == TIM_CKD_DIV1) || (ckd == TIM_CKD_DIV2) ||
+		       (ckd == TIM_CKD_DIV4));
 
-	reg = (uint16_t)((reg & ~TIM_CTLR1_CKD_MASK)
-			| (((uint16_t)ckd << TIM_CTLR1_CKD_SHIFT)
-					& TIM_CTLR1_CKD_MASK));
+	reg = (uint16_t)((reg & ~TIM_CTLR1_CKD_MASK) |
+			 (((uint16_t)ckd << TIM_CTLR1_CKD_SHIFT) &
+			  TIM_CTLR1_CKD_MASK));
 	TIM_CTLR1(tim) = reg;
 }
 
@@ -265,16 +265,16 @@ void timer_generate_event(uint32_t tim, enum tim_event event) {
  */
 
 void timer_set_oc_mode(uint32_t tim, enum tim_oc_id oc, enum tim_oc_mode mode) {
-	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift
-			+ 4);
+	uint16_t shift =
+	    (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift + 4);
 	uint16_t mask = (uint16_t)(0x7u << shift);
 	uint16_t reg = tim_chctlr_read(tim, oc);
 
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
-	openwch_assert((mode >= TIM_OC_MODE_FROZEN) && (mode <= TIM_OC_MODE_PWM2));
+	openwch_assert((mode >= TIM_OC_MODE_FROZEN) &&
+		       (mode <= TIM_OC_MODE_PWM2));
 
-	reg = (uint16_t)((reg & ~mask)
-			| ((((uint16_t)mode) << shift) & mask));
+	reg = (uint16_t)((reg & ~mask) | ((((uint16_t)mode) << shift) & mask));
 	tim_chctlr_write(tim, oc, reg);
 }
 
@@ -284,16 +284,14 @@ void timer_set_oc_value(uint32_t tim, enum tim_oc_id oc, uint16_t value) {
 	tim_ccr_write(tim, oc, value);
 }
 
-void timer_set_oc_polarity(
-	uint32_t tim,
-	enum tim_oc_id oc,
-	enum tim_oc_polarity polarity
-) {
+void timer_set_oc_polarity(uint32_t tim,
+			   enum tim_oc_id oc,
+			   enum tim_oc_polarity polarity) {
 	uint16_t reg = TIM_CCER(tim);
 
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
-	openwch_assert((polarity == TIM_OC_POLARITY_ACTIVE_HIGH)
-			|| (polarity == TIM_OC_POLARITY_ACTIVE_LOW));
+	openwch_assert((polarity == TIM_OC_POLARITY_ACTIVE_HIGH) ||
+		       (polarity == TIM_OC_POLARITY_ACTIVE_LOW));
 
 	if (polarity == TIM_OC_POLARITY_ACTIVE_LOW) {
 		reg |= tim_ccer_polarity_bit(oc);
@@ -316,8 +314,8 @@ void timer_disable_oc_output(uint32_t tim, enum tim_oc_id oc) {
 }
 
 void timer_enable_oc_preload(uint32_t tim, enum tim_oc_id oc) {
-	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift
-			+ 3);
+	uint16_t shift =
+	    (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift + 3);
 	uint16_t reg = tim_chctlr_read(tim, oc);
 
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
@@ -327,8 +325,8 @@ void timer_enable_oc_preload(uint32_t tim, enum tim_oc_id oc) {
 }
 
 void timer_disable_oc_preload(uint32_t tim, enum tim_oc_id oc) {
-	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift
-			+ 3);
+	uint16_t shift =
+	    (uint16_t)(tim_channels[tim_channel_index(oc)].ccxs_shift + 3);
 	uint16_t reg = tim_chctlr_read(tim, oc);
 
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
@@ -337,16 +335,15 @@ void timer_disable_oc_preload(uint32_t tim, enum tim_oc_id oc) {
 	tim_chctlr_write(tim, oc, reg);
 }
 
-void timer_set_oc_idle_state(
-	uint32_t tim,
-	enum tim_oc_id oc,
-	enum tim_oc_idle_state state
-) {
+void timer_set_oc_idle_state(uint32_t tim,
+			     enum tim_oc_id oc,
+			     enum tim_oc_idle_state state) {
 	uint16_t bit;
 	uint16_t reg;
 
 	openwch_assert((oc >= TIM_OC1) && (oc <= TIM_OC4));
-	openwch_assert((state == TIM_OC_IDLE_RESET) || (state == TIM_OC_IDLE_SET));
+	openwch_assert((state == TIM_OC_IDLE_RESET) ||
+		       (state == TIM_OC_IDLE_SET));
 
 	switch (tim_channel_index(oc)) {
 	case 0:
@@ -377,29 +374,27 @@ void timer_set_oc_idle_state(
  */
 
 void timer_set_input_filter(uint32_t tim, enum tim_ic_id ic, uint8_t filter) {
-	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(ic)].ccxs_shift
-			+ 4);
+	uint16_t shift =
+	    (uint16_t)(tim_channels[tim_channel_index(ic)].ccxs_shift + 4);
 	uint16_t mask = (uint16_t)(0xfu << shift);
 	uint16_t reg = tim_chctlr_read(tim, ic);
 
 	openwch_assert((ic >= TIM_IC1) && (ic <= TIM_IC4));
 	openwch_assert(filter <= 0xfu);
 
-	reg = (uint16_t)((reg & ~mask)
-			| ((((uint16_t)filter) << shift) & mask));
+	reg =
+	    (uint16_t)((reg & ~mask) | ((((uint16_t)filter) << shift) & mask));
 	tim_chctlr_write(tim, ic, reg);
 }
 
-void timer_set_input_polarity(
-	uint32_t tim,
-	enum tim_ic_id ic,
-	enum tim_ic_polarity polarity
-) {
+void timer_set_input_polarity(uint32_t tim,
+			      enum tim_ic_id ic,
+			      enum tim_ic_polarity polarity) {
 	uint16_t reg = TIM_CCER(tim);
 
 	openwch_assert((ic >= TIM_IC1) && (ic <= TIM_IC4));
-	openwch_assert((polarity == TIM_IC_POLARITY_RISING)
-			|| (polarity == TIM_IC_POLARITY_FALLING));
+	openwch_assert((polarity == TIM_IC_POLARITY_RISING) ||
+		       (polarity == TIM_IC_POLARITY_FALLING));
 
 	/* The input capture polarity bit is CCxP, shared with output compare. */
 	if (polarity == TIM_IC_POLARITY_FALLING) {
@@ -411,16 +406,15 @@ void timer_set_input_polarity(
 }
 
 void timer_set_ic_prescaler(uint32_t tim, enum tim_ic_id ic, uint8_t psc) {
-	uint16_t shift = (uint16_t)(tim_channels[tim_channel_index(ic)].ccxs_shift
-			+ 2);
+	uint16_t shift =
+	    (uint16_t)(tim_channels[tim_channel_index(ic)].ccxs_shift + 2);
 	uint16_t mask = (uint16_t)(0x3u << shift);
 	uint16_t reg = tim_chctlr_read(tim, ic);
 
 	openwch_assert((ic >= TIM_IC1) && (ic <= TIM_IC4));
 	openwch_assert(psc <= 0x3u);
 
-	reg = (uint16_t)((reg & ~mask)
-			| ((((uint16_t)psc) << shift) & mask));
+	reg = (uint16_t)((reg & ~mask) | ((((uint16_t)psc) << shift) & mask));
 	tim_chctlr_write(tim, ic, reg);
 }
 
@@ -441,8 +435,8 @@ void timer_enable_break_main_output(uint32_t tim) {
 void timer_set_deadtime(uint32_t tim, uint8_t deadtime) {
 	uint16_t reg = TIM_BDTR(tim);
 
-	reg = (uint16_t)((reg & ~TIM_BDTR_DTG_MASK)
-			| ((uint16_t)deadtime & TIM_BDTR_DTG_MASK));
+	reg = (uint16_t)((reg & ~TIM_BDTR_DTG_MASK) |
+			 ((uint16_t)deadtime & TIM_BDTR_DTG_MASK));
 	TIM_BDTR(tim) = reg;
 }
 
@@ -460,23 +454,15 @@ void timer_set_deadtime(uint32_t tim, uint8_t deadtime) {
  */
 static uint16_t tim_flag_mask(enum tim_flag flag) {
 	static const uint16_t masks[] = {
-		TIM_INTFR_UIF,
-		TIM_INTFR_CC1IF,
-		TIM_INTFR_CC2IF,
-		TIM_INTFR_CC3IF,
-		TIM_INTFR_CC4IF,
-		TIM_INTFR_COMIF,
-		TIM_INTFR_TIF,
-		TIM_INTFR_BIF,
-		TIM_INTFR_CC1OF,
-		TIM_INTFR_CC2OF,
-		TIM_INTFR_CC3OF,
-		TIM_INTFR_CC4OF,
+	    TIM_INTFR_UIF,   TIM_INTFR_CC1IF, TIM_INTFR_CC2IF, TIM_INTFR_CC3IF,
+	    TIM_INTFR_CC4IF, TIM_INTFR_COMIF, TIM_INTFR_TIF,   TIM_INTFR_BIF,
+	    TIM_INTFR_CC1OF, TIM_INTFR_CC2OF, TIM_INTFR_CC3OF, TIM_INTFR_CC4OF,
 	};
 
 	openwch_assert(flag <= TIM_FLAG_CC4_OVERCAPTURE);
 
-	return masks[(flag <= TIM_FLAG_CC4_OVERCAPTURE) ? (unsigned int)flag : 0u];
+	return masks[(flag <= TIM_FLAG_CC4_OVERCAPTURE) ? (unsigned int)flag
+							: 0u];
 }
 
 void timer_enable_irq(uint32_t tim, enum tim_irq irq) {

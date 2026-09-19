@@ -43,7 +43,7 @@ LGPL License Terms @ref lgpl_license
  * peripheral base; there is no second instance and no per-instance function
  * parameter.
  */
-#define PWR_BASE			SYS_BASE
+#define PWR_BASE SYS_BASE
 
 #include <libopenwch/ch5xx58x/common/pwr_common_v1.h>
 

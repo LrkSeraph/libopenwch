@@ -63,11 +63,9 @@ void dma_channel_reset(uint32_t dma, uint8_t channel) {
 	dma_clear_interrupt_pending_bit(dma, channel);
 }
 
-void dma_set_peripheral_address(
-	uint32_t dma,
-	uint8_t channel,
-	uint32_t address
-) {
+void dma_set_peripheral_address(uint32_t dma,
+				uint8_t channel,
+				uint32_t address) {
 	dma_assert_channel(channel);
 	DMA_PADDR(dma, channel) = address;
 }
@@ -124,8 +122,8 @@ void dma_set_peripheral_size(uint32_t dma, uint8_t channel, uint32_t size) {
 	openwch_assert((size & ~DMA_SIZE_MASK) == 0);
 
 	reg = DMA_CFGR(dma, channel);
-	reg = (reg & ~DMA_CFGR_PSIZE_MASK)
-		| ((size & DMA_SIZE_MASK) << DMA_CFGR_PSIZE_SHIFT);
+	reg = (reg & ~DMA_CFGR_PSIZE_MASK) |
+	      ((size & DMA_SIZE_MASK) << DMA_CFGR_PSIZE_SHIFT);
 	DMA_CFGR(dma, channel) = reg;
 }
 
@@ -136,8 +134,8 @@ void dma_set_memory_size(uint32_t dma, uint8_t channel, uint32_t size) {
 	openwch_assert((size & ~DMA_SIZE_MASK) == 0);
 
 	reg = DMA_CFGR(dma, channel);
-	reg = (reg & ~DMA_CFGR_MSIZE_MASK)
-		| ((size & DMA_SIZE_MASK) << DMA_CFGR_MSIZE_SHIFT);
+	reg = (reg & ~DMA_CFGR_MSIZE_MASK) |
+	      ((size & DMA_SIZE_MASK) << DMA_CFGR_MSIZE_SHIFT);
 	DMA_CFGR(dma, channel) = reg;
 }
 
@@ -163,8 +161,8 @@ void dma_set_priority(uint32_t dma, uint8_t channel, uint32_t priority) {
 	openwch_assert((priority & ~DMA_PRIORITY_MASK) == 0);
 
 	reg = DMA_CFGR(dma, channel);
-	reg = (reg & ~DMA_CFGR_PL_MASK)
-		| ((priority & DMA_PRIORITY_MASK) << DMA_CFGR_PL_SHIFT);
+	reg = (reg & ~DMA_CFGR_PL_MASK) |
+	      ((priority & DMA_PRIORITY_MASK) << DMA_CFGR_PL_SHIFT);
 	DMA_CFGR(dma, channel) = reg;
 }
 
@@ -210,8 +208,8 @@ void dma_channel_disable(uint32_t dma, uint8_t channel) {
 
 uint32_t dma_get_flag(uint32_t dma, uint8_t channel, uint32_t flag) {
 	dma_assert_channel(channel);
-	return (DMA_INTFR(dma) >> DMA_FLAG_OFFSET(channel))
-		& (flag & DMA_FLAG_MASK);
+	return (DMA_INTFR(dma) >> DMA_FLAG_OFFSET(channel)) &
+	       (flag & DMA_FLAG_MASK);
 }
 
 void dma_clear_flag(uint32_t dma, uint8_t channel, uint32_t flag) {

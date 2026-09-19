@@ -44,7 +44,7 @@ LGPL License Terms @ref lgpl_license
  * gpio_pin_remap(GPIO_REMAP_I2C); the pins then drive open-drain as the bus
  * requires, so they must not be configured as push-pull outputs.
  */
-#define I2C1				I2C1_BASE
+#define I2C1 I2C1_BASE
 
 #include <libopenwch/ch5xx58x/common/i2c_common_v1.h>
 

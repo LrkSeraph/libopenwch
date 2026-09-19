@@ -44,10 +44,10 @@ LGPL License Terms @ref lgpl_license
  */
 
 #if defined(__ASSEMBLER__)
-#define MMIO8(addr)	(addr)
-#define MMIO16(addr)	(addr)
-#define MMIO32(addr)	(addr)
-#define MMIO64(addr)	(addr)
+#define MMIO8(addr) (addr)
+#define MMIO16(addr) (addr)
+#define MMIO32(addr) (addr)
+#define MMIO64(addr) (addr)
 #else
 
 #include <stdint.h>
@@ -55,69 +55,69 @@ LGPL License Terms @ref lgpl_license
 #include <stddef.h>
 
 /* Generic memory-mapped I/O accessor functions */
-#define MMIO8(addr)		(*(volatile uint8_t *)(addr))
-#define MMIO16(addr)		(*(volatile uint16_t *)(addr))
-#define MMIO32(addr)		(*(volatile uint32_t *)(addr))
-#define MMIO64(addr)		(*(volatile uint64_t *)(addr))
+#define MMIO8(addr) (*(volatile uint8_t *)(addr))
+#define MMIO16(addr) (*(volatile uint16_t *)(addr))
+#define MMIO32(addr) (*(volatile uint32_t *)(addr))
+#define MMIO64(addr) (*(volatile uint64_t *)(addr))
 #endif
 
 /* Generic bit definition */
-#define BIT0	(1 << 0)
-#define BIT1	(1 << 1)
-#define BIT2	(1 << 2)
-#define BIT3	(1 << 3)
-#define BIT4	(1 << 4)
-#define BIT5	(1 << 5)
-#define BIT6	(1 << 6)
-#define BIT7	(1 << 7)
-#define BIT8	(1 << 8)
-#define BIT9	(1 << 9)
-#define BIT10	(1 << 10)
-#define BIT11	(1 << 11)
-#define BIT12	(1 << 12)
-#define BIT13	(1 << 13)
-#define BIT14	(1 << 14)
-#define BIT15	(1 << 15)
-#define BIT16	(1 << 16)
-#define BIT17	(1 << 17)
-#define BIT18	(1 << 18)
-#define BIT19	(1 << 19)
-#define BIT20	(1 << 20)
-#define BIT21	(1 << 21)
-#define BIT22	(1 << 22)
-#define BIT23	(1 << 23)
-#define BIT24	(1 << 24)
-#define BIT25	(1 << 25)
-#define BIT26	(1 << 26)
-#define BIT27	(1 << 27)
-#define BIT28	(1 << 28)
-#define BIT29	(1 << 29)
-#define BIT30	(1 << 30)
-#define BIT31	(1 << 31)
+#define BIT0 (1 << 0)
+#define BIT1 (1 << 1)
+#define BIT2 (1 << 2)
+#define BIT3 (1 << 3)
+#define BIT4 (1 << 4)
+#define BIT5 (1 << 5)
+#define BIT6 (1 << 6)
+#define BIT7 (1 << 7)
+#define BIT8 (1 << 8)
+#define BIT9 (1 << 9)
+#define BIT10 (1 << 10)
+#define BIT11 (1 << 11)
+#define BIT12 (1 << 12)
+#define BIT13 (1 << 13)
+#define BIT14 (1 << 14)
+#define BIT15 (1 << 15)
+#define BIT16 (1 << 16)
+#define BIT17 (1 << 17)
+#define BIT18 (1 << 18)
+#define BIT19 (1 << 19)
+#define BIT20 (1 << 20)
+#define BIT21 (1 << 21)
+#define BIT22 (1 << 22)
+#define BIT23 (1 << 23)
+#define BIT24 (1 << 24)
+#define BIT25 (1 << 25)
+#define BIT26 (1 << 26)
+#define BIT27 (1 << 27)
+#define BIT28 (1 << 28)
+#define BIT29 (1 << 29)
+#define BIT30 (1 << 30)
+#define BIT31 (1 << 31)
 
 /* Linkage helpers.  Semantics identical to libopencm3's cm3/common.h. */
 #ifdef __ASSEMBLER__
-# define BEGIN_DECLS	.if 0
-# define END_DECLS	.endif
+#define BEGIN_DECLS .if 0
+#define END_DECLS .endif
 #else
-# ifdef __cplusplus
-#  define BEGIN_DECLS	extern "C" {
-#  define END_DECLS	}
-# else
-#  define BEGIN_DECLS
-#  define END_DECLS
-# endif
+#ifdef __cplusplus
+#define BEGIN_DECLS extern "C" {
+#define END_DECLS }
+#else
+#define BEGIN_DECLS
+#define END_DECLS
+#endif
 #endif
 
 /* Full-featured deprecation attribute with fallback for older compilers. */
 #ifdef __GNUC__
-# if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4)
-#  define LIBOPENWCH_DEPRECATED(x) __attribute__((deprecated(x)))
-# else
-#  define LIBOPENWCH_DEPRECATED(x) __attribute__((deprecated))
-# endif
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4)
+#define LIBOPENWCH_DEPRECATED(x) __attribute__((deprecated(x)))
 #else
-# define LIBOPENWCH_DEPRECATED(x)
+#define LIBOPENWCH_DEPRECATED(x) __attribute__((deprecated))
+#endif
+#else
+#define LIBOPENWCH_DEPRECATED(x)
 #endif
 
 /*
@@ -135,26 +135,26 @@ LGPL License Terms @ref lgpl_license
  * a full frame -- correct, just larger.
  */
 #if defined(__riscv)
-# define OPENWCH_IRQ_ATTR_WCH	__attribute__((interrupt("WCH-Interrupt-fast")))
-# define OPENWCH_IRQ_ATTR_PLAIN	__attribute__((interrupt()))
-# if defined(OPENWCH_USE_WCH_INTERRUPT)
-#  define OPENWCH_INTERRUPT	OPENWCH_IRQ_ATTR_WCH
-# else
-#  define OPENWCH_INTERRUPT	OPENWCH_IRQ_ATTR_PLAIN
-# endif
-# define OPENWCH_NAKED		__attribute__((naked))
-# define OPENWCH_WEAK		__attribute__((weak))
-# define OPENWCH_ALIAS(x)	__attribute__((weak, alias(#x)))
-# define OPENWCH_USED		__attribute__((used))
+#define OPENWCH_IRQ_ATTR_WCH __attribute__((interrupt("WCH-Interrupt-fast")))
+#define OPENWCH_IRQ_ATTR_PLAIN __attribute__((interrupt()))
+#if defined(OPENWCH_USE_WCH_INTERRUPT)
+#define OPENWCH_INTERRUPT OPENWCH_IRQ_ATTR_WCH
 #else
-# error "libopenwch targets RISC-V parts only"
+#define OPENWCH_INTERRUPT OPENWCH_IRQ_ATTR_PLAIN
+#endif
+#define OPENWCH_NAKED __attribute__((naked))
+#define OPENWCH_WEAK __attribute__((weak))
+#define OPENWCH_ALIAS(x) __attribute__((weak, alias(#x)))
+#define OPENWCH_USED __attribute__((used))
+#else
+#error "libopenwch targets RISC-V parts only"
 #endif
 
 /* Place code that must execute from RAM (see the .highcode section). */
-#define OPENWCH_HIGH_CODE	__attribute__((section(".highcode"), used))
+#define OPENWCH_HIGH_CODE __attribute__((section(".highcode"), used))
 
 /* Force a 2-byte-aligned object (the WCH vector table requirement). */
-#define OPENWCH_ALIGN2		__attribute__((aligned(2)))
+#define OPENWCH_ALIGN2 __attribute__((aligned(2)))
 
 #endif
 /**@}*/

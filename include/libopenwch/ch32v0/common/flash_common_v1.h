@@ -62,99 +62,99 @@ specific memorymap.h header before including this header file. */
  * definitions are identical, so both headers may be included in any order.
  */
 #ifndef FLASH_ACTLR
-#define FLASH_ACTLR			MMIO32(FLASH_R_BASE + 0x00)
+#define FLASH_ACTLR MMIO32(FLASH_R_BASE + 0x00)
 #endif
 /* Latency field of FLASH_ACTLR (also in rcc.h). */
 #ifndef FLASH_ACTLR_LATENCY_MASK
-#define FLASH_ACTLR_LATENCY_MASK	0x3u
-#define FLASH_ACTLR_LATENCY_0		0x0u
-#define FLASH_ACTLR_LATENCY_1		0x1u
-#define FLASH_ACTLR_LATENCY_2		0x2u
+#define FLASH_ACTLR_LATENCY_MASK 0x3u
+#define FLASH_ACTLR_LATENCY_0 0x0u
+#define FLASH_ACTLR_LATENCY_1 0x1u
+#define FLASH_ACTLR_LATENCY_2 0x2u
 #endif
 
 /* Flash key register (FLASH_KEYR) */
-#define FLASH_KEYR(flash)		MMIO32((flash) + 0x04)
+#define FLASH_KEYR(flash) MMIO32((flash) + 0x04)
 /* Option byte key register (FLASH_OBKEYR) */
-#define FLASH_OBKEYR(flash)		MMIO32((flash) + 0x08)
+#define FLASH_OBKEYR(flash) MMIO32((flash) + 0x08)
 /* Status register (FLASH_STATR) */
-#define FLASH_STATR(flash)		MMIO32((flash) + 0x0c)
+#define FLASH_STATR(flash) MMIO32((flash) + 0x0c)
 /* Control register (FLASH_CTLR) */
-#define FLASH_CTLR(flash)		MMIO32((flash) + 0x10)
+#define FLASH_CTLR(flash) MMIO32((flash) + 0x10)
 /* Address register (FLASH_ADDR) */
-#define FLASH_ADDR(flash)		MMIO32((flash) + 0x14)
+#define FLASH_ADDR(flash) MMIO32((flash) + 0x14)
 /* Option byte register (FLASH_OBR) */
-#define FLASH_OBR(flash)		MMIO32((flash) + 0x1c)
+#define FLASH_OBR(flash) MMIO32((flash) + 0x1c)
 /* Write protection register (FLASH_WPR) */
-#define FLASH_WPR(flash)		MMIO32((flash) + 0x20)
+#define FLASH_WPR(flash) MMIO32((flash) + 0x20)
 /* Mode key register, unlocks the fast program path (FLASH_MODEKEYR) */
-#define FLASH_MODEKEYR(flash)		MMIO32((flash) + 0x24)
+#define FLASH_MODEKEYR(flash) MMIO32((flash) + 0x24)
 /* Boot mode key register (FLASH_BOOT_MODEKEYR) */
-#define FLASH_BOOT_MODEKEYR(flash)	MMIO32((flash) + 0x28)
+#define FLASH_BOOT_MODEKEYR(flash) MMIO32((flash) + 0x28)
 
 /* --- Option byte block (OB_BASE) ----------------------------------------- */
 
-#define FLASH_OB_RDPR			MMIO16(OB_BASE + 0x00)
-#define FLASH_OB_USER			MMIO16(OB_BASE + 0x02)
-#define FLASH_OB_DATA0			MMIO16(OB_BASE + 0x04)
-#define FLASH_OB_DATA1			MMIO16(OB_BASE + 0x06)
-#define FLASH_OB_WRPR0			MMIO16(OB_BASE + 0x08)
-#define FLASH_OB_WRPR1			MMIO16(OB_BASE + 0x0a)
+#define FLASH_OB_RDPR MMIO16(OB_BASE + 0x00)
+#define FLASH_OB_USER MMIO16(OB_BASE + 0x02)
+#define FLASH_OB_DATA0 MMIO16(OB_BASE + 0x04)
+#define FLASH_OB_DATA1 MMIO16(OB_BASE + 0x06)
+#define FLASH_OB_WRPR0 MMIO16(OB_BASE + 0x08)
+#define FLASH_OB_WRPR1 MMIO16(OB_BASE + 0x0a)
 
 /* --- Unlock keys --------------------------------------------------------- */
 
-#define FLASH_KEYR_KEY1			((uint32_t)0x45670123)
-#define FLASH_KEYR_KEY2			((uint32_t)0xcdef89ab)
-#define FLASH_OBKEYR_KEY1		FLASH_KEYR_KEY1
-#define FLASH_OBKEYR_KEY2		FLASH_KEYR_KEY2
-#define FLASH_MODEKEYR_KEY1		FLASH_KEYR_KEY1
-#define FLASH_MODEKEYR_KEY2		FLASH_KEYR_KEY2
-#define FLASH_BOOT_MODEKEYR_KEY1	FLASH_KEYR_KEY1
-#define FLASH_BOOT_MODEKEYR_KEY2	FLASH_KEYR_KEY2
+#define FLASH_KEYR_KEY1 ((uint32_t)0x45670123)
+#define FLASH_KEYR_KEY2 ((uint32_t)0xcdef89ab)
+#define FLASH_OBKEYR_KEY1 FLASH_KEYR_KEY1
+#define FLASH_OBKEYR_KEY2 FLASH_KEYR_KEY2
+#define FLASH_MODEKEYR_KEY1 FLASH_KEYR_KEY1
+#define FLASH_MODEKEYR_KEY2 FLASH_KEYR_KEY2
+#define FLASH_BOOT_MODEKEYR_KEY1 FLASH_KEYR_KEY1
+#define FLASH_BOOT_MODEKEYR_KEY2 FLASH_KEYR_KEY2
 
 /* --- Sizes --------------------------------------------------------------- */
 
 /** A CH32V00x fast-program flash page is 64 bytes. */
-#define FLASH_PAGE_SIZE			64u
+#define FLASH_PAGE_SIZE 64u
 /** The block-erase (CTLR PER) granularity is 1 KiB. */
-#define FLASH_BLOCK_SIZE		1024u
+#define FLASH_BLOCK_SIZE 1024u
 
 /* --- FLASH_STATR bits ---------------------------------------------------- */
 
-#define FLASH_STATR_BSY			(1 << 0)	/**< busy */
-#define FLASH_STATR_WRPRTERR		(1 << 4)	/**< write protection error */
-#define FLASH_STATR_EOP			(1 << 5)	/**< end of operation */
-#define FLASH_STATR_MODE		(1 << 14)	/**< fast mode status */
-#define FLASH_STATR_LOCK		(1 << 15)	/**< locked status */
+#define FLASH_STATR_BSY (1 << 0)      /**< busy */
+#define FLASH_STATR_WRPRTERR (1 << 4) /**< write protection error */
+#define FLASH_STATR_EOP (1 << 5)      /**< end of operation */
+#define FLASH_STATR_MODE (1 << 14)    /**< fast mode status */
+#define FLASH_STATR_LOCK (1 << 15)    /**< locked status */
 
 /* --- FLASH_CTLR bits ----------------------------------------------------- */
 
-#define FLASH_CTLR_PG			(1 << 0)	/**< halfword program */
-#define FLASH_CTLR_PER			(1 << 1)	/**< 1 KiB block erase */
-#define FLASH_CTLR_MER			(1 << 2)	/**< mass erase */
-#define FLASH_CTLR_OPTPG		(1 << 4)	/**< option byte program */
-#define FLASH_CTLR_OPTER		(1 << 5)	/**< option byte erase */
-#define FLASH_CTLR_STRT			(1 << 6)	/**< start operation */
-#define FLASH_CTLR_LOCK			(1 << 7)	/**< lock the controller */
-#define FLASH_CTLR_OPTWRE		(1 << 9)	/**< option byte write enable */
-#define FLASH_CTLR_ERRIE		(1 << 10)	/**< error interrupt enable */
-#define FLASH_CTLR_EOPIE		(1 << 12)	/**< end-of-operation IE */
-#define FLASH_CTLR_FLOCK		(1 << 15)	/**< fast-mode lock */
-#define FLASH_CTLR_PAGE_PG		(1 << 16)	/**< 64-byte page program */
-#define FLASH_CTLR_PAGE_ER		(1 << 17)	/**< 64-byte page erase */
-#define FLASH_CTLR_BUF_LOAD		(1 << 18)	/**< load write buffer */
-#define FLASH_CTLR_BUF_RST		(1 << 19)	/**< reset write buffer */
+#define FLASH_CTLR_PG (1 << 0)	      /**< halfword program */
+#define FLASH_CTLR_PER (1 << 1)	      /**< 1 KiB block erase */
+#define FLASH_CTLR_MER (1 << 2)	      /**< mass erase */
+#define FLASH_CTLR_OPTPG (1 << 4)     /**< option byte program */
+#define FLASH_CTLR_OPTER (1 << 5)     /**< option byte erase */
+#define FLASH_CTLR_STRT (1 << 6)      /**< start operation */
+#define FLASH_CTLR_LOCK (1 << 7)      /**< lock the controller */
+#define FLASH_CTLR_OPTWRE (1 << 9)    /**< option byte write enable */
+#define FLASH_CTLR_ERRIE (1 << 10)    /**< error interrupt enable */
+#define FLASH_CTLR_EOPIE (1 << 12)    /**< end-of-operation IE */
+#define FLASH_CTLR_FLOCK (1 << 15)    /**< fast-mode lock */
+#define FLASH_CTLR_PAGE_PG (1 << 16)  /**< 64-byte page program */
+#define FLASH_CTLR_PAGE_ER (1 << 17)  /**< 64-byte page erase */
+#define FLASH_CTLR_BUF_LOAD (1 << 18) /**< load write buffer */
+#define FLASH_CTLR_BUF_RST (1 << 19)  /**< reset write buffer */
 
 /* --- FLASH_OBR bits ------------------------------------------------------ */
 
-#define FLASH_OBR_OPTERR		(1 << 0)	/**< option byte error */
-#define FLASH_OBR_RDPRT			(1 << 1)	/**< read protection */
-#define FLASH_OBR_WDG_SW		(1 << 2)	/**< watchdog software mode */
-#define FLASH_OBR_nRST_STOP		(1 << 3)	/**< reset on stop */
-#define FLASH_OBR_nRST_STDBY		(1 << 4)	/**< reset on standby */
-#define FLASH_OBR_RST_MODE		(0x3u << 5)	/**< reset pin mode */
-#define FLASH_OBR_STATR_MODE		(1 << 7)
-#define FLASH_OBR_USER			(0xffu << 2)	/**< user option field */
-#define FLASH_OBR_FIX_11		(0x3u << 8)
+#define FLASH_OBR_OPTERR (1 << 0)      /**< option byte error */
+#define FLASH_OBR_RDPRT (1 << 1)       /**< read protection */
+#define FLASH_OBR_WDG_SW (1 << 2)      /**< watchdog software mode */
+#define FLASH_OBR_nRST_STOP (1 << 3)   /**< reset on stop */
+#define FLASH_OBR_nRST_STDBY (1 << 4)  /**< reset on standby */
+#define FLASH_OBR_RST_MODE (0x3u << 5) /**< reset pin mode */
+#define FLASH_OBR_STATR_MODE (1 << 7)
+#define FLASH_OBR_USER (0xffu << 2) /**< user option field */
+#define FLASH_OBR_FIX_11 (0x3u << 8)
 
 /* --- Status -------------------------------------------------------------- */
 
@@ -163,9 +163,9 @@ specific memorymap.h header before including this header file. */
 
 @{*/
 enum flash_status {
-	FLASH_STATUS_COMPLETE = 0,	/**< operation finished, no error */
-	FLASH_STATUS_BUSY,		/**< controller is busy */
-	FLASH_STATUS_WRPRTERR,		/**< write protection error */
+	FLASH_STATUS_COMPLETE = 0, /**< operation finished, no error */
+	FLASH_STATUS_BUSY,	   /**< controller is busy */
+	FLASH_STATUS_WRPRTERR,	   /**< write protection error */
 };
 /**@}*/
 
@@ -187,19 +187,18 @@ void flash_clear_status_flags(uint32_t flash);
 
 enum flash_status flash_erase_page(uint32_t flash, uint32_t address);
 enum flash_status flash_erase_all_pages(uint32_t flash);
-enum flash_status flash_program_word(uint32_t flash, uint32_t address,
-				     uint32_t data);
-enum flash_status flash_program_halfword(uint32_t flash, uint32_t address,
-					 uint16_t data);
+enum flash_status
+flash_program_word(uint32_t flash, uint32_t address, uint32_t data);
+enum flash_status
+flash_program_halfword(uint32_t flash, uint32_t address, uint16_t data);
 
 /* --- Latency and option bytes -------------------------------------------- */
 
 void flash_set_latency(uint32_t flash, uint32_t latency);
-enum flash_status flash_program_option_bytes(uint32_t flash, uint32_t address,
-					     uint16_t data);
+enum flash_status
+flash_program_option_bytes(uint32_t flash, uint32_t address, uint16_t data);
 uint32_t flash_get_option_bytes(uint32_t flash);
-enum flash_status flash_enable_write_protection(uint32_t flash,
-						uint32_t pages);
+enum flash_status flash_enable_write_protection(uint32_t flash, uint32_t pages);
 
 /* --- Fast (buffered) page program ---------------------------------------- */
 

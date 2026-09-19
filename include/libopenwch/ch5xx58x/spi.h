@@ -48,8 +48,8 @@ LGPL License Terms @ref lgpl_license
  * alternate function with gpio_pin_remap(GPIO_REMAP_SPI0) and enable the
  * SCK/MOSI (master) or MISO (slave) output drivers with spi_enable().
  */
-#define SPI0				SPI0_BASE
-#define SPI1				SPI1_BASE
+#define SPI0 SPI0_BASE
+#define SPI1 SPI1_BASE
 
 #include <libopenwch/ch5xx58x/common/spi_common_v1.h>
 

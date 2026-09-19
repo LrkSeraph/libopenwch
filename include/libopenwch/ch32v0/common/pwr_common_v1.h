@@ -51,37 +51,37 @@ specific memorymap.h header before including this header file. */
 /* --- Register accessors -------------------------------------------------- */
 
 /* Power control register (PWR_CTLR) */
-#define PWR_CTLR(pwr)			MMIO32((pwr) + 0x00)
+#define PWR_CTLR(pwr) MMIO32((pwr) + 0x00)
 /* Power control/status register (PWR_CSR) */
-#define PWR_CSR(pwr)			MMIO32((pwr) + 0x04)
+#define PWR_CSR(pwr) MMIO32((pwr) + 0x04)
 /* Auto-wakeup control/status register (PWR_AWUCSR) */
-#define PWR_AWUCSR(pwr)			MMIO32((pwr) + 0x08)
+#define PWR_AWUCSR(pwr) MMIO32((pwr) + 0x08)
 /* Auto-wakeup window register (PWR_AWUWR) */
-#define PWR_AWUWR(pwr)			MMIO32((pwr) + 0x0c)
+#define PWR_AWUWR(pwr) MMIO32((pwr) + 0x0c)
 /* Auto-wakeup prescaler register (PWR_AWUPSC) */
-#define PWR_AWUPSC(pwr)			MMIO32((pwr) + 0x10)
+#define PWR_AWUPSC(pwr) MMIO32((pwr) + 0x10)
 
 /* --- PWR_CTLR bits ------------------------------------------------------- */
 
-#define PWR_CTLR_PDDS			(1 << 1)	/**< power-down deepsleep */
-#define PWR_CTLR_PVDE			(1 << 4)	/**< PVD enable */
-#define PWR_CTLR_PLS_MASK		(0x7u << 5)	/**< PVD level field */
-#define PWR_CTLR_PLS_0			(1 << 5)
-#define PWR_CTLR_PLS_1			(1 << 6)
-#define PWR_CTLR_PLS_2			(1 << 7)
+#define PWR_CTLR_PDDS (1 << 1)	      /**< power-down deepsleep */
+#define PWR_CTLR_PVDE (1 << 4)	      /**< PVD enable */
+#define PWR_CTLR_PLS_MASK (0x7u << 5) /**< PVD level field */
+#define PWR_CTLR_PLS_0 (1 << 5)
+#define PWR_CTLR_PLS_1 (1 << 6)
+#define PWR_CTLR_PLS_2 (1 << 7)
 
 /* --- PWR_CSR bits -------------------------------------------------------- */
 
-#define PWR_CSR_PVDO			(1 << 2)	/**< PVD output */
+#define PWR_CSR_PVDO (1 << 2) /**< PVD output */
 
 /* --- PWR_AWUCSR bits ----------------------------------------------------- */
 
-#define PWR_AWUCSR_AWUEN		(1 << 1)	/**< auto-wakeup enable */
+#define PWR_AWUCSR_AWUEN (1 << 1) /**< auto-wakeup enable */
 
 /* --- PWR_AWUWR / PWR_AWUPSC fields --------------------------------------- */
 
-#define PWR_AWUWR_MASK			0x3fu		/**< window field */
-#define PWR_AWUPSC_MASK			0x0fu		/**< prescaler field */
+#define PWR_AWUWR_MASK 0x3fu  /**< window field */
+#define PWR_AWUPSC_MASK 0x0fu /**< prescaler field */
 
 /* --- PVD detection levels ------------------------------------------------ */
 
@@ -90,14 +90,14 @@ specific memorymap.h header before including this header file. */
 
 @{*/
 enum pwr_pvd_level {
-	PWR_PVD_LEVEL_0 = 0x00,		/**< 2.9 V */
-	PWR_PVD_LEVEL_1 = 0x20,		/**< 3.1 V */
-	PWR_PVD_LEVEL_2 = 0x40,		/**< 3.3 V */
-	PWR_PVD_LEVEL_3 = 0x60,		/**< 3.5 V */
-	PWR_PVD_LEVEL_4 = 0x80,		/**< 3.7 V */
-	PWR_PVD_LEVEL_5 = 0xa0,		/**< 3.9 V */
-	PWR_PVD_LEVEL_6 = 0xc0,		/**< 4.1 V */
-	PWR_PVD_LEVEL_7 = 0xe0,		/**< 4.4 V */
+	PWR_PVD_LEVEL_0 = 0x00, /**< 2.9 V */
+	PWR_PVD_LEVEL_1 = 0x20, /**< 3.1 V */
+	PWR_PVD_LEVEL_2 = 0x40, /**< 3.3 V */
+	PWR_PVD_LEVEL_3 = 0x60, /**< 3.5 V */
+	PWR_PVD_LEVEL_4 = 0x80, /**< 3.7 V */
+	PWR_PVD_LEVEL_5 = 0xa0, /**< 3.9 V */
+	PWR_PVD_LEVEL_6 = 0xc0, /**< 4.1 V */
+	PWR_PVD_LEVEL_7 = 0xe0, /**< 4.4 V */
 };
 /**@}*/
 
@@ -108,27 +108,27 @@ enum pwr_pvd_level {
 
 @{*/
 enum pwr_awu_prescaler {
-	PWR_AWU_DIV1 = 0x0,		/**< LSI / 1 */
-	PWR_AWU_DIV2 = 0x2,		/**< LSI / 2 */
-	PWR_AWU_DIV4 = 0x3,		/**< LSI / 4 */
-	PWR_AWU_DIV8 = 0x4,		/**< LSI / 8 */
-	PWR_AWU_DIV16 = 0x5,		/**< LSI / 16 */
-	PWR_AWU_DIV32 = 0x6,		/**< LSI / 32 */
-	PWR_AWU_DIV64 = 0x7,		/**< LSI / 64 */
-	PWR_AWU_DIV128 = 0x8,		/**< LSI / 128 */
-	PWR_AWU_DIV256 = 0x9,		/**< LSI / 256 */
-	PWR_AWU_DIV512 = 0xa,		/**< LSI / 512 */
-	PWR_AWU_DIV1024 = 0xb,		/**< LSI / 1024 */
-	PWR_AWU_DIV2048 = 0xc,		/**< LSI / 2048 */
-	PWR_AWU_DIV4096 = 0xd,		/**< LSI / 4096 */
-	PWR_AWU_DIV10240 = 0xe,		/**< LSI / 10240 */
-	PWR_AWU_DIV61440 = 0xf,		/**< LSI / 61440 */
+	PWR_AWU_DIV1 = 0x0,	/**< LSI / 1 */
+	PWR_AWU_DIV2 = 0x2,	/**< LSI / 2 */
+	PWR_AWU_DIV4 = 0x3,	/**< LSI / 4 */
+	PWR_AWU_DIV8 = 0x4,	/**< LSI / 8 */
+	PWR_AWU_DIV16 = 0x5,	/**< LSI / 16 */
+	PWR_AWU_DIV32 = 0x6,	/**< LSI / 32 */
+	PWR_AWU_DIV64 = 0x7,	/**< LSI / 64 */
+	PWR_AWU_DIV128 = 0x8,	/**< LSI / 128 */
+	PWR_AWU_DIV256 = 0x9,	/**< LSI / 256 */
+	PWR_AWU_DIV512 = 0xa,	/**< LSI / 512 */
+	PWR_AWU_DIV1024 = 0xb,	/**< LSI / 1024 */
+	PWR_AWU_DIV2048 = 0xc,	/**< LSI / 2048 */
+	PWR_AWU_DIV4096 = 0xd,	/**< LSI / 4096 */
+	PWR_AWU_DIV10240 = 0xe, /**< LSI / 10240 */
+	PWR_AWU_DIV61440 = 0xf, /**< LSI / 61440 */
 };
 /**@}*/
 
 /* --- Flags --------------------------------------------------------------- */
 
-#define PWR_FLAG_PVDO			PWR_CSR_PVDO
+#define PWR_FLAG_PVDO PWR_CSR_PVDO
 
 BEGIN_DECLS
 

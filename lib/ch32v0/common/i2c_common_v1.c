@@ -57,22 +57,22 @@
 #include <libopenwch/qingke/assert.h>
 
 /* Division constants of the CKCFGR CCR field, in units of CCR per Hz. */
-#define I2C_CCR_DIV_STANDARD		2u
-#define I2C_CCR_DIV_FAST_DUTY_2		3u
-#define I2C_CCR_DIV_FAST_DUTY_16_9	25u
+#define I2C_CCR_DIV_STANDARD 2u
+#define I2C_CCR_DIV_FAST_DUTY_2 3u
+#define I2C_CCR_DIV_FAST_DUTY_16_9 25u
 
 /** Largest value the 12-bit CCR field can represent. */
-#define I2C_CCR_MAX			0x0fffu
+#define I2C_CCR_MAX 0x0fffu
 
 /** Maximum rise time, in ns, for each speed. */
-#define I2C_RISE_TIME_STANDARD_NS	1000u
-#define I2C_RISE_TIME_FAST_NS		300u
+#define I2C_RISE_TIME_STANDARD_NS 1000u
+#define I2C_RISE_TIME_FAST_NS 300u
 
 /** One MHz, the unit of the CTLR2 FREQ field and of the TRISE calculation. */
-#define I2C_MHZ				1000000u
+#define I2C_MHZ 1000000u
 
 /** Nanoseconds in one second; the rise times are expressed in ns. */
-#define I2C_NS_PER_SECOND		1000000000u
+#define I2C_NS_PER_SECOND 1000000000u
 
 /* --- Internal helpers ---------------------------------------------------- */
 
@@ -102,8 +102,10 @@ static void i2c_set_rise_time(uint32_t i2c, uint32_t clock, uint32_t speed) {
 		rise_ns = I2C_RISE_TIME_STANDARD_NS;
 	}
 
-	I2C_CKCFGR(i2c) = (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK)
-			| (i2c_div_round(clock, I2C_NS_PER_SECOND / rise_ns) + 1u));
+	I2C_CKCFGR(i2c) =
+	    (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK) |
+		       (i2c_div_round(clock, I2C_NS_PER_SECOND / rise_ns) +
+			1u));
 }
 
 /* --- Configuration ------------------------------------------------------- */
@@ -125,17 +127,15 @@ void i2c_set_clock_frequency(uint32_t i2c, uint32_t clock) {
 	openwch_assert(freq_mhz >= 1);
 	openwch_assert(freq_mhz <= I2C_CTLR2_FREQ_MASK);
 
-	I2C_CTLR2(i2c) = (uint16_t)((I2C_CTLR2(i2c) & ~I2C_CTLR2_FREQ_MASK)
-			| ((freq_mhz << I2C_CTLR2_FREQ_SHIFT)
-				& I2C_CTLR2_FREQ_MASK));
+	I2C_CTLR2(i2c) = (uint16_t)((I2C_CTLR2(i2c) & ~I2C_CTLR2_FREQ_MASK) |
+				    ((freq_mhz << I2C_CTLR2_FREQ_SHIFT) &
+				     I2C_CTLR2_FREQ_MASK));
 }
 
-void i2c_init_master(
-	uint32_t i2c,
-	uint32_t clock,
-	uint32_t speed,
-	uint32_t duty_cycle
-) {
+void i2c_init_master(uint32_t i2c,
+		     uint32_t clock,
+		     uint32_t speed,
+		     uint32_t duty_cycle) {
 	uint16_t ckcfgr;
 	uint32_t divider;
 
@@ -143,33 +143,34 @@ void i2c_init_master(
 	openwch_assert(clock <= I2C_MAX_CLOCK_FREQUENCY);
 	openwch_assert(speed != 0);
 	openwch_assert(speed <= I2C_SPEED_FAST);
-	openwch_assert((duty_cycle == I2C_CCR_DUTY_2)
-			|| (duty_cycle == I2C_CCR_DUTY_16_9));
+	openwch_assert((duty_cycle == I2C_CCR_DUTY_2) ||
+		       (duty_cycle == I2C_CCR_DUTY_16_9));
 
 	i2c_set_clock_frequency(i2c, clock);
 
 	if (speed <= I2C_SPEED_STANDARD) {
 		/* Standard mode: CCR = fPCLK1 / (2 * speed), DUTY is unused. */
 		divider = I2C_CCR_DIV_STANDARD * speed;
-		ckcfgr = I2C_CKCFGR(i2c) & ~(I2C_CKCFGR_CCR_MASK
-				| I2C_CKCFGR_DUTY | I2C_CKCFGR_FS);
+		ckcfgr = I2C_CKCFGR(i2c) & ~(I2C_CKCFGR_CCR_MASK |
+					     I2C_CKCFGR_DUTY | I2C_CKCFGR_FS);
 	} else {
 		/* Fast mode: set FS, then the requested Tlow/Thigh ratio. */
 		divider = (duty_cycle == I2C_CCR_DUTY_16_9)
-				? I2C_CCR_DIV_FAST_DUTY_16_9
-				: I2C_CCR_DIV_FAST_DUTY_2;
+			      ? I2C_CCR_DIV_FAST_DUTY_16_9
+			      : I2C_CCR_DIV_FAST_DUTY_2;
 		divider *= speed;
-		ckcfgr = (I2C_CKCFGR(i2c) & ~(I2C_CKCFGR_CCR_MASK
-				| I2C_CKCFGR_DUTY | I2C_CKCFGR_FS))
-				| I2C_CKCFGR_FS | (uint16_t)duty_cycle;
+		ckcfgr =
+		    (I2C_CKCFGR(i2c) &
+		     ~(I2C_CKCFGR_CCR_MASK | I2C_CKCFGR_DUTY | I2C_CKCFGR_FS)) |
+		    I2C_CKCFGR_FS | (uint16_t)duty_cycle;
 	}
 
 	/* The requested speed can always be divided down: divider >= 2 * 1e5. */
 	openwch_assert(divider >= I2C_CCR_DIV_STANDARD);
 
 	ckcfgr |= (uint16_t)i2c_div_round(clock, divider);
-	openwch_assert((ckcfgr & ~(I2C_CKCFGR_CCR_MASK | I2C_CKCFGR_DUTY
-					| I2C_CKCFGR_FS)) == 0);
+	openwch_assert((ckcfgr & ~(I2C_CKCFGR_CCR_MASK | I2C_CKCFGR_DUTY |
+				   I2C_CKCFGR_FS)) == 0);
 	I2C_CKCFGR(i2c) = ckcfgr;
 
 	i2c_set_rise_time(i2c, clock, speed);
@@ -233,16 +234,16 @@ void i2c_set_own_7bit_address(uint32_t i2c, uint8_t address) {
 void i2c_set_own_10bit_address(uint32_t i2c, uint16_t address) {
 	openwch_assert(address <= 0x3ffu);
 
-	I2C_OADDR1(i2c) = (uint16_t)((address << 1 & I2C_OADDR1_ADD8_9)
-			| (address << 1 & I2C_OADDR1_ADD1_7)
-			| I2C_OADDR1_ADDMODE);
+	I2C_OADDR1(i2c) =
+	    (uint16_t)((address << 1 & I2C_OADDR1_ADD8_9) |
+		       (address << 1 & I2C_OADDR1_ADD1_7) | I2C_OADDR1_ADDMODE);
 }
 
 void i2c_enable_dual_address(uint32_t i2c, uint8_t address) {
 	openwch_assert(address <= 0x7fu);
 
-	I2C_OADDR2(i2c) = (uint16_t)(((address << 1) & I2C_OADDR2_ADD2)
-			| I2C_OADDR2_ENDUAL);
+	I2C_OADDR2(i2c) =
+	    (uint16_t)(((address << 1) & I2C_OADDR2_ADD2) | I2C_OADDR2_ENDUAL);
 }
 
 void i2c_enable_general_call(uint32_t i2c) {
@@ -254,8 +255,8 @@ void i2c_enable_general_call(uint32_t i2c) {
 void i2c_set_ccr(uint32_t i2c, uint32_t ccr) {
 	openwch_assert((ccr & I2C_CKCFGR_CCR_MASK) == ccr);
 
-	I2C_CKCFGR(i2c) = (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK)
-			| ccr);
+	I2C_CKCFGR(i2c) =
+	    (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK) | ccr);
 }
 
 void i2c_set_trise(uint32_t i2c, uint32_t trise) {
@@ -268,8 +269,8 @@ void i2c_set_trise(uint32_t i2c, uint32_t trise) {
 	 * as i2c_set_ccr(), and the two are set in turn during configuration,
 	 * as WCH's own initialisation sequence does.
 	 */
-	I2C_CKCFGR(i2c) = (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK)
-			| trise);
+	I2C_CKCFGR(i2c) =
+	    (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK) | trise);
 }
 
 /* --- Acknowledge --------------------------------------------------------- */
@@ -313,8 +314,8 @@ void i2c_disable_pec(uint32_t i2c) {
 }
 
 uint8_t i2c_get_pec(uint32_t i2c) {
-	return (uint8_t)((I2C_STAR2(i2c) & I2C_STAR2_PEC_MASK)
-			>> I2C_STAR2_PEC_SHIFT);
+	return (uint8_t)((I2C_STAR2(i2c) & I2C_STAR2_PEC_MASK) >>
+			 I2C_STAR2_PEC_SHIFT);
 }
 
 /* --- Reset --------------------------------------------------------------- */
@@ -343,15 +344,15 @@ uint16_t i2c_get_flag(uint32_t i2c, uint32_t flag) {
 		openwch_assert_not_reached();
 	}
 
-	if (flag & (I2C_STAR1_SB | I2C_STAR1_ADDR | I2C_STAR1_BTF
-			| I2C_STAR1_ADD10 | I2C_STAR1_STOPF | I2C_STAR1_RXNE
-			| I2C_STAR1_TXE | I2C_STAR1_BERR | I2C_STAR1_ARLO
-			| I2C_STAR1_AF | I2C_STAR1_OVR | I2C_STAR1_PECERR)) {
+	if (flag & (I2C_STAR1_SB | I2C_STAR1_ADDR | I2C_STAR1_BTF |
+		    I2C_STAR1_ADD10 | I2C_STAR1_STOPF | I2C_STAR1_RXNE |
+		    I2C_STAR1_TXE | I2C_STAR1_BERR | I2C_STAR1_ARLO |
+		    I2C_STAR1_AF | I2C_STAR1_OVR | I2C_STAR1_PECERR)) {
 		status = I2C_STAR1(i2c);
 	}
 
-	if (flag & (I2C_STAR2_MSL | I2C_STAR2_BUSY | I2C_STAR2_TRA
-			| I2C_STAR2_GENCALL | I2C_STAR2_DUALF)) {
+	if (flag & (I2C_STAR2_MSL | I2C_STAR2_BUSY | I2C_STAR2_TRA |
+		    I2C_STAR2_GENCALL | I2C_STAR2_DUALF)) {
 		status |= I2C_STAR2(i2c);
 	}
 

@@ -77,7 +77,7 @@ TEMPLATE_NVIC_H = '''/* This file is part of the libopenwch project.
  * vector_table.handler[] corresponds to vector slot {slot_first}. */
 #define OPENWCH_IRQ_COUNT {irqcount}
 #define OPENWCH_IRQ_FIRST {slot_first}
-#define OPENWCH_IRQ_LAST  {slot_last}
+#define OPENWCH_IRQ_LAST {slot_last}
 
 /* Number of entries in the generated descriptor table. */
 #define OPENWCH_IRQ_TABLE_SIZE OPENWCH_IRQ_COUNT
@@ -269,8 +269,8 @@ def convert(infile):
             irqdefinitions.append('#define %s_IRQ %d' % (cname.upper(), slot))
             isrprototypes.append('void %s(void);' % symbol)
             irqhandlers.append('#define %s_IRQHandler %s' % (cname.upper(), symbol))
-        isrdecls.append('__attribute__((weak, alias("blocking_handler")))\n'
-                        'void %s(void);' % symbol)
+        isrdecls.append('__attribute__((weak, alias("blocking_handler"))) void %s(void);'
+                        % symbol)
         handler_entries.append('\t\t%s, /* [%2d] slot %2d %s */'
                                % (symbol, offset, slot,
                                   '' if slot in by_slot else '(reserved)'))

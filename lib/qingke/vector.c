@@ -60,15 +60,14 @@ extern init_fn_t __fini_array_start[], __fini_array_end[];
  * Sanity check: the WCH vector table has room for at most 64 entries.
  */
 _Static_assert(OPENWCH_VECTOR_ENTRY_COUNT <= 64,
-	"vector table larger than the WCH 64-entry maximum");
+	       "vector table larger than the WCH 64-entry maximum");
 
 /*
  * Default for the chip-specific core configuration.  Families whose QingKe
  * core has the pipeline control register (CH32V103/20x/30x, CH58x, CH59x)
  * override this in lib/<family>/common/vector_chipset.c.
  */
-__attribute__((weak))
-void openwch_chipset_core_configure(void) {
+__attribute__((weak)) void openwch_chipset_core_configure(void) {
 }
 
 /*
@@ -76,8 +75,7 @@ void openwch_chipset_core_configure(void) {
  * code from RAM before .data is available (flash-controller reconfiguration)
  * override this.
  */
-__attribute__((weak))
-void openwch_chipset_early_init(void) {
+__attribute__((weak)) void openwch_chipset_early_init(void) {
 }
 
 /* Run the C++ static constructors, if any.  Mirrors libopencm3's reset path,
@@ -172,7 +170,8 @@ const char *openwch_irq_name(uint8_t irq) {
 
 	for (i = 0; i < OPENWCH_IRQ_TABLE_SIZE; i++) {
 		if (openwch_irq_table[i].id == irq) {
-			const char *name = openwch_irq_names[openwch_irq_table[i].name];
+			const char *name =
+			    openwch_irq_names[openwch_irq_table[i].name];
 			if (name[0] != '\0') {
 				return name;
 			}

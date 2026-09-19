@@ -43,31 +43,31 @@ LGPL License Terms @ref lgpl_license
  * function" register at 0x40023800, which is also where the LDO trim and the
  * lockup-reset bits are.
  */
-#define EXTEN				EXTEN_BASE
-#define EXTEN_CTR(exten)		MMIO32((exten) + 0x00)
+#define EXTEN EXTEN_BASE
+#define EXTEN_CTR(exten) MMIO32((exten) + 0x00)
 
 /* EXTEN_CTR bits */
-#define EXTEN_CTR_LOCKUP_EN		(1 << 6)	/**< lockup reset enable */
-#define EXTEN_CTR_LOCKUP_RSTF		(1 << 7)	/**< lockup reset flag */
-#define EXTEN_CTR_LDO_TRIM		(1 << 10)	/**< LDO trim */
-#define EXTEN_CTR_OPA_EN		(1 << 16)	/**< op-amp enable */
-#define EXTEN_CTR_OPA_NSEL		(1 << 17)	/**< negative input select */
-#define EXTEN_CTR_OPA_PSEL		(1 << 18)	/**< positive input select */
+#define EXTEN_CTR_LOCKUP_EN (1 << 6)   /**< lockup reset enable */
+#define EXTEN_CTR_LOCKUP_RSTF (1 << 7) /**< lockup reset flag */
+#define EXTEN_CTR_LDO_TRIM (1 << 10)   /**< LDO trim */
+#define EXTEN_CTR_OPA_EN (1 << 16)     /**< op-amp enable */
+#define EXTEN_CTR_OPA_NSEL (1 << 17)   /**< negative input select */
+#define EXTEN_CTR_OPA_PSEL (1 << 18)   /**< positive input select */
 
 /* Only the OPA control bits are covered by opa_reset(). */
-#define EXTEN_CTR_OPA_MASK \
+#define EXTEN_CTR_OPA_MASK                                                     \
 	(EXTEN_CTR_OPA_EN | EXTEN_CTR_OPA_NSEL | EXTEN_CTR_OPA_PSEL)
 
 /** Which pin drives the op-amp's positive input. */
 typedef enum {
-	OPA_PSEL_CHP0 = 0,	/**< positive input on the default pin */
-	OPA_PSEL_CHP1 = 1,	/**< positive input on the alternate pin */
+	OPA_PSEL_CHP0 = 0, /**< positive input on the default pin */
+	OPA_PSEL_CHP1 = 1, /**< positive input on the alternate pin */
 } opa_psel_t;
 
 /** Which pin drives the op-amp's negative input. */
 typedef enum {
-	OPA_NSEL_CHN0 = 0,	/**< negative input on the default pin */
-	OPA_NSEL_CHN1 = 1,	/**< negative input on the alternate pin */
+	OPA_NSEL_CHN0 = 0, /**< negative input on the default pin */
+	OPA_NSEL_CHN1 = 1, /**< negative input on the alternate pin */
 } opa_nsel_t;
 
 #include <libopenwch/ch32v0/common/opa_common_v1.h>

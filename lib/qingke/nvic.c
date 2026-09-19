@@ -55,8 +55,8 @@
 #include <libopenwch/qingke/assert.h>
 
 /* PFIC interrupt id -> bit inside a 32-bit bank. */
-#define PFIC_BANK(id)	((id) >> 5)
-#define PFIC_BIT(id)	(1u << ((id) & 0x1f))
+#define PFIC_BANK(id) ((id) >> 5)
+#define PFIC_BIT(id) (1u << ((id) & 0x1f))
 
 static inline void pfic_check(uint32_t irqn) {
 	openwch_assert(irqn >= OPENWCH_IRQ_FIRST && irqn <= OPENWCH_IRQ_LAST);
@@ -127,11 +127,9 @@ void nvic_set_irq_threshold(uint8_t threshold) {
 	PFIC->ithresdr = threshold;
 }
 
-void nvic_enable_fast_irq(
-	uint8_t channel,
-	uint8_t irqn,
-	void (*handler)(void)
-) {
+void nvic_enable_fast_irq(uint8_t channel,
+			  uint8_t irqn,
+			  void (*handler)(void)) {
 	openwch_assert(channel < 4);
 	pfic_check(irqn);
 	PFIC->vtcfgr[channel] = irqn;

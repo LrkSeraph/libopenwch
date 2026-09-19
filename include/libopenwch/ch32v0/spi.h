@@ -44,7 +44,7 @@ LGPL License Terms @ref lgpl_license
  * gpio_set_mode(..., GPIO_MODE_AF_PP), enable the clock with the RCC driver
  * and select the remap with gpio_primary_remap(GPIO_REMAP_SPI1).
  */
-#define SPI1				SPI1_BASE
+#define SPI1 SPI1_BASE
 
 #include <libopenwch/ch32v0/common/spi_common_v1.h>
 

@@ -61,114 +61,114 @@ LGPL License Terms @ref lgpl_license
  *	0x4000c000  BLE    (registers only; the stack is a closed library)
  */
 
-#define SFR_BASE			(0x40000000U)
+#define SFR_BASE (0x40000000U)
 
 /* --- Code / data --------------------------------------------------------- */
-#define CODE_BASE			(0x00000000U)
-#define RAM_BASE			(0x20000000U)
+#define CODE_BASE (0x00000000U)
+#define RAM_BASE (0x20000000U)
 
 /* --- System -------------------------------------------------------------- */
-#define SYS_BASE			(SFR_BASE + 0x1000)
+#define SYS_BASE (SFR_BASE + 0x1000)
 
 /* The SYS block is best addressed by byte/word offset from SYS_BASE because
  * its registers are a mix of 8-, 16- and 32-bit views of the same addresses.
  * The important ones are named here. */
-#define R32_SAFE_ACCESS			(SYS_BASE + 0x40)
-#define R8_SAFE_ACCESS_SIG		(SYS_BASE + 0x40)
-#define R8_SAFE_ACCESS_ID		(SYS_BASE + 0x42)
-#define R32_CLK_SYS_CFG			(SYS_BASE + 0x08)
-#define R16_CLK_SYS_CFG			(SYS_BASE + 0x08)
-#define R8_HFCK_PWR_CTRL		(SYS_BASE + 0x0a)
-#define R32_SLEEP_CONTROL		(SYS_BASE + 0x0c)
-#define R8_SLP_CLK_OFF0			(SYS_BASE + 0x0c)
-#define R8_SLP_CLK_OFF1			(SYS_BASE + 0x0d)
-#define R8_SLP_WAKE_CTRL		(SYS_BASE + 0x0e)
-#define R8_SLP_POWER_CTRL		(SYS_BASE + 0x0f)
-#define R16_PIN_ALTERNATE		(SYS_BASE + 0x18)
-#define R16_PIN_ANALOG_IE		(SYS_BASE + 0x1a)
-#define R32_POWER_MANAG			(SYS_BASE + 0x20)
-#define R16_POWER_PLAN			(SYS_BASE + 0x20)
-#define R32_OSC32K_CTRL			(SYS_BASE + 0x2c)
-#define R32_RTC_CTRL			(SYS_BASE + 0x30)
-#define R32_RTC_TRIG			(SYS_BASE + 0x34)
-#define R32_RTC_CNT_32K			(SYS_BASE + 0x38)
-#define R8_CK32K_CONFIG			(SYS_BASE + 0x2f)
-#define R8_BAT_DET_CTRL			(SYS_BASE + 0x24)
-#define R8_BAT_DET_CFG			(SYS_BASE + 0x25)
-#define R32_MISC_CTRL			(SYS_BASE + 0x48)
-#define R8_PLL_CONFIG			(SYS_BASE + 0x4b)
-#define R32_OSC32M_CTRL			(SYS_BASE + 0x4c)
-#define R8_XT32M_TUNE			(SYS_BASE + 0x4e)
+#define R32_SAFE_ACCESS (SYS_BASE + 0x40)
+#define R8_SAFE_ACCESS_SIG (SYS_BASE + 0x40)
+#define R8_SAFE_ACCESS_ID (SYS_BASE + 0x42)
+#define R32_CLK_SYS_CFG (SYS_BASE + 0x08)
+#define R16_CLK_SYS_CFG (SYS_BASE + 0x08)
+#define R8_HFCK_PWR_CTRL (SYS_BASE + 0x0a)
+#define R32_SLEEP_CONTROL (SYS_BASE + 0x0c)
+#define R8_SLP_CLK_OFF0 (SYS_BASE + 0x0c)
+#define R8_SLP_CLK_OFF1 (SYS_BASE + 0x0d)
+#define R8_SLP_WAKE_CTRL (SYS_BASE + 0x0e)
+#define R8_SLP_POWER_CTRL (SYS_BASE + 0x0f)
+#define R16_PIN_ALTERNATE (SYS_BASE + 0x18)
+#define R16_PIN_ANALOG_IE (SYS_BASE + 0x1a)
+#define R32_POWER_MANAG (SYS_BASE + 0x20)
+#define R16_POWER_PLAN (SYS_BASE + 0x20)
+#define R32_OSC32K_CTRL (SYS_BASE + 0x2c)
+#define R32_RTC_CTRL (SYS_BASE + 0x30)
+#define R32_RTC_TRIG (SYS_BASE + 0x34)
+#define R32_RTC_CNT_32K (SYS_BASE + 0x38)
+#define R8_CK32K_CONFIG (SYS_BASE + 0x2f)
+#define R8_BAT_DET_CTRL (SYS_BASE + 0x24)
+#define R8_BAT_DET_CFG (SYS_BASE + 0x25)
+#define R32_MISC_CTRL (SYS_BASE + 0x48)
+#define R8_PLL_CONFIG (SYS_BASE + 0x4b)
+#define R32_OSC32M_CTRL (SYS_BASE + 0x4c)
+#define R8_XT32M_TUNE (SYS_BASE + 0x4e)
 /*
  * Identity and reset registers.  These were taken from CH583SFR.h rather than
  * guessed: getting them wrong does not fail loudly, it silently reads a
  * neighbouring register.
  */
-#define R8_WDOG_COUNT			(SYS_BASE + 0x43)
-#define R8_CHIP_ID			(SYS_BASE + 0x41)
-#define R8_RESET_STATUS			(SYS_BASE + 0x44)
-#define R8_GLOB_ROM_CFG			R8_RESET_STATUS	/**< same byte, RWA view */
-#define R8_GLOB_CFG_INFO		(SYS_BASE + 0x45)
-#define R8_RST_WDOG_CTRL		(SYS_BASE + 0x46)
-#define R8_GLOB_RESET_KEEP		(SYS_BASE + 0x47)
+#define R8_WDOG_COUNT (SYS_BASE + 0x43)
+#define R8_CHIP_ID (SYS_BASE + 0x41)
+#define R8_RESET_STATUS (SYS_BASE + 0x44)
+#define R8_GLOB_ROM_CFG R8_RESET_STATUS /**< same byte, RWA view */
+#define R8_GLOB_CFG_INFO (SYS_BASE + 0x45)
+#define R8_RST_WDOG_CTRL (SYS_BASE + 0x46)
+#define R8_GLOB_RESET_KEEP (SYS_BASE + 0x47)
 
 /* GPIO interrupt banks */
-#define R16_PA_INT_EN			(SYS_BASE + 0x90)
-#define R16_PB_INT_EN			(SYS_BASE + 0x92)
-#define R16_PA_INT_MODE			(SYS_BASE + 0x94)
-#define R16_PB_INT_MODE			(SYS_BASE + 0x96)
-#define R16_PA_INT_IF			(SYS_BASE + 0x9c)
-#define R16_PB_INT_IF			(SYS_BASE + 0x9e)
+#define R16_PA_INT_EN (SYS_BASE + 0x90)
+#define R16_PB_INT_EN (SYS_BASE + 0x92)
+#define R16_PA_INT_MODE (SYS_BASE + 0x94)
+#define R16_PB_INT_MODE (SYS_BASE + 0x96)
+#define R16_PA_INT_IF (SYS_BASE + 0x9c)
+#define R16_PB_INT_IF (SYS_BASE + 0x9e)
 
 /* Flash controller (ROM control registers) */
-#define ROM_CTRL_BASE			(SYS_BASE + 0x800)
-#define R8_FLASH_CFG			(ROM_CTRL_BASE + 0x07)
+#define ROM_CTRL_BASE (SYS_BASE + 0x800)
+#define R8_FLASH_CFG (ROM_CTRL_BASE + 0x07)
 
 /* --- GPIO ---------------------------------------------------------------- */
-#define GPIOA_BASE			(SFR_BASE + 0x10a0)
-#define GPIOB_BASE			(SFR_BASE + 0x10c0)
+#define GPIOA_BASE (SFR_BASE + 0x10a0)
+#define GPIOB_BASE (SFR_BASE + 0x10c0)
 
 /* Per-port register layout, 0x20 bytes per port. */
-#define GPIO_DIR_OFFSET			0x00	/**< direction, 1 = output */
-#define GPIO_PIN_OFFSET			0x04	/**< input value (read only) */
-#define GPIO_OUT_OFFSET			0x08	/**< output value */
-#define GPIO_CLR_OFFSET			0x0c	/**< write 1 to clear (write only) */
-#define GPIO_PU_OFFSET			0x10	/**< pull-up enable */
-#define GPIO_PD_DRV_OFFSET		0x14	/**< input pull-down / output drive */
+#define GPIO_DIR_OFFSET 0x00	/**< direction, 1 = output */
+#define GPIO_PIN_OFFSET 0x04	/**< input value (read only) */
+#define GPIO_OUT_OFFSET 0x08	/**< output value */
+#define GPIO_CLR_OFFSET 0x0c	/**< write 1 to clear (write only) */
+#define GPIO_PU_OFFSET 0x10	/**< pull-up enable */
+#define GPIO_PD_DRV_OFFSET 0x14 /**< input pull-down / output drive */
 
 /* --- Peripherals --------------------------------------------------------- */
-#define TMR0_BASE			(SFR_BASE + 0x2000)
-#define TMR1_BASE			(SFR_BASE + 0x2400)
-#define TMR2_BASE			(SFR_BASE + 0x2800)
-#define TMR3_BASE			(SFR_BASE + 0x2c00)
+#define TMR0_BASE (SFR_BASE + 0x2000)
+#define TMR1_BASE (SFR_BASE + 0x2400)
+#define TMR2_BASE (SFR_BASE + 0x2800)
+#define TMR3_BASE (SFR_BASE + 0x2c00)
 
-#define UART0_BASE			(SFR_BASE + 0x3000)
-#define UART1_BASE			(SFR_BASE + 0x3400)
-#define UART2_BASE			(SFR_BASE + 0x3800)
-#define UART3_BASE			(SFR_BASE + 0x3c00)
+#define UART0_BASE (SFR_BASE + 0x3000)
+#define UART1_BASE (SFR_BASE + 0x3400)
+#define UART2_BASE (SFR_BASE + 0x3800)
+#define UART3_BASE (SFR_BASE + 0x3c00)
 
-#define SPI0_BASE			(SFR_BASE + 0x4000)
-#define SPI1_BASE			(SFR_BASE + 0x4400)
+#define SPI0_BASE (SFR_BASE + 0x4000)
+#define SPI1_BASE (SFR_BASE + 0x4400)
 
-#define I2C1_BASE			(SFR_BASE + 0x4800)
+#define I2C1_BASE (SFR_BASE + 0x4800)
 
-#define PWMX_BASE			(SFR_BASE + 0x5000)
+#define PWMX_BASE (SFR_BASE + 0x5000)
 
-#define USB_BASE			(SFR_BASE + 0x8000)
-#define USB2_BASE			(SFR_BASE + 0x8400)
+#define USB_BASE (SFR_BASE + 0x8000)
+#define USB2_BASE (SFR_BASE + 0x8400)
 
-#define BLE_BASE			(SFR_BASE + 0xc000)
+#define BLE_BASE (SFR_BASE + 0xc000)
 
 /* --- Factory information ------------------------------------------------- */
-#define INFO_BASE			(0x00000000U)
-#define ROM_CFG_BASE			(0x0007f000U)
-#define ROM_CFG_MAC_ADDR		(ROM_CFG_BASE + 0x018)
-#define ROM_CFG_TMP_25C			(ROM_CFG_BASE + 0x014)
-#define BOOT_LOAD_CFG			(0x0007e000U)
+#define INFO_BASE (0x00000000U)
+#define ROM_CFG_BASE (0x0007f000U)
+#define ROM_CFG_MAC_ADDR (ROM_CFG_BASE + 0x018)
+#define ROM_CFG_TMP_25C (ROM_CFG_BASE + 0x014)
+#define BOOT_LOAD_CFG (0x0007e000U)
 
 /* Data flash (EEPROM emulation) */
-#define DATA_FLASH_ADDR			(0x00070000U)
-#define DATA_FLASH_SIZE			(0x8000U)
+#define DATA_FLASH_ADDR (0x00070000U)
+#define DATA_FLASH_SIZE (0x8000U)
 
 #endif
 /**@}*/

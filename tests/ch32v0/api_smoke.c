@@ -133,7 +133,7 @@ void api_smoke(void) {
 	usart_send_blocking(USART1, 'y');
 	(void)usart_recv_blocking(USART1);
 	{
-		const uint8_t buf[1] = { 'z' };
+		const uint8_t buf[1] = {'z'};
 
 		usart_write(USART1, buf, 1);
 	}
@@ -291,7 +291,8 @@ void api_smoke(void) {
 
 		for (ch = DMA_CHANNEL1; ch <= DMA_CHANNEL7; ch++) {
 			dma_channel_reset(DMA1, ch);
-			dma_set_peripheral_address(DMA1, ch, USART1_BASE + 0x04);
+			dma_set_peripheral_address(DMA1, ch,
+						   USART1_BASE + 0x04);
 			dma_set_memory_address(DMA1, ch, 0x20000000);
 			dma_set_number_of_data(DMA1, ch, 16);
 			(void)dma_get_number_of_data(DMA1, ch);

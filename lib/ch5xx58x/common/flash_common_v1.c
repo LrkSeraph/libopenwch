@@ -87,8 +87,7 @@ void flash_read(uint32_t address, void *buf, uint32_t len) {
 
 void flash_rom_read(uint32_t address, void *buf, uint32_t len) {
 	uint32_t *dst = (uint32_t *)buf;
-	const volatile uint32_t *src =
-		(const volatile uint32_t *)address;
+	const volatile uint32_t *src = (const volatile uint32_t *)address;
 	uint32_t words = len >> 2;
 	uint32_t i;
 
@@ -127,11 +126,8 @@ enum flash_status flash_erase_page(uint32_t address) {
 	return FLASH_STATUS_UNSUPPORTED;
 }
 
-enum flash_status flash_program(
-	uint32_t address,
-	const void *buf,
-	uint32_t len
-) {
+enum flash_status
+flash_program(uint32_t address, const void *buf, uint32_t len) {
 	(void)address;
 	(void)buf;
 	(void)len;

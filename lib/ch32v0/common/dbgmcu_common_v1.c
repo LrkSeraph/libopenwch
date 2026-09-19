@@ -39,7 +39,7 @@
 #include <libopenwch/qingke/csr.h>
 
 /* CSR 0x7c0: the CH32V00x debug control register (WCH calls it CFGR0). */
-#define DBGMCU_CSR_CONTROL	0x7c0
+#define DBGMCU_CSR_CONTROL 0x7c0
 
 uint32_t dbgmcu_get_revision_id(void) {
 	return DBGMCU_ID_WORD >> DBGMCU_ID_REVISION_SHIFT;

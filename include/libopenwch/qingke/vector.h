@@ -85,28 +85,28 @@ LGPL License Terms @ref lgpl_license
  */
 
 /** Index of the first external interrupt (and of the first PFIC interrupt). */
-#define OPENWCH_VECTOR_EXC_COUNT	16
+#define OPENWCH_VECTOR_EXC_COUNT 16
 
 /** Offset of the first external interrupt slot, in bytes. */
-#define OPENWCH_VECTOR_EXC_OFFSET	(OPENWCH_VECTOR_EXC_COUNT * 4)
+#define OPENWCH_VECTOR_EXC_OFFSET (OPENWCH_VECTOR_EXC_COUNT * 4)
 
 /** Total number of entries in the whole vector table. */
-#define OPENWCH_VECTOR_ENTRY_COUNT \
+#define OPENWCH_VECTOR_ENTRY_COUNT                                             \
 	(OPENWCH_VECTOR_EXC_COUNT + OPENWCH_IRQ_COUNT)
 
 /* Indices (relative to the whole table) of the conventional exception slots. */
-#define OPENWCH_VEC_INSN_MISALIGNED	0
-#define OPENWCH_VEC_INSN_ACCESS		1
-#define OPENWCH_VEC_ILLEGAL_INSN	2	/**< also the NMI slot */
-#define OPENWCH_VEC_HARD_FAULT		3
-#define OPENWCH_VEC_ECALL_M		5
-#define OPENWCH_VEC_ECALL_U		8
-#define OPENWCH_VEC_BREAKPOINT		9
-#define OPENWCH_VEC_SYSTICK		12
-#define OPENWCH_VEC_SOFTWARE		14
+#define OPENWCH_VEC_INSN_MISALIGNED 0
+#define OPENWCH_VEC_INSN_ACCESS 1
+#define OPENWCH_VEC_ILLEGAL_INSN 2 /**< also the NMI slot */
+#define OPENWCH_VEC_HARD_FAULT 3
+#define OPENWCH_VEC_ECALL_M 5
+#define OPENWCH_VEC_ECALL_U 8
+#define OPENWCH_VEC_BREAKPOINT 9
+#define OPENWCH_VEC_SYSTICK 12
+#define OPENWCH_VEC_SOFTWARE 14
 
 /* The WCH magic word expected in slot 4. */
-#define OPENWCH_VECTOR_MAGIC		0xf3f9bda9u
+#define OPENWCH_VECTOR_MAGIC 0xf3f9bda9u
 
 typedef void (*vector_table_entry_t)(void);
 
@@ -128,8 +128,8 @@ extern vector_table_t vector_table;
 
 /** Description of one external interrupt.  Used for diagnostics. */
 typedef struct {
-	uint16_t id;			/**< vector slot / PFIC interrupt id */
-	uint16_t name;			/**< index into the generated name table */
+	uint16_t id;   /**< vector slot / PFIC interrupt id */
+	uint16_t name; /**< index into the generated name table */
 } openwch_irq_desc_t;
 
 /** Generated descriptor array; `[0]` is vector slot 16. */
@@ -140,8 +140,7 @@ extern const char *const openwch_irq_names[];
 extern vector_table_entry_t _vector_base[];
 
 /** Entry point; defined in qingke/vector_chipset.S. */
-__attribute__((noreturn))
-void _reset_entry(void);
+__attribute__((noreturn)) void _reset_entry(void);
 
 /** C part of the reset path, called from _reset_entry() with gp and sp set. */
 void openwch_reset_init(void);
@@ -164,7 +163,7 @@ const char *openwch_irq_name(uint8_t irq);
 
 END_DECLS
 
-#define OPENWCH_VECTOR_SET(irq, fn)	(openwch_vector_set((irq), (fn)))
+#define OPENWCH_VECTOR_SET(irq, fn) (openwch_vector_set((irq), (fn)))
 
 #endif
 /**@}*/

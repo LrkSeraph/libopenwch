@@ -60,9 +60,9 @@ void pwm_set_cycle(uint32_t pwm, uint32_t cycle) {
 	openwch_assert((cycle & ~(uint32_t)PWM_CYCLE_MASK) == 0);
 
 	/* The cycle generator is shared, so only its own two fields change. */
-	PWM_CONFIG_REG(pwm) = (uint8_t)((PWM_CONFIG_REG(pwm)
-					 & (uint8_t)~PWM_CYCLE_MASK)
-					| (cycle & PWM_CYCLE_MASK));
+	PWM_CONFIG_REG(pwm) =
+	    (uint8_t)((PWM_CONFIG_REG(pwm) & (uint8_t)~PWM_CYCLE_MASK) |
+		      (cycle & PWM_CYCLE_MASK));
 }
 
 void pwm_set_clock_divider(uint32_t pwm, uint32_t div) {
@@ -124,10 +124,9 @@ void pwm_enable_alternate(uint32_t pwm, uint32_t channel) {
 	 * of at the same time.  Only whole pairs can be selected, so a mask
 	 * that is not one of the four group bits is a programming error.
 	 */
-	openwch_assert(channel == RB_PWM4_5_STAG_EN ||
-		       channel == RB_PWM6_7_STAG_EN ||
-		       channel == RB_PWM8_9_STAG_EN ||
-		       channel == RB_PWM10_11_STAG_EN);
+	openwch_assert(
+	    channel == RB_PWM4_5_STAG_EN || channel == RB_PWM6_7_STAG_EN ||
+	    channel == RB_PWM8_9_STAG_EN || channel == RB_PWM10_11_STAG_EN);
 
 	PWM_CONFIG_REG(pwm) |= (uint8_t)channel;
 }

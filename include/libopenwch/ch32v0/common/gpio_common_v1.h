@@ -61,40 +61,40 @@ specific memorymap.h header before including this header file.*/
 /* --- Register accessors -------------------------------------------------- */
 
 /* Port configuration register low (GPIOx_CFGLR) */
-#define GPIO_CFGLR(port)		MMIO32((port) + 0x00)
-#define GPIOA_CFGLR			GPIO_CFGLR(GPIOA)
-#define GPIOC_CFGLR			GPIO_CFGLR(GPIOC)
-#define GPIOD_CFGLR			GPIO_CFGLR(GPIOD)
+#define GPIO_CFGLR(port) MMIO32((port) + 0x00)
+#define GPIOA_CFGLR GPIO_CFGLR(GPIOA)
+#define GPIOC_CFGLR GPIO_CFGLR(GPIOC)
+#define GPIOD_CFGLR GPIO_CFGLR(GPIOD)
 
 /* Port input data register (GPIOx_INDR) */
-#define GPIO_INDR(port)			MMIO32((port) + 0x08)
-#define GPIOA_INDR			GPIO_INDR(GPIOA)
-#define GPIOC_INDR			GPIO_INDR(GPIOC)
-#define GPIOD_INDR			GPIO_INDR(GPIOD)
+#define GPIO_INDR(port) MMIO32((port) + 0x08)
+#define GPIOA_INDR GPIO_INDR(GPIOA)
+#define GPIOC_INDR GPIO_INDR(GPIOC)
+#define GPIOD_INDR GPIO_INDR(GPIOD)
 
 /* Port output data register (GPIOx_OUTDR) */
-#define GPIO_OUTDR(port)		MMIO32((port) + 0x0c)
-#define GPIOA_OUTDR			GPIO_OUTDR(GPIOA)
-#define GPIOC_OUTDR			GPIO_OUTDR(GPIOC)
-#define GPIOD_OUTDR			GPIO_OUTDR(GPIOD)
+#define GPIO_OUTDR(port) MMIO32((port) + 0x0c)
+#define GPIOA_OUTDR GPIO_OUTDR(GPIOA)
+#define GPIOC_OUTDR GPIO_OUTDR(GPIOC)
+#define GPIOD_OUTDR GPIO_OUTDR(GPIOD)
 
 /* Port bit set/reset register (GPIOx_BSHR) */
-#define GPIO_BSHR(port)			MMIO32((port) + 0x10)
-#define GPIOA_BSHR			GPIO_BSHR(GPIOA)
-#define GPIOC_BSHR			GPIO_BSHR(GPIOC)
-#define GPIOD_BSHR			GPIO_BSHR(GPIOD)
+#define GPIO_BSHR(port) MMIO32((port) + 0x10)
+#define GPIOA_BSHR GPIO_BSHR(GPIOA)
+#define GPIOC_BSHR GPIO_BSHR(GPIOC)
+#define GPIOD_BSHR GPIO_BSHR(GPIOD)
 
 /* Port bit reset register (GPIOx_BCR) */
-#define GPIO_BCR(port)			MMIO32((port) + 0x14)
-#define GPIOA_BCR			GPIO_BCR(GPIOA)
-#define GPIOC_BCR			GPIO_BCR(GPIOC)
-#define GPIOD_BCR			GPIO_BCR(GPIOD)
+#define GPIO_BCR(port) MMIO32((port) + 0x14)
+#define GPIOA_BCR GPIO_BCR(GPIOA)
+#define GPIOC_BCR GPIO_BCR(GPIOC)
+#define GPIOD_BCR GPIO_BCR(GPIOD)
 
 /* Port configuration lock register (GPIOx_LCKR) */
-#define GPIO_LCKR(port)			MMIO32((port) + 0x18)
-#define GPIOA_LCKR			GPIO_LCKR(GPIOA)
-#define GPIOC_LCKR			GPIO_LCKR(GPIOC)
-#define GPIOD_LCKR			GPIO_LCKR(GPIOD)
+#define GPIO_LCKR(port) MMIO32((port) + 0x18)
+#define GPIOA_LCKR GPIO_LCKR(GPIOA)
+#define GPIOC_LCKR GPIO_LCKR(GPIOC)
+#define GPIOD_LCKR GPIO_LCKR(GPIOD)
 
 /* --- Pin identifiers ----------------------------------------------------- */
 
@@ -102,15 +102,15 @@ specific memorymap.h header before including this header file.*/
 @ingroup gpio_defines
 
 @{*/
-#define GPIO0				(1 << 0)
-#define GPIO1				(1 << 1)
-#define GPIO2				(1 << 2)
-#define GPIO3				(1 << 3)
-#define GPIO4				(1 << 4)
-#define GPIO5				(1 << 5)
-#define GPIO6				(1 << 6)
-#define GPIO7				(1 << 7)
-#define GPIO_ALL			0x00ff
+#define GPIO0 (1 << 0)
+#define GPIO1 (1 << 1)
+#define GPIO2 (1 << 2)
+#define GPIO3 (1 << 3)
+#define GPIO4 (1 << 4)
+#define GPIO5 (1 << 5)
+#define GPIO6 (1 << 6)
+#define GPIO7 (1 << 7)
+#define GPIO_ALL 0x00ff
 /**@}*/
 
 /* --- Pin configuration nibbles ------------------------------------------ */
@@ -147,14 +147,14 @@ specific memorymap.h header before including this header file.*/
 @ingroup gpio_defines
 
 @{*/
-#define GPIO_MODE_AIN			0x0u	/**< analog input */
-#define GPIO_MODE_IN_FLOATING		0x4u	/**< floating input */
-#define GPIO_MODE_IPD			0x28u	/**< input, pull-down */
-#define GPIO_MODE_IPU			0x48u	/**< input, pull-up */
-#define GPIO_MODE_OUT_OD		0x14u	/**< open-drain output, 10 MHz */
-#define GPIO_MODE_OUT_PP		0x10u	/**< push-pull output, 10 MHz */
-#define GPIO_MODE_AF_OD			0x1cu	/**< alternate function open-drain */
-#define GPIO_MODE_AF_PP			0x18u	/**< alternate function push-pull */
+#define GPIO_MODE_AIN 0x0u	   /**< analog input */
+#define GPIO_MODE_IN_FLOATING 0x4u /**< floating input */
+#define GPIO_MODE_IPD 0x28u	   /**< input, pull-down */
+#define GPIO_MODE_IPU 0x48u	   /**< input, pull-up */
+#define GPIO_MODE_OUT_OD 0x14u	   /**< open-drain output, 10 MHz */
+#define GPIO_MODE_OUT_PP 0x10u	   /**< push-pull output, 10 MHz */
+#define GPIO_MODE_AF_OD 0x1cu	   /**< alternate function open-drain */
+#define GPIO_MODE_AF_PP 0x18u	   /**< alternate function push-pull */
 /**@}*/
 
 /*
@@ -162,22 +162,22 @@ specific memorymap.h header before including this header file.*/
  * separate speed field): the 10 MHz nibbles above are the ones WCH's own
  * examples use, and the faster variants are listed here for completeness.
  */
-#define GPIO_MODE_IPD_PULL		GPIO_MODE_IPD
-#define GPIO_MODE_IPU_PULL		GPIO_MODE_IPU
+#define GPIO_MODE_IPD_PULL GPIO_MODE_IPD
+#define GPIO_MODE_IPU_PULL GPIO_MODE_IPU
 
 /* Convenience aliases so that "output" reads naturally at a call site. */
-#define GPIO_MODE_OUTPUT_PP		GPIO_MODE_OUT_PP
-#define GPIO_MODE_OUTPUT_OD		GPIO_MODE_OUT_OD
-#define GPIO_MODE_OUTPUT_AF_PP		GPIO_MODE_AF_PP
-#define GPIO_MODE_OUTPUT_AF_OD		GPIO_MODE_AF_OD
+#define GPIO_MODE_OUTPUT_PP GPIO_MODE_OUT_PP
+#define GPIO_MODE_OUTPUT_OD GPIO_MODE_OUT_OD
+#define GPIO_MODE_OUTPUT_AF_PP GPIO_MODE_AF_PP
+#define GPIO_MODE_OUTPUT_AF_OD GPIO_MODE_AF_OD
 
 /* Mask of one pin's nibble inside CFGLR. */
-#define GPIO_CFGLR_NIBBLE_MASK		0xfu
+#define GPIO_CFGLR_NIBBLE_MASK 0xfu
 
 /* --- Number of pins ------------------------------------------------------ */
 
 /** Number of GPIO pins per port.  The CH32V00x ports are 8 bits wide. */
-#define GPIO_PIN_COUNT			8
+#define GPIO_PIN_COUNT 8
 
 /* --- Alternate function remap -------------------------------------------- */
 
@@ -190,25 +190,25 @@ code (USART1, I2C1, TIM1, TIM2) prefer the dedicated gpio_<periph>_remap()
 helpers, which clear and set the field in one step.
 
 @{*/
-#define GPIO_REMAP_SPI1			0x1u
-#define GPIO_REMAP_I2C1_PARTIAL		0x2u
-#define GPIO_REMAP_I2C1_FULL		0x3u
-#define GPIO_REMAP_USART1_PARTIAL1	0x1u
-#define GPIO_REMAP_USART1_PARTIAL2	0x2u
-#define GPIO_REMAP_USART1_FULL		0x3u
-#define GPIO_REMAP_TIM1_NONE		0x0u
-#define GPIO_REMAP_TIM1_PARTIAL1	0x1u
-#define GPIO_REMAP_TIM1_PARTIAL2	0x2u
-#define GPIO_REMAP_TIM1_FULL		0x3u
-#define GPIO_REMAP_TIM2_NONE		0x0u
-#define GPIO_REMAP_TIM2_PARTIAL1	0x1u
-#define GPIO_REMAP_TIM2_PARTIAL2	0x2u
-#define GPIO_REMAP_TIM2_FULL		0x3u
-#define GPIO_REMAP_PA12_ON_OSC		0x1u
-#define GPIO_REMAP_ADC1_ETRGINJ		0x1u
-#define GPIO_REMAP_ADC1_ETRGREG		0x1u
-#define GPIO_REMAP_SDI_DISABLE		0x1u
-#define GPIO_REMAP_LSI_CAL		0x1u
+#define GPIO_REMAP_SPI1 0x1u
+#define GPIO_REMAP_I2C1_PARTIAL 0x2u
+#define GPIO_REMAP_I2C1_FULL 0x3u
+#define GPIO_REMAP_USART1_PARTIAL1 0x1u
+#define GPIO_REMAP_USART1_PARTIAL2 0x2u
+#define GPIO_REMAP_USART1_FULL 0x3u
+#define GPIO_REMAP_TIM1_NONE 0x0u
+#define GPIO_REMAP_TIM1_PARTIAL1 0x1u
+#define GPIO_REMAP_TIM1_PARTIAL2 0x2u
+#define GPIO_REMAP_TIM1_FULL 0x3u
+#define GPIO_REMAP_TIM2_NONE 0x0u
+#define GPIO_REMAP_TIM2_PARTIAL1 0x1u
+#define GPIO_REMAP_TIM2_PARTIAL2 0x2u
+#define GPIO_REMAP_TIM2_FULL 0x3u
+#define GPIO_REMAP_PA12_ON_OSC 0x1u
+#define GPIO_REMAP_ADC1_ETRGINJ 0x1u
+#define GPIO_REMAP_ADC1_ETRGREG 0x1u
+#define GPIO_REMAP_SDI_DISABLE 0x1u
+#define GPIO_REMAP_LSI_CAL 0x1u
 /**@}*/
 
 /**@{*/
@@ -227,40 +227,40 @@ helpers, which clear and set the field in one step.
 /* --- Register accessors -------------------------------------------------- */
 
 /* Port configuration register low (GPIOx_CFGLR) */
-#define GPIO_CFGLR(port)		MMIO32((port) + 0x00)
-#define GPIOA_CFGLR			GPIO_CFGLR(GPIOA)
-#define GPIOC_CFGLR			GPIO_CFGLR(GPIOC)
-#define GPIOD_CFGLR			GPIO_CFGLR(GPIOD)
+#define GPIO_CFGLR(port) MMIO32((port) + 0x00)
+#define GPIOA_CFGLR GPIO_CFGLR(GPIOA)
+#define GPIOC_CFGLR GPIO_CFGLR(GPIOC)
+#define GPIOD_CFGLR GPIO_CFGLR(GPIOD)
 
 /* Port input data register (GPIOx_INDR) */
-#define GPIO_INDR(port)			MMIO32((port) + 0x08)
-#define GPIOA_INDR			GPIO_INDR(GPIOA)
-#define GPIOC_INDR			GPIO_INDR(GPIOC)
-#define GPIOD_INDR			GPIO_INDR(GPIOD)
+#define GPIO_INDR(port) MMIO32((port) + 0x08)
+#define GPIOA_INDR GPIO_INDR(GPIOA)
+#define GPIOC_INDR GPIO_INDR(GPIOC)
+#define GPIOD_INDR GPIO_INDR(GPIOD)
 
 /* Port output data register (GPIOx_OUTDR) */
-#define GPIO_OUTDR(port)		MMIO32((port) + 0x0c)
-#define GPIOA_OUTDR			GPIO_OUTDR(GPIOA)
-#define GPIOC_OUTDR			GPIO_OUTDR(GPIOC)
-#define GPIOD_OUTDR			GPIO_OUTDR(GPIOD)
+#define GPIO_OUTDR(port) MMIO32((port) + 0x0c)
+#define GPIOA_OUTDR GPIO_OUTDR(GPIOA)
+#define GPIOC_OUTDR GPIO_OUTDR(GPIOC)
+#define GPIOD_OUTDR GPIO_OUTDR(GPIOD)
 
 /* Port bit set/reset register (GPIOx_BSHR) */
-#define GPIO_BSHR(port)			MMIO32((port) + 0x10)
-#define GPIOA_BSHR			GPIO_BSHR(GPIOA)
-#define GPIOC_BSHR			GPIO_BSHR(GPIOC)
-#define GPIOD_BSHR			GPIO_BSHR(GPIOD)
+#define GPIO_BSHR(port) MMIO32((port) + 0x10)
+#define GPIOA_BSHR GPIO_BSHR(GPIOA)
+#define GPIOC_BSHR GPIO_BSHR(GPIOC)
+#define GPIOD_BSHR GPIO_BSHR(GPIOD)
 
 /* Port bit reset register (GPIOx_BCR) */
-#define GPIO_BCR(port)			MMIO32((port) + 0x14)
-#define GPIOA_BCR			GPIO_BCR(GPIOA)
-#define GPIOC_BCR			GPIO_BCR(GPIOC)
-#define GPIOD_BCR			GPIO_BCR(GPIOD)
+#define GPIO_BCR(port) MMIO32((port) + 0x14)
+#define GPIOA_BCR GPIO_BCR(GPIOA)
+#define GPIOC_BCR GPIO_BCR(GPIOC)
+#define GPIOD_BCR GPIO_BCR(GPIOD)
 
 /* Port configuration lock register (GPIOx_LCKR) */
-#define GPIO_LCKR(port)			MMIO32((port) + 0x18)
-#define GPIOA_LCKR			GPIO_LCKR(GPIOA)
-#define GPIOC_LCKR			GPIO_LCKR(GPIOC)
-#define GPIOD_LCKR			GPIO_LCKR(GPIOD)
+#define GPIO_LCKR(port) MMIO32((port) + 0x18)
+#define GPIOA_LCKR GPIO_LCKR(GPIOA)
+#define GPIOC_LCKR GPIO_LCKR(GPIOC)
+#define GPIOD_LCKR GPIO_LCKR(GPIOD)
 
 /* --- Pin identifiers ----------------------------------------------------- */
 
@@ -268,15 +268,15 @@ helpers, which clear and set the field in one step.
 @ingroup gpio_defines
 
 @{*/
-#define GPIO0				(1 << 0)
-#define GPIO1				(1 << 1)
-#define GPIO2				(1 << 2)
-#define GPIO3				(1 << 3)
-#define GPIO4				(1 << 4)
-#define GPIO5				(1 << 5)
-#define GPIO6				(1 << 6)
-#define GPIO7				(1 << 7)
-#define GPIO_ALL			0x00ff
+#define GPIO0 (1 << 0)
+#define GPIO1 (1 << 1)
+#define GPIO2 (1 << 2)
+#define GPIO3 (1 << 3)
+#define GPIO4 (1 << 4)
+#define GPIO5 (1 << 5)
+#define GPIO6 (1 << 6)
+#define GPIO7 (1 << 7)
+#define GPIO_ALL 0x00ff
 /**@}*/
 
 /* --- Pin configuration nibbles ------------------------------------------ */
@@ -313,14 +313,14 @@ helpers, which clear and set the field in one step.
 @ingroup gpio_defines
 
 @{*/
-#define GPIO_MODE_AIN			0x0u	/**< analog input */
-#define GPIO_MODE_IN_FLOATING		0x4u	/**< floating input */
-#define GPIO_MODE_IPD			0x28u	/**< input, pull-down */
-#define GPIO_MODE_IPU			0x48u	/**< input, pull-up */
-#define GPIO_MODE_OUT_OD		0x14u	/**< open-drain output, 10 MHz */
-#define GPIO_MODE_OUT_PP		0x10u	/**< push-pull output, 10 MHz */
-#define GPIO_MODE_AF_OD			0x1cu	/**< alternate function open-drain */
-#define GPIO_MODE_AF_PP			0x18u	/**< alternate function push-pull */
+#define GPIO_MODE_AIN 0x0u	   /**< analog input */
+#define GPIO_MODE_IN_FLOATING 0x4u /**< floating input */
+#define GPIO_MODE_IPD 0x28u	   /**< input, pull-down */
+#define GPIO_MODE_IPU 0x48u	   /**< input, pull-up */
+#define GPIO_MODE_OUT_OD 0x14u	   /**< open-drain output, 10 MHz */
+#define GPIO_MODE_OUT_PP 0x10u	   /**< push-pull output, 10 MHz */
+#define GPIO_MODE_AF_OD 0x1cu	   /**< alternate function open-drain */
+#define GPIO_MODE_AF_PP 0x18u	   /**< alternate function push-pull */
 /**@}*/
 
 /*
@@ -328,25 +328,24 @@ helpers, which clear and set the field in one step.
  * separate speed field): the 10 MHz nibbles above are the ones WCH's own
  * examples use, and the faster variants are listed here for completeness.
  */
-#define GPIO_MODE_IPD_PULL		GPIO_MODE_IPD
-#define GPIO_MODE_IPU_PULL		GPIO_MODE_IPU
+#define GPIO_MODE_IPD_PULL GPIO_MODE_IPD
+#define GPIO_MODE_IPU_PULL GPIO_MODE_IPU
 
 /* Convenience aliases so that "output" reads naturally at a call site. */
-#define GPIO_MODE_OUTPUT_PP		GPIO_MODE_OUT_PP
-#define GPIO_MODE_OUTPUT_OD		GPIO_MODE_OUT_OD
-#define GPIO_MODE_OUTPUT_AF_PP		GPIO_MODE_AF_PP
-#define GPIO_MODE_OUTPUT_AF_OD		GPIO_MODE_AF_OD
+#define GPIO_MODE_OUTPUT_PP GPIO_MODE_OUT_PP
+#define GPIO_MODE_OUTPUT_OD GPIO_MODE_OUT_OD
+#define GPIO_MODE_OUTPUT_AF_PP GPIO_MODE_AF_PP
+#define GPIO_MODE_OUTPUT_AF_OD GPIO_MODE_AF_OD
 
 /* Mask of one pin's nibble inside CFGLR. */
-#define GPIO_CFGLR_NIBBLE_MASK		0xfu
+#define GPIO_CFGLR_NIBBLE_MASK 0xfu
 
 /* --- Number of pins ------------------------------------------------------ */
 
 /** Number of GPIO pins per port.  The CH32V00x ports are 8 bits wide. */
-#define GPIO_PIN_COUNT			8
+#define GPIO_PIN_COUNT 8
 
 /* --- Alternate function remap -------------------------------------------- */
-
 
 BEGIN_DECLS
 

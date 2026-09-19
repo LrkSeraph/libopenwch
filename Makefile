@@ -59,8 +59,19 @@ STYLECHECK      := scripts/checkpatch.pl
 ##   BRACES          the `do { } while (0)` and `while (1) { ; }` macro and
 ##                   busy-wait idioms.
 ##
+## The last two exist because clang-format owns formatting here (see
+## .githooks/pre-commit) and the two tools genuinely disagree: clang-format
+## pads continuation lines and aligned escapes with spaces, which is the only
+## way to align to a column at all, while the kernel rule demands tabs.  When
+## the formatter and the checker disagree, the formatter wins -- that is the
+## whole point of having one.
+##
+##   LEADING_SPACE          clang-format alignment padding.
+##   SUSPECT_CODE_INDENT    ditto, for a macro body broken across lines.
+##
 STYLECHECKIGNORE := VOLATILE,NEW_TYPEDEFS,CAMELCASE,COMPLEX_MACRO,SPACING
 STYLECHECKIGNORE := $(STYLECHECKIGNORE),AVOID_EXTERNS,STORAGE_CLASS,BRACES
+STYLECHECKIGNORE := $(STYLECHECKIGNORE),LEADING_SPACE,SUSPECT_CODE_INDENT
 
 STYLECHECKFLAGS := --no-tree -f --terse --mailback --ignore $(STYLECHECKIGNORE)
 
@@ -242,6 +253,25 @@ genlinktests.clean:
 list-targets:
 	@echo $(TARGETS)
 
+##
+## Formatting and hooks.
+##
+## Formatting is clang-format's job and happens on commit, never in CI: see
+## .githooks/pre-commit.  That hook is a no-op when clang-format is not
+## installed, so a contributor without LLVM is not blocked.
+##
+## `make hooks` points this clone's core.hooksPath at the tracked .githooks
+## directory.  It is a per-clone setting, hence a target rather than something
+## checked in.
+##
+hooks:
+	$(Q)git config core.hooksPath .githooks
+	@printf "  HOOKS   core.hooksPath -> .githooks\n"
+
+unhooks:
+	$(Q)git config --unset core.hooksPath || true
+	@printf "  HOOKS   core.hooksPath unset\n"
+
 .PHONY: build lib $(LIB_DIRS) doc html clean generatedheaders cleanheaders \
 	stylecheck styleclean genlinktests genlinktests.clean apitest apitest.clean \
-	list-targets
+	list-targets hooks unhooks

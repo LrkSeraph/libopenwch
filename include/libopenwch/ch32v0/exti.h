@@ -42,7 +42,7 @@ LGPL License Terms @ref lgpl_license
  * and line 8/9 from the PVD and the auto-wakeup unit; the port that drives a
  * GPIO line is chosen with gpio_exti_select_source().
  */
-#define EXTI				EXTI_BASE
+#define EXTI EXTI_BASE
 
 #include <libopenwch/ch32v0/common/exti_common_v1.h>
 

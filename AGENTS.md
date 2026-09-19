@@ -40,28 +40,29 @@
 5. **RWA 寄存器必须先解锁**。CH58x 的任何 RWA 寄存器写入必须经 `rwa_unlock()`/安全访问封装，
    不得裸写。
 6. **寄存器宏命名贴近 WCH 手册**（`HACKING` 要求），例如 `USART_CTLR1_UE`、`GPIO_CFGLR`。
-7. **提交前跑 `make stylecheck`**（`scripts/checkpatch.pl`，已按本仓库风格打过补丁）。
-   这是**门禁**：有发现即返回非零。风格 = Linux 内核风格，**唯一例外**是函数定义：
+7. **格式化由 clang-format 负责，不要手写格式，也不要用脚本改格式**。
 
-   ```c
-   int foo(int a) {
-   }
-
-   __attribute__((xxx))
-   void bar(
-   	int a,
-   	int b
-   ) {
-   	foo(a);
-   }
+   ```sh
+   make hooks          # 每个 clone 执行一次：git config core.hooksPath .githooks
    ```
 
-   要点：函数定义的 `{` 与 `)` **同行**；作用于整个函数的 `__attribute__` **单独一行**、
-   置于返回类型之前；参数表超 80 列则**每行一个参数**、`) {` 独占一行；**末尾不加逗号**
-   （C 标准不允许，会编译失败）。`if`/`while`/`for`/`switch` 仍按内核风格，`{` 与条件同行。
-   详见 `HACKING` 的「Braces on function definitions」。
+   装好钩子后，`git commit` 会用 `.clang-format` 重排本次暂存的 `.c`/`.h` 并重新 `git add`。
+   **CI 里绝不格式化**（格式化是提交时的属性，构建农场事后改写只会让人忽略它）。
+   钩子在**未安装 clang-format 时直接放行**（`exit 0`），没有 LLVM 的贡献者不会被挡住。
 
-8. **不得手工编辑生成文件**。`lib/*/vector_handlers.c`、`lib/*/vector_names.c`、
+   自动格式化后的形态是：函数定义的 `{` 与 `)` **同行**（这是本项目相对内核风格的**唯一**偏离，
+   内核风格要求 `{` 另起一行）；超 80 列的签名断行后参数与左括号对齐、`)` 留在最后一个参数上。
+   两点按设计如此、不要「修回」：
+   - clang-format **没有**「`) {` 独占一行」的选项；
+   - `BreakAfterAttributes: Always` 只对 C++ `[[...]]` 生效，GNU `__attribute__((...))` 仍与声明同行。
+
+   想改版式就改 `.clang-format`，然后对全树重跑 clang-format。
+
+8. **`make stylecheck` 是第二意见**。`scripts/checkpatch.pl` 仍在跑（括号规则已反转以匹配上面的风格），
+   有发现即返回非零；其中与格式化相关的检查已关闭——**格式器与检查器冲突时以格式器为准**，
+   具体忽略了哪些类型及原因见 `Makefile` 的 `STYLECHECKIGNORE` 注释。
+
+9. **不得手工编辑生成文件**。`lib/*/vector_handlers.c`、`lib/*/vector_names.c`、
    `include/libopenwch/*/nvic.h`、`include/libopencmsis/*/irqhandlers.h` 由
    `scripts/irq2nvic_h` 生成（`make stylecheck` 会跳过它们），要改风格请改生成器。
 
@@ -100,7 +101,11 @@ make PREFIX=riscv64-unknown-elf-
 # 链接脚本生成冒烟测试
 make genlinktests
 
-# 代码规范
+# 安装 git 钩子（提交时自动 clang-format；无 clang-format 时放行）
+make hooks
+make unhooks
+
+# 代码规范（第二意见，非 CI 门禁）
 make stylecheck
 make styleclean
 

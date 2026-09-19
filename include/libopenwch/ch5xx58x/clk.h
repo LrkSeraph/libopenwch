@@ -60,64 +60,64 @@ LGPL License Terms @ref lgpl_license
  */
 
 /* --- Register accessors -------------------------------------------------- */
-#define CLK_SYS_CFG			MMIO32(R32_CLK_SYS_CFG)
-#define HFCK_PWR_CTRL			MMIO8(R8_HFCK_PWR_CTRL)
-#define PLL_CONFIG			MMIO8(R8_PLL_CONFIG)
-#define XT32M_TUNE			MMIO8(R8_XT32M_TUNE)
-#define OSC32K_CTRL			MMIO32(R32_OSC32K_CTRL)
-#define FLASH_CFG			MMIO8(R8_FLASH_CFG)
+#define CLK_SYS_CFG MMIO32(R32_CLK_SYS_CFG)
+#define HFCK_PWR_CTRL MMIO8(R8_HFCK_PWR_CTRL)
+#define PLL_CONFIG MMIO8(R8_PLL_CONFIG)
+#define XT32M_TUNE MMIO8(R8_XT32M_TUNE)
+#define OSC32K_CTRL MMIO32(R32_OSC32K_CTRL)
+#define FLASH_CFG MMIO8(R8_FLASH_CFG)
 
 /* --- HFCK_PWR_CTRL bits -------------------------------------------------- */
-#define CLK_XT32K_PON			(1 << 0)	/**< 32.768 kHz crystal */
-#define CLK_LSI_PON			(1 << 1)	/**< internal 32 kHz RC */
-#define CLK_XT32M_PON			(1 << 2)	/**< 32 MHz crystal */
-#define CLK_PLL_PON			(1 << 4)	/**< 480 MHz PLL */
+#define CLK_XT32K_PON (1 << 0) /**< 32.768 kHz crystal */
+#define CLK_LSI_PON (1 << 1)   /**< internal 32 kHz RC */
+#define CLK_XT32M_PON (1 << 2) /**< 32 MHz crystal */
+#define CLK_PLL_PON (1 << 4)   /**< 480 MHz PLL */
 
 /* --- CLK_SYS_CFG fields -------------------------------------------------- */
-#define CLK_SYS_CFG_MOD_MASK		(0xc0u)		/**< bits 7:6 */
-#define CLK_SYS_CFG_MOD_HSE		(0x00u)		/**< 0b00 XT32M path */
-#define CLK_SYS_CFG_MOD_PLL		(0x40u)		/**< 0b01 PLL path */
-#define CLK_SYS_CFG_MOD_32K		(0xc0u)		/**< 0b11 32 kHz path */
-#define CLK_SYS_CFG_DIV_MASK		(0x1fu)		/**< bits 4:0 */
+#define CLK_SYS_CFG_MOD_MASK (0xc0u) /**< bits 7:6 */
+#define CLK_SYS_CFG_MOD_HSE (0x00u)  /**< 0b00 XT32M path */
+#define CLK_SYS_CFG_MOD_PLL (0x40u)  /**< 0b01 PLL path */
+#define CLK_SYS_CFG_MOD_32K (0xc0u)  /**< 0b11 32 kHz path */
+#define CLK_SYS_CFG_DIV_MASK (0x1fu) /**< bits 4:0 */
 
 /* --- PLL_CONFIG bits ----------------------------------------------------- */
-#define PLL_CONFIG_HALT			(1 << 5)	/**< 1 = PLL halted */
-#define PLL_CONFIG_DRV			(1 << 7)	/**< flash clock drive */
+#define PLL_CONFIG_HALT (1 << 5) /**< 1 = PLL halted */
+#define PLL_CONFIG_DRV (1 << 7)	 /**< flash clock drive */
 
 /* --- Source selection ---------------------------------------------------- */
 
 /** System clock sources, as written to R16_CLK_SYS_CFG. */
 typedef enum {
-	CLK_SOURCE_LSI		= 0x00,	/**< ~32 kHz internal RC */
-	CLK_SOURCE_LSE		= 0x01,	/**< 32.768 kHz crystal */
+	CLK_SOURCE_LSI = 0x00, /**< ~32 kHz internal RC */
+	CLK_SOURCE_LSE = 0x01, /**< 32.768 kHz crystal */
 
-	CLK_SOURCE_HSE_16MHZ	= 0x22,	/**< XT32M / 2 */
-	CLK_SOURCE_HSE_8MHZ	= 0x24,	/**< XT32M / 4 */
-	CLK_SOURCE_HSE_6_4MHZ	= 0x25,	/**< XT32M / 5 */
-	CLK_SOURCE_HSE_4MHZ	= 0x28,	/**< XT32M / 8 */
-	CLK_SOURCE_HSE_2MHZ	= 0x30,	/**< XT32M / 16 */
-	CLK_SOURCE_HSE_1MHZ	= 0x20,	/**< XT32M / 32 */
+	CLK_SOURCE_HSE_16MHZ = 0x22,  /**< XT32M / 2 */
+	CLK_SOURCE_HSE_8MHZ = 0x24,   /**< XT32M / 4 */
+	CLK_SOURCE_HSE_6_4MHZ = 0x25, /**< XT32M / 5 */
+	CLK_SOURCE_HSE_4MHZ = 0x28,   /**< XT32M / 8 */
+	CLK_SOURCE_HSE_2MHZ = 0x30,   /**< XT32M / 16 */
+	CLK_SOURCE_HSE_1MHZ = 0x20,   /**< XT32M / 32 */
 
-	CLK_SOURCE_PLL_80MHZ	= 0x46,	/**< 480 / 6 */
-	CLK_SOURCE_PLL_60MHZ	= 0x48,	/**< 480 / 8 */
-	CLK_SOURCE_PLL_48MHZ	= 0x4a,	/**< 480 / 10  (USB) */
-	CLK_SOURCE_PLL_40MHZ	= 0x4c,	/**< 480 / 12 */
-	CLK_SOURCE_PLL_36_9MHZ	= 0x4d,	/**< 480 / 13 */
-	CLK_SOURCE_PLL_32MHZ	= 0x4f,	/**< 480 / 15 */
-	CLK_SOURCE_PLL_30MHZ	= 0x50,	/**< 480 / 16 */
-	CLK_SOURCE_PLL_24MHZ	= 0x54,	/**< 480 / 20 */
-	CLK_SOURCE_PLL_20MHZ	= 0x58,	/**< 480 / 24 */
-	CLK_SOURCE_PLL_15MHZ	= 0x40,	/**< 480 / 32 */
+	CLK_SOURCE_PLL_80MHZ = 0x46,   /**< 480 / 6 */
+	CLK_SOURCE_PLL_60MHZ = 0x48,   /**< 480 / 8 */
+	CLK_SOURCE_PLL_48MHZ = 0x4a,   /**< 480 / 10  (USB) */
+	CLK_SOURCE_PLL_40MHZ = 0x4c,   /**< 480 / 12 */
+	CLK_SOURCE_PLL_36_9MHZ = 0x4d, /**< 480 / 13 */
+	CLK_SOURCE_PLL_32MHZ = 0x4f,   /**< 480 / 15 */
+	CLK_SOURCE_PLL_30MHZ = 0x50,   /**< 480 / 16 */
+	CLK_SOURCE_PLL_24MHZ = 0x54,   /**< 480 / 20 */
+	CLK_SOURCE_PLL_20MHZ = 0x58,   /**< 480 / 24 */
+	CLK_SOURCE_PLL_15MHZ = 0x40,   /**< 480 / 32 */
 } clk_source_t;
 
 /** Nominal XT32M frequency, in Hz.  The crystal on every WCH board is 32 MHz. */
-#define CLK_XT32M_FREQUENCY		32000000u
+#define CLK_XT32M_FREQUENCY 32000000u
 /** The PLL is a fixed 480 MHz multiplier of XT32M. */
-#define CLK_PLL_FREQUENCY		480000000u
+#define CLK_PLL_FREQUENCY 480000000u
 /** LSI frequency, in Hz. */
-#define CLK_LSI_FREQUENCY		32000u
+#define CLK_LSI_FREQUENCY 32000u
 /** LSE frequency, in Hz. */
-#define CLK_LSE_FREQUENCY		32768u
+#define CLK_LSE_FREQUENCY 32768u
 
 /* --- Crystal tuning ------------------------------------------------------ */
 

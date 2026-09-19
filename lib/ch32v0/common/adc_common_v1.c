@@ -57,16 +57,16 @@
  * The regular sequence is spread over three registers: RSQR3 covers ranks
  * 1..6, RSQR2 ranks 7..12 and RSQR1 ranks 13..16.  Each rank is five bits.
  */
-#define ADC_RSQR_SQ_BITS		5u
-#define ADC_RSQR3_RANKS			6u
-#define ADC_RSQR23_RANKS		12u
+#define ADC_RSQR_SQ_BITS 5u
+#define ADC_RSQR3_RANKS 6u
+#define ADC_RSQR23_RANKS 12u
 
 /*
  * The sample-time registers are split by channel rather than by rank:
  * SAMPTR2 covers channels 0..9, SAMPTR1 channels 10..15, three bits each.
  */
-#define ADC_SAMPTR_SPLIT_CHANNEL	10u
-#define ADC_SAMPTR_SMP_BITS		3u
+#define ADC_SAMPTR_SPLIT_CHANNEL 10u
+#define ADC_SAMPTR_SMP_BITS 3u
 
 void adc_enable(uint32_t adc) {
 	ADC_CTLR2(adc) |= ADC_CTLR2_ADON;
@@ -107,20 +107,20 @@ void adc_set_channel(uint32_t adc, uint8_t channel, uint8_t rank) {
 
 	if (rank <= ADC_RSQR3_RANKS) {
 		shift = ADC_RSQR_SQ_BITS * (uint32_t)(rank - 1u);
-		reg = (ADC_RSQR3(adc) & ~(ADC_RSQR_SQ_MASK << shift))
-			| (((uint32_t)channel & ADC_RSQR_SQ_MASK) << shift);
+		reg = (ADC_RSQR3(adc) & ~(ADC_RSQR_SQ_MASK << shift)) |
+		      (((uint32_t)channel & ADC_RSQR_SQ_MASK) << shift);
 		ADC_RSQR3(adc) = reg;
 	} else if (rank <= ADC_RSQR23_RANKS) {
-		shift = ADC_RSQR_SQ_BITS * (uint32_t)(rank - 1u
-						      - ADC_RSQR3_RANKS);
-		reg = (ADC_RSQR2(adc) & ~(ADC_RSQR_SQ_MASK << shift))
-			| (((uint32_t)channel & ADC_RSQR_SQ_MASK) << shift);
+		shift =
+		    ADC_RSQR_SQ_BITS * (uint32_t)(rank - 1u - ADC_RSQR3_RANKS);
+		reg = (ADC_RSQR2(adc) & ~(ADC_RSQR_SQ_MASK << shift)) |
+		      (((uint32_t)channel & ADC_RSQR_SQ_MASK) << shift);
 		ADC_RSQR2(adc) = reg;
 	} else {
-		shift = ADC_RSQR_SQ_BITS * (uint32_t)(rank - 1u
-						      - ADC_RSQR23_RANKS);
-		reg = (ADC_RSQR1(adc) & ~(ADC_RSQR_SQ_MASK << shift))
-			| (((uint32_t)channel & ADC_RSQR_SQ_MASK) << shift);
+		shift =
+		    ADC_RSQR_SQ_BITS * (uint32_t)(rank - 1u - ADC_RSQR23_RANKS);
+		reg = (ADC_RSQR1(adc) & ~(ADC_RSQR_SQ_MASK << shift)) |
+		      (((uint32_t)channel & ADC_RSQR_SQ_MASK) << shift);
 		ADC_RSQR1(adc) = reg;
 	}
 
@@ -130,16 +130,14 @@ void adc_set_channel(uint32_t adc, uint8_t channel, uint8_t rank) {
 	 */
 	length = (ADC_RSQR1(adc) & ADC_RSQR1_L_MASK) >> ADC_RSQR1_L_SHIFT;
 	if ((uint32_t)(rank - 1u) > length) {
-		ADC_RSQR1(adc) = (ADC_RSQR1(adc) & ~ADC_RSQR1_L_MASK)
-			| ((uint32_t)(rank - 1u) << ADC_RSQR1_L_SHIFT);
+		ADC_RSQR1(adc) = (ADC_RSQR1(adc) & ~ADC_RSQR1_L_MASK) |
+				 ((uint32_t)(rank - 1u) << ADC_RSQR1_L_SHIFT);
 	}
 }
 
-void adc_set_sample_time(
-	uint32_t adc,
-	uint8_t channel,
-	enum adc_sample_time time
-) {
+void adc_set_sample_time(uint32_t adc,
+			 uint8_t channel,
+			 enum adc_sample_time time) {
 	uint32_t shift;
 	uint32_t reg;
 
@@ -148,22 +146,20 @@ void adc_set_sample_time(
 
 	if (channel < ADC_SAMPTR_SPLIT_CHANNEL) {
 		shift = ADC_SAMPTR_SMP_BITS * (uint32_t)channel;
-		reg = (ADC_SAMPTR2(adc) & ~(ADC_SAMPTR_SMP_MASK << shift))
-			| (((uint32_t)time & ADC_SAMPTR_SMP_MASK) << shift);
+		reg = (ADC_SAMPTR2(adc) & ~(ADC_SAMPTR_SMP_MASK << shift)) |
+		      (((uint32_t)time & ADC_SAMPTR_SMP_MASK) << shift);
 		ADC_SAMPTR2(adc) = reg;
 	} else {
-		shift = ADC_SAMPTR_SMP_BITS
-			* (uint32_t)(channel - ADC_SAMPTR_SPLIT_CHANNEL);
-		reg = (ADC_SAMPTR1(adc) & ~(ADC_SAMPTR_SMP_MASK << shift))
-			| (((uint32_t)time & ADC_SAMPTR_SMP_MASK) << shift);
+		shift = ADC_SAMPTR_SMP_BITS *
+			(uint32_t)(channel - ADC_SAMPTR_SPLIT_CHANNEL);
+		reg = (ADC_SAMPTR1(adc) & ~(ADC_SAMPTR_SMP_MASK << shift)) |
+		      (((uint32_t)time & ADC_SAMPTR_SMP_MASK) << shift);
 		ADC_SAMPTR1(adc) = reg;
 	}
 }
 
-void adc_set_sample_time_on_all_channels(
-	uint32_t adc,
-	enum adc_sample_time time
-) {
+void adc_set_sample_time_on_all_channels(uint32_t adc,
+					 enum adc_sample_time time) {
 	uint32_t all;
 
 	openwch_assert(((uint32_t)time & ~ADC_SAMPTR_SMP_MASK) == 0);
@@ -190,15 +186,15 @@ void adc_set_right_aligned(uint32_t adc) {
 void adc_set_external_trigger_regular(uint32_t adc, uint32_t trigger) {
 	openwch_assert((trigger & ~ADC_CTLR2_EXTSEL_MASK) == 0);
 
-	ADC_CTLR2(adc) = (ADC_CTLR2(adc) & ~ADC_CTLR2_EXTSEL_MASK)
-		| (trigger & ADC_CTLR2_EXTSEL_MASK);
+	ADC_CTLR2(adc) = (ADC_CTLR2(adc) & ~ADC_CTLR2_EXTSEL_MASK) |
+			 (trigger & ADC_CTLR2_EXTSEL_MASK);
 }
 
 void adc_set_external_trigger_injected(uint32_t adc, uint32_t trigger) {
 	openwch_assert((trigger & ~ADC_CTLR2_JEXTSEL_MASK) == 0);
 
-	ADC_CTLR2(adc) = (ADC_CTLR2(adc) & ~ADC_CTLR2_JEXTSEL_MASK)
-		| (trigger & ADC_CTLR2_JEXTSEL_MASK);
+	ADC_CTLR2(adc) = (ADC_CTLR2(adc) & ~ADC_CTLR2_JEXTSEL_MASK) |
+			 (trigger & ADC_CTLR2_JEXTSEL_MASK);
 }
 
 void adc_enable_external_trigger_regular(uint32_t adc) {
@@ -298,27 +294,25 @@ bool adc_is_calibration_complete(uint32_t adc) {
 }
 
 void adc_set_calibration_voltage(uint32_t adc, uint32_t calvol) {
-	openwch_assert(calvol == ADC_CALVOL_DISABLE
-		       || calvol == ADC_CALVOL_50PERCENT
-		       || calvol == ADC_CALVOL_75PERCENT);
+	openwch_assert(calvol == ADC_CALVOL_DISABLE ||
+		       calvol == ADC_CALVOL_50PERCENT ||
+		       calvol == ADC_CALVOL_75PERCENT);
 
-	ADC_CTLR1(adc) = (ADC_CTLR1(adc) & ~ADC_CTLR1_CALVOLSELECT_MASK)
-		| (calvol & ADC_CTLR1_CALVOLSELECT_MASK);
+	ADC_CTLR1(adc) = (ADC_CTLR1(adc) & ~ADC_CTLR1_CALVOLSELECT_MASK) |
+			 (calvol & ADC_CTLR1_CALVOLSELECT_MASK);
 }
 
-void adc_set_external_trigger_delay(
-	uint32_t adc,
-	uint32_t source,
-	uint16_t delay
-) {
-	openwch_assert(source == ADC_DLYR_SOURCE_REGULAR
-		       || source == ADC_DLYR_SOURCE_INJECTED);
+void adc_set_external_trigger_delay(uint32_t adc,
+				    uint32_t source,
+				    uint16_t delay) {
+	openwch_assert(source == ADC_DLYR_SOURCE_REGULAR ||
+		       source == ADC_DLYR_SOURCE_INJECTED);
 	openwch_assert((delay & ~ADC_DLYR_DLYVLU_MASK) == 0);
 
-	ADC_DLYR(adc) = (ADC_DLYR(adc)
-			 & ~(ADC_DLYR_DLYSRC | ADC_DLYR_DLYVLU_MASK))
-		| (source & ADC_DLYR_DLYSRC)
-		| ((uint32_t)delay & ADC_DLYR_DLYVLU_MASK);
+	ADC_DLYR(adc) =
+	    (ADC_DLYR(adc) & ~(ADC_DLYR_DLYSRC | ADC_DLYR_DLYVLU_MASK)) |
+	    (source & ADC_DLYR_DLYSRC) |
+	    ((uint32_t)delay & ADC_DLYR_DLYVLU_MASK);
 }
 
 void adc_enable_analog_watchdog_regular(uint32_t adc) {

@@ -49,11 +49,9 @@
 
 /* --- Initialisation ------------------------------------------------------ */
 
-void adc_init_single_channel(
-	uint32_t adc,
-	adc_sample_clk_t sample_clk,
-	adc_pga_t pga
-) {
+void adc_init_single_channel(uint32_t adc,
+			     adc_sample_clk_t sample_clk,
+			     adc_pga_t pga) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(sample_clk <= ADC_SAMPLE_CLK_4MHZ);
 	openwch_assert(pga <= ADC_PGA_2);
@@ -68,11 +66,9 @@ void adc_init_single_channel(
 			     ((uint8_t)pga << ADC_PGA_GAIN_SHIFT)));
 }
 
-void adc_init_differential(
-	uint32_t adc,
-	adc_sample_clk_t sample_clk,
-	adc_pga_t pga
-) {
+void adc_init_differential(uint32_t adc,
+			   adc_sample_clk_t sample_clk,
+			   adc_pga_t pga) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(sample_clk <= ADC_SAMPLE_CLK_4MHZ);
 	openwch_assert(pga <= ADC_PGA_2);
@@ -101,9 +97,8 @@ void adc_init_temperature(uint32_t adc) {
 	 * sample-clock change.  The sensor output is a delta against the
 	 * internal reference, which is why differential mode is used.
 	 */
-	RWA_WRITE8(ADC_CFG(adc),
-		   (uint8_t)(RB_ADC_POWER_ON | RB_ADC_DIFF_EN |
-			     (3u << ADC_PGA_GAIN_SHIFT)));
+	RWA_WRITE8(ADC_CFG(adc), (uint8_t)(RB_ADC_POWER_ON | RB_ADC_DIFF_EN |
+					   (3u << ADC_PGA_GAIN_SHIFT)));
 }
 
 void adc_init_battery(uint32_t adc) {
@@ -176,12 +171,10 @@ void adc_set_auto_cycle(uint32_t adc, uint8_t cycles) {
 	ADC_AUTO_CYCLE(adc) = cycles;
 }
 
-void adc_enable_dma(
-	uint32_t adc,
-	adc_dma_mode_t mode,
-	uint16_t start,
-	uint16_t end
-) {
+void adc_enable_dma(uint32_t adc,
+		    adc_dma_mode_t mode,
+		    uint16_t start,
+		    uint16_t end) {
 	uint8_t ctrl;
 
 	openwch_assert(adc == ADC_BASE);
@@ -190,16 +183,14 @@ void adc_enable_dma(
 	ADC_DMA_BEG(adc) = start;
 	ADC_DMA_END(adc) = end;
 
-	ctrl = (uint8_t)(ADC_DMA_CTRL(adc) &
-			 (uint8_t)~RB_ADC_DMA_LOOP);
+	ctrl = (uint8_t)(ADC_DMA_CTRL(adc) & (uint8_t)~RB_ADC_DMA_LOOP);
 
 	if (mode == ADC_DMA_MODE_LOOP) {
 		ctrl = (uint8_t)(ctrl | RB_ADC_DMA_LOOP);
 	}
 
-	ADC_DMA_CTRL(adc) = (uint8_t)(ctrl |
-				      RB_ADC_IE_DMA_END |
-				      RB_ADC_DMA_ENABLE);
+	ADC_DMA_CTRL(adc) =
+	    (uint8_t)(ctrl | RB_ADC_IE_DMA_END | RB_ADC_DMA_ENABLE);
 }
 
 void adc_disable_dma(uint32_t adc) {
@@ -229,11 +220,12 @@ void adc_disable_touchkey(uint32_t adc) {
 uint16_t adc_read_touchkey(uint32_t adc, uint8_t charge, uint8_t discharge) {
 	openwch_assert(adc == ADC_BASE);
 	openwch_assert(charge <= RB_TKEY_CHARG_CNT);
-	openwch_assert(discharge <= (RB_TKEY_DISCH_CNT >> ADC_TKEY_DISCH_SHIFT));
+	openwch_assert(discharge <=
+		       (RB_TKEY_DISCH_CNT >> ADC_TKEY_DISCH_SHIFT));
 
-	ADC_TKEY_COUNT(adc) = (uint8_t)(((uint8_t)discharge <<
-					 ADC_TKEY_DISCH_SHIFT) |
-					((uint8_t)charge & RB_TKEY_CHARG_CNT));
+	ADC_TKEY_COUNT(adc) =
+	    (uint8_t)(((uint8_t)discharge << ADC_TKEY_DISCH_SHIFT) |
+		      ((uint8_t)charge & RB_TKEY_CHARG_CNT));
 
 	ADC_TKEY_CONVERT(adc) = RB_TKEY_START;
 

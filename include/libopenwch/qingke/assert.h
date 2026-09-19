@@ -42,51 +42,47 @@ LGPL License Terms @ref lgpl_license
  * override them to print diagnostics.
  */
 
-#define OPENWCH_LIKELY(expr)	(__builtin_expect(!!(expr), 1))
+#define OPENWCH_LIKELY(expr) (__builtin_expect(!!(expr), 1))
 
 #ifdef NDEBUG
-# define openwch_assert(expr)		((void)0)
-# define openwch_assert_not_reached()	do { } while (1)
+#define openwch_assert(expr) ((void)0)
+#define openwch_assert_not_reached()                                           \
+	do {                                                                   \
+	} while (1)
 #else
-# ifdef OPENWCH_ASSERT_VERBOSE
-#  define openwch_assert(expr) \
-	do { \
-		if (OPENWCH_LIKELY(expr)) { \
-			(void)0; \
-		} else { \
-			openwch_assert_failed_verbose( \
-				__FILE__, __LINE__, \
-				__func__, #expr); \
-		} \
+#ifdef OPENWCH_ASSERT_VERBOSE
+#define openwch_assert(expr)                                                   \
+	do {                                                                   \
+		if (OPENWCH_LIKELY(expr)) {                                    \
+			(void)0;                                               \
+		} else {                                                       \
+			openwch_assert_failed_verbose(__FILE__, __LINE__,      \
+						      __func__, #expr);        \
+		}                                                              \
 	} while (0)
-#  define openwch_assert_not_reached() \
-	openwch_assert_failed_verbose( \
-			__FILE__, __LINE__, \
-			__func__, 0)
-# else
-#  define openwch_assert(expr) \
-	do { \
-		if (OPENWCH_LIKELY(expr)) { \
-			(void)0; \
-		} else { \
-			openwch_assert_failed(); \
-		} \
+#define openwch_assert_not_reached()                                           \
+	openwch_assert_failed_verbose(__FILE__, __LINE__, __func__, 0)
+#else
+#define openwch_assert(expr)                                                   \
+	do {                                                                   \
+		if (OPENWCH_LIKELY(expr)) {                                    \
+			(void)0;                                               \
+		} else {                                                       \
+			openwch_assert_failed();                               \
+		}                                                              \
 	} while (0)
-#  define openwch_assert_not_reached()	openwch_assert_failed()
-# endif
+#define openwch_assert_not_reached() openwch_assert_failed()
+#endif
 #endif
 
 BEGIN_DECLS
 
-__attribute__((__noreturn__))
-void openwch_assert_failed(void);
-__attribute__((__noreturn__))
-void openwch_assert_failed_verbose(
-	const char *file,
-	int line,
-	const char *func,
-	const char *assert_expr
-);
+__attribute__((__noreturn__)) void openwch_assert_failed(void);
+__attribute__((__noreturn__)) void
+openwch_assert_failed_verbose(const char *file,
+			      int line,
+			      const char *func,
+			      const char *assert_expr);
 
 END_DECLS
 

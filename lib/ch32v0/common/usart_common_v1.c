@@ -45,7 +45,7 @@
 #include <libopenwch/qingke/assert.h>
 
 /** Largest value the 12.4 divider can represent. */
-#define USART_BRR_MAX_DIVIDER		0xffffu
+#define USART_BRR_MAX_DIVIDER 0xffffu
 
 void usart_set_baudrate(uint32_t usart, uint32_t baud) {
 	struct rcc_clock_scale clocks;
@@ -95,8 +95,9 @@ void usart_set_stopbits(uint32_t usart, uint8_t stopbits) {
 
 	openwch_assert((stopbits & ~0x3u) == 0);
 
-	reg = (uint16_t)((reg & ~USART_CTLR2_STOP_MASK)
-			| ((stopbits << USART_CTLR2_STOP_SHIFT) & USART_CTLR2_STOP_MASK));
+	reg = (uint16_t)((reg & ~USART_CTLR2_STOP_MASK) |
+			 ((stopbits << USART_CTLR2_STOP_SHIFT) &
+			  USART_CTLR2_STOP_MASK));
 	USART_CTLR2(usart) = reg;
 }
 
@@ -124,26 +125,26 @@ void usart_set_parity(uint32_t usart, uint8_t parity) {
 void usart_set_mode(uint32_t usart, uint32_t mode) {
 	uint16_t reg = USART_CTLR1(usart);
 
-	reg = (uint16_t)((reg & ~(USART_CTLR1_RE | USART_CTLR1_TE))
-			| (mode & (USART_CTLR1_RE | USART_CTLR1_TE)));
+	reg = (uint16_t)((reg & ~(USART_CTLR1_RE | USART_CTLR1_TE)) |
+			 (mode & (USART_CTLR1_RE | USART_CTLR1_TE)));
 	USART_CTLR1(usart) = reg;
 }
 
 void usart_set_flow_control(uint32_t usart, uint32_t flowcontrol) {
 	uint16_t reg = USART_CTLR3(usart);
 
-	reg = (uint16_t)((reg & ~(USART_CTLR3_RTSE | USART_CTLR3_CTSE))
-			| (flowcontrol & (USART_CTLR3_RTSE | USART_CTLR3_CTSE)));
+	reg = (uint16_t)((reg & ~(USART_CTLR3_RTSE | USART_CTLR3_CTSE)) |
+			 (flowcontrol & (USART_CTLR3_RTSE | USART_CTLR3_CTSE)));
 	USART_CTLR3(usart) = reg;
 }
 
 void usart_set_clock(uint32_t usart, uint32_t clock) {
 	uint16_t reg = USART_CTLR2(usart);
 
-	reg = (uint16_t)((reg & ~(USART_CTLR2_CLKEN | USART_CTLR2_CPOL
-					| USART_CTLR2_CPHA | USART_CTLR2_LBCL))
-			| (clock & (USART_CTLR2_CLKEN | USART_CTLR2_CPOL
-					| USART_CTLR2_CPHA | USART_CTLR2_LBCL)));
+	reg = (uint16_t)((reg & ~(USART_CTLR2_CLKEN | USART_CTLR2_CPOL |
+				  USART_CTLR2_CPHA | USART_CTLR2_LBCL)) |
+			 (clock & (USART_CTLR2_CLKEN | USART_CTLR2_CPOL |
+				   USART_CTLR2_CPHA | USART_CTLR2_LBCL)));
 	USART_CTLR2(usart) = reg;
 }
 
@@ -200,7 +201,8 @@ void usart_clear_flag(uint32_t usart, uint16_t flag) {
 	 * clearable ones may be written; writing a 1 to the others is a no-op,
 	 * so masking with the clearable set keeps this safe.
 	 */
-	USART_STATR(usart) = (uint16_t)(flag & (USART_STATR_CTS | USART_STATR_LBD));
+	USART_STATR(usart) =
+	    (uint16_t)(flag & (USART_STATR_CTS | USART_STATR_LBD));
 }
 
 void usart_enable_rx_interrupt(uint32_t usart) {

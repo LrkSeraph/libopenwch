@@ -70,38 +70,38 @@ LGPL License Terms @ref lgpl_license
  * peripherals live in byte 0, the high peripherals in byte 1, the wake-up
  * sources in byte 2 and the power-down controls in byte 3.
  */
-#define PWR_SLEEP_CONTROL	MMIO32(SYS_BASE + 0x0c)
-#define PWR_SLP_CLK_OFF0	MMIO8(SYS_BASE + 0x0c)
-#define PWR_SLP_CLK_OFF1	MMIO8(SYS_BASE + 0x0d)
-#define PWR_SLP_WAKE_CTRL	MMIO8(SYS_BASE + 0x0e)
-#define PWR_SLP_POWER_CTRL	MMIO8(SYS_BASE + 0x0f)
+#define PWR_SLEEP_CONTROL MMIO32(SYS_BASE + 0x0c)
+#define PWR_SLP_CLK_OFF0 MMIO8(SYS_BASE + 0x0c)
+#define PWR_SLP_CLK_OFF1 MMIO8(SYS_BASE + 0x0d)
+#define PWR_SLP_WAKE_CTRL MMIO8(SYS_BASE + 0x0e)
+#define PWR_SLP_POWER_CTRL MMIO8(SYS_BASE + 0x0f)
 
 /* High-frequency clock module power (R8_HFCK_PWR_CTRL). */
-#define PWR_HFCK_PWR_CTRL	MMIO8(SYS_BASE + 0x0a)
+#define PWR_HFCK_PWR_CTRL MMIO8(SYS_BASE + 0x0a)
 
 /* Power plan applied when the core executes WFI. */
-#define PWR_POWER_MANAG		MMIO32(SYS_BASE + 0x20)
-#define PWR_POWER_PLAN		MMIO16(SYS_BASE + 0x20)
-#define PWR_AUX_POWER_ADJ	MMIO8(SYS_BASE + 0x22)
+#define PWR_POWER_MANAG MMIO32(SYS_BASE + 0x20)
+#define PWR_POWER_PLAN MMIO16(SYS_BASE + 0x20)
+#define PWR_AUX_POWER_ADJ MMIO8(SYS_BASE + 0x22)
 
 /* Battery / supply voltage detector. */
-#define PWR_BAT_DET_CTRL	MMIO8(SYS_BASE + 0x24)
-#define PWR_BAT_DET_CFG		MMIO8(SYS_BASE + 0x25)
-#define PWR_BAT_STATUS		MMIO8(SYS_BASE + 0x26)
+#define PWR_BAT_DET_CTRL MMIO8(SYS_BASE + 0x24)
+#define PWR_BAT_DET_CFG MMIO8(SYS_BASE + 0x25)
+#define PWR_BAT_STATUS MMIO8(SYS_BASE + 0x26)
 
 /* 32 kHz oscillator power and source selection. */
-#define PWR_CK32K_CONFIG	MMIO8(SYS_BASE + 0x2f)
+#define PWR_CK32K_CONFIG MMIO8(SYS_BASE + 0x2f)
 
 /* Flash controller access control, used to park the flash before sleeping. */
-#define PWR_FLASH_CTRL		MMIO8(ROM_CTRL_BASE + 0x06)
+#define PWR_FLASH_CTRL MMIO8(ROM_CTRL_BASE + 0x06)
 
 /* Oscillator tuning and reset control, touched only by the low-power paths. */
-#define PWR_XT32M_TUNE		MMIO8(SYS_BASE + 0x4e)
-#define PWR_XT32K_TUNE		MMIO8(SYS_BASE + 0x2e)
-#define PWR_INT32K_TUNE		MMIO16(SYS_BASE + 0x2c)
-#define PWR_RTC_CNT_32K		MMIO16(SYS_BASE + 0x38)
-#define PWR_PLL_CONFIG		MMIO8(SYS_BASE + 0x4b)
-#define PWR_RST_WDOG_CTRL	MMIO8(SYS_BASE + 0x46)
+#define PWR_XT32M_TUNE MMIO8(SYS_BASE + 0x4e)
+#define PWR_XT32K_TUNE MMIO8(SYS_BASE + 0x2e)
+#define PWR_INT32K_TUNE MMIO16(SYS_BASE + 0x2c)
+#define PWR_RTC_CNT_32K MMIO16(SYS_BASE + 0x38)
+#define PWR_PLL_CONFIG MMIO8(SYS_BASE + 0x4b)
+#define PWR_RST_WDOG_CTRL MMIO8(SYS_BASE + 0x46)
 
 /* --- Peripheral clock gates (R32_SLEEP_CONTROL) -------------------------- */
 
@@ -111,25 +111,25 @@ LGPL License Terms @ref lgpl_license
 Each bit is a clock-OFF flag in R32_SLEEP_CONTROL (see the note above).
 @{
 */
-#define PWR_CLK_TMR0		(1u << 0)	/**< TMR0 */
-#define PWR_CLK_TMR1		(1u << 1)	/**< TMR1 */
-#define PWR_CLK_TMR2		(1u << 2)	/**< TMR2 */
-#define PWR_CLK_TMR3		(1u << 3)	/**< TMR3 */
-#define PWR_CLK_UART0		(1u << 4)	/**< UART0 */
-#define PWR_CLK_UART1		(1u << 5)	/**< UART1 */
-#define PWR_CLK_UART2		(1u << 6)	/**< UART2 */
-#define PWR_CLK_UART3		(1u << 7)	/**< UART3 */
-#define PWR_CLK_SPI0		(1u << 8)	/**< SPI0 */
-#define PWR_CLK_SPI1		(1u << 9)	/**< SPI1 */
-#define PWR_CLK_PWMX		(1u << 10)	/**< PWMX */
-#define PWR_CLK_I2C		(1u << 11)	/**< I2C */
-#define PWR_CLK_USB		(1u << 12)	/**< USB */
-#define PWR_CLK_USB2		(1u << 13)	/**< USB2 (CH582/CH583 only) */
-#define PWR_CLK_BLE		(1u << 15)	/**< BLE */
-#define PWR_CLK_RAMX		(1u << 28)	/**< main SRAM */
-#define PWR_CLK_RAM2K		(1u << 29)	/**< retention 2 KB SRAM */
+#define PWR_CLK_TMR0 (1u << 0)	 /**< TMR0 */
+#define PWR_CLK_TMR1 (1u << 1)	 /**< TMR1 */
+#define PWR_CLK_TMR2 (1u << 2)	 /**< TMR2 */
+#define PWR_CLK_TMR3 (1u << 3)	 /**< TMR3 */
+#define PWR_CLK_UART0 (1u << 4)	 /**< UART0 */
+#define PWR_CLK_UART1 (1u << 5)	 /**< UART1 */
+#define PWR_CLK_UART2 (1u << 6)	 /**< UART2 */
+#define PWR_CLK_UART3 (1u << 7)	 /**< UART3 */
+#define PWR_CLK_SPI0 (1u << 8)	 /**< SPI0 */
+#define PWR_CLK_SPI1 (1u << 9)	 /**< SPI1 */
+#define PWR_CLK_PWMX (1u << 10)	 /**< PWMX */
+#define PWR_CLK_I2C (1u << 11)	 /**< I2C */
+#define PWR_CLK_USB (1u << 12)	 /**< USB */
+#define PWR_CLK_USB2 (1u << 13)	 /**< USB2 (CH582/CH583 only) */
+#define PWR_CLK_BLE (1u << 15)	 /**< BLE */
+#define PWR_CLK_RAMX (1u << 28)	 /**< main SRAM */
+#define PWR_CLK_RAM2K (1u << 29) /**< retention 2 KB SRAM */
 /** Every gate the family defines, low half plus the two SRAM bits. */
-#define PWR_CLK_ALL		(PWR_CLK_RAMX | PWR_CLK_RAM2K | 0xffffu)
+#define PWR_CLK_ALL (PWR_CLK_RAMX | PWR_CLK_RAM2K | 0xffffu)
 /**@}*/
 
 /* --- Controllable power units -------------------------------------------- */
@@ -142,12 +142,12 @@ R8_HFCK_PWR_CTRL.  They are deliberately kept in one mask space because the
 reference API takes them as a single `unit` argument.
 @{
 */
-#define PWR_UNIT_LSE		(1u << 0)	/**< XT32K crystal */
-#define PWR_UNIT_LSI		(1u << 1)	/**< internal 32 kHz RC */
-#define PWR_UNIT_HSE		(1u << 2)	/**< XT32M crystal */
-#define PWR_UNIT_PLL		(1u << 4)	/**< 480 MHz PLL */
-#define PWR_UNIT_MASK		(PWR_UNIT_LSE | PWR_UNIT_LSI | \
-				 PWR_UNIT_HSE | PWR_UNIT_PLL)
+#define PWR_UNIT_LSE (1u << 0) /**< XT32K crystal */
+#define PWR_UNIT_LSI (1u << 1) /**< internal 32 kHz RC */
+#define PWR_UNIT_HSE (1u << 2) /**< XT32M crystal */
+#define PWR_UNIT_PLL (1u << 4) /**< 480 MHz PLL */
+#define PWR_UNIT_MASK                                                          \
+	(PWR_UNIT_LSE | PWR_UNIT_LSI | PWR_UNIT_HSE | PWR_UNIT_PLL)
 /**@}*/
 
 /* --- Sleep wake-up sources (R8_SLP_WAKE_CTRL) ---------------------------- */
@@ -156,15 +156,16 @@ reference API takes them as a single `unit` argument.
 @ingroup pwr_defines
 @{
 */
-#define PWR_WAKE_USB		(1u << 0)	/**< USB resume */
-#define PWR_WAKE_USB2		(1u << 1)	/**< USB2 resume */
-#define PWR_WAKE_RTC		(1u << 3)	/**< RTC alarm */
-#define PWR_WAKE_GPIO		(1u << 4)	/**< GPIO edge */
-#define PWR_WAKE_BAT		(1u << 5)	/**< battery voltage drop */
-#define PWR_WAKE_MASK		(PWR_WAKE_USB | PWR_WAKE_USB2 | PWR_WAKE_RTC | \
-				 PWR_WAKE_GPIO | PWR_WAKE_BAT)
+#define PWR_WAKE_USB (1u << 0)	/**< USB resume */
+#define PWR_WAKE_USB2 (1u << 1) /**< USB2 resume */
+#define PWR_WAKE_RTC (1u << 3)	/**< RTC alarm */
+#define PWR_WAKE_GPIO (1u << 4) /**< GPIO edge */
+#define PWR_WAKE_BAT (1u << 5)	/**< battery voltage drop */
+#define PWR_WAKE_MASK                                                          \
+	(PWR_WAKE_USB | PWR_WAKE_USB2 | PWR_WAKE_RTC | PWR_WAKE_GPIO |         \
+	 PWR_WAKE_BAT)
 /** Event-wakeup mode: 1 = keep the event for a long time, 0 = short pulse. */
-#define PWR_WAKE_EV_MODE	(1u << 6)
+#define PWR_WAKE_EV_MODE (1u << 6)
 /**@}*/
 
 /** Wake-up delay, as encoded by RB_WAKE_DLY_MOD in R8_SLP_POWER_CTRL. */
@@ -183,19 +184,19 @@ typedef enum {
  * (about 210 uA); the low nibble selects the threshold.
  */
 typedef enum {
-	PWR_VOLTAGE_MONITOR_1V9		= 0x00,	/**< 1.7 - 1.9 V, high accuracy */
-	PWR_VOLTAGE_MONITOR_2V1		= 0x01,	/**< 1.9 - 2.1 V, high accuracy */
-	PWR_VOLTAGE_MONITOR_2V3		= 0x02,	/**< 2.1 - 2.3 V, high accuracy */
-	PWR_VOLTAGE_MONITOR_2V5		= 0x03,	/**< 2.3 - 2.5 V, high accuracy */
+	PWR_VOLTAGE_MONITOR_1V9 = 0x00, /**< 1.7 - 1.9 V, high accuracy */
+	PWR_VOLTAGE_MONITOR_2V1 = 0x01, /**< 1.9 - 2.1 V, high accuracy */
+	PWR_VOLTAGE_MONITOR_2V3 = 0x02, /**< 2.1 - 2.3 V, high accuracy */
+	PWR_VOLTAGE_MONITOR_2V5 = 0x03, /**< 2.3 - 2.5 V, high accuracy */
 
-	PWR_VOLTAGE_MONITOR_1V8_LP	= 0x80,	/**< 1.8 V, low power */
-	PWR_VOLTAGE_MONITOR_1V9_LP	= 0x81,	/**< 1.9 V, low power */
-	PWR_VOLTAGE_MONITOR_2V0_LP	= 0x82,	/**< 2.0 V, low power */
-	PWR_VOLTAGE_MONITOR_2V1_LP	= 0x83,	/**< 2.1 V, low power */
-	PWR_VOLTAGE_MONITOR_2V2_LP	= 0x84,	/**< 2.2 V, low power */
-	PWR_VOLTAGE_MONITOR_2V3_LP	= 0x85,	/**< 2.3 V, low power */
-	PWR_VOLTAGE_MONITOR_2V4_LP	= 0x86,	/**< 2.4 V, low power */
-	PWR_VOLTAGE_MONITOR_2V5_LP	= 0x87,	/**< 2.5 V, low power */
+	PWR_VOLTAGE_MONITOR_1V8_LP = 0x80, /**< 1.8 V, low power */
+	PWR_VOLTAGE_MONITOR_1V9_LP = 0x81, /**< 1.9 V, low power */
+	PWR_VOLTAGE_MONITOR_2V0_LP = 0x82, /**< 2.0 V, low power */
+	PWR_VOLTAGE_MONITOR_2V1_LP = 0x83, /**< 2.1 V, low power */
+	PWR_VOLTAGE_MONITOR_2V2_LP = 0x84, /**< 2.2 V, low power */
+	PWR_VOLTAGE_MONITOR_2V3_LP = 0x85, /**< 2.3 V, low power */
+	PWR_VOLTAGE_MONITOR_2V4_LP = 0x86, /**< 2.4 V, low power */
+	PWR_VOLTAGE_MONITOR_2V5_LP = 0x87, /**< 2.5 V, low power */
 } pwr_voltage_monitor_t;
 
 /* --- Battery detector bits ----------------------------------------------- */
@@ -204,13 +205,13 @@ typedef enum {
 @ingroup pwr_defines
 @{
 */
-#define PWR_BAT_DET_EN		(1u << 0)	/**< enable detector */
-#define PWR_BAT_LOW_VTHX	(1u << 0)	/**< threshold select, monitor mode */
-#define PWR_BAT_MON_EN		(1u << 1)	/**< enable monitor during sleep */
-#define PWR_BAT_LOWER_IE	(1u << 2)	/**< lower-voltage interrupt */
-#define PWR_BAT_LOW_IE		(1u << 3)	/**< low-voltage interrupt */
+#define PWR_BAT_DET_EN (1u << 0)   /**< enable detector */
+#define PWR_BAT_LOW_VTHX (1u << 0) /**< threshold select, monitor mode */
+#define PWR_BAT_MON_EN (1u << 1)   /**< enable monitor during sleep */
+#define PWR_BAT_LOWER_IE (1u << 2) /**< lower-voltage interrupt */
+#define PWR_BAT_LOW_IE (1u << 3)   /**< low-voltage interrupt */
 /** Threshold field of R8_BAT_DET_CFG. */
-#define PWR_BAT_LOW_VTH_MASK	0x03u
+#define PWR_BAT_LOW_VTH_MASK 0x03u
 /**@}*/
 
 /* --- Retention mask for the low-power entry points ----------------------- */
@@ -222,12 +223,12 @@ Bits OR-ed into R16_POWER_PLAN to keep a supply domain alive across sleep or
 shutdown.  Passing 0 powers everything down.
 @{
 */
-#define PWR_RETAIN_XROM		(1u << 0)	/**< flash ROM */
-#define PWR_RETAIN_RAM2K	(1u << 1)	/**< retention 2 KB SRAM */
-#define PWR_RETAIN_CORE		(1u << 2)	/**< core and base peripherals */
-#define PWR_RETAIN_EXTEND	(1u << 3)	/**< USB and BLE */
-#define PWR_RETAIN_RAM30K	(1u << 4)	/**< main SRAM */
-#define PWR_RETAIN_MASK		(0x1fu)
+#define PWR_RETAIN_XROM (1u << 0)   /**< flash ROM */
+#define PWR_RETAIN_RAM2K (1u << 1)  /**< retention 2 KB SRAM */
+#define PWR_RETAIN_CORE (1u << 2)   /**< core and base peripherals */
+#define PWR_RETAIN_EXTEND (1u << 3) /**< USB and BLE */
+#define PWR_RETAIN_RAM30K (1u << 4) /**< main SRAM */
+#define PWR_RETAIN_MASK (0x1fu)
 /**@}*/
 
 /* --- Power plan and auxiliary power bits --------------------------------- */
@@ -236,20 +237,20 @@ shutdown.  Passing 0 powers everything down.
 @ingroup pwr_defines
 @{
 */
-#define PWR_DCDC_EN		(1u << 9)	/**< DC/DC converter enable */
-#define PWR_DCDC_PRE		(1u << 10)	/**< DC/DC pre-enable */
-#define PWR_PLAN_MUST_0010	(1u << 12)	/**< reserved, must be 1 */
-#define PWR_PLAN_EN		(1u << 15)	/**< apply the plan on WFI */
+#define PWR_DCDC_EN (1u << 9)	      /**< DC/DC converter enable */
+#define PWR_DCDC_PRE (1u << 10)	      /**< DC/DC pre-enable */
+#define PWR_PLAN_MUST_0010 (1u << 12) /**< reserved, must be 1 */
+#define PWR_PLAN_EN (1u << 15)	      /**< apply the plan on WFI */
 
-#define PWR_DCDC_CHARGE		(1u << 7)	/**< DC/DC auxiliary charge */
+#define PWR_DCDC_CHARGE (1u << 7) /**< DC/DC auxiliary charge */
 /** Ultra-low-power LDO adjust field of R16_AUX_POWER_ADJ. */
-#define PWR_ULPLDO_ADJ_MASK	0x07u
+#define PWR_ULPLDO_ADJ_MASK 0x07u
 
 /** R8_RST_WDOG_CTRL.RB_SOFTWARE_RESET: request a global software reset. */
-#define PWR_SOFTWARE_RESET	(1u << 0)
+#define PWR_SOFTWARE_RESET (1u << 0)
 
 /** RAM retention voltage: 1 = low voltage for low power. */
-#define PWR_SLP_RAM_RET_LV	(1u << 6)
+#define PWR_SLP_RAM_RET_LV (1u << 6)
 /**@}*/
 
 /* --- Flag bits ----------------------------------------------------------- */
@@ -260,9 +261,9 @@ shutdown.  Passing 0 powers everything down.
 Read back from R8_BAT_STATUS.  Both are high-active.
 @{
 */
-#define PWR_FLAG_BAT_LOWER	(1u << 0)	/**< lower voltage detected */
-#define PWR_FLAG_BAT_LOW	(1u << 1)	/**< low voltage detected */
-#define PWR_FLAG_MASK		(PWR_FLAG_BAT_LOWER | PWR_FLAG_BAT_LOW)
+#define PWR_FLAG_BAT_LOWER (1u << 0) /**< lower voltage detected */
+#define PWR_FLAG_BAT_LOW (1u << 1)   /**< low voltage detected */
+#define PWR_FLAG_MASK (PWR_FLAG_BAT_LOWER | PWR_FLAG_BAT_LOW)
 /**@}*/
 
 BEGIN_DECLS

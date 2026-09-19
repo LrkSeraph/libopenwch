@@ -73,26 +73,26 @@ LGPL License Terms @ref lgpl_license
 
 /* --- Register accessors -------------------------------------------------- */
 
-#define SYS_SAFE_ACCESS_SIG		MMIO8(SYS_BASE + 0x40)
-#define SYS_CHIP_ID			MMIO8(SYS_BASE + 0x41)
-#define SYS_SAFE_ACCESS_ID		MMIO8(SYS_BASE + 0x42)
-#define SYS_WDOG_COUNT			MMIO8(SYS_BASE + 0x43)
-#define SYS_RESET_STATUS		MMIO8(SYS_BASE + 0x44)
-#define SYS_GLOB_CFG_INFO		MMIO8(SYS_BASE + 0x45)
-#define SYS_RST_WDOG_CTRL		MMIO8(SYS_BASE + 0x46)
-#define SYS_GLOB_RESET_KEEP		MMIO8(SYS_BASE + 0x47)
+#define SYS_SAFE_ACCESS_SIG MMIO8(SYS_BASE + 0x40)
+#define SYS_CHIP_ID MMIO8(SYS_BASE + 0x41)
+#define SYS_SAFE_ACCESS_ID MMIO8(SYS_BASE + 0x42)
+#define SYS_WDOG_COUNT MMIO8(SYS_BASE + 0x43)
+#define SYS_RESET_STATUS MMIO8(SYS_BASE + 0x44)
+#define SYS_GLOB_CFG_INFO MMIO8(SYS_BASE + 0x45)
+#define SYS_RST_WDOG_CTRL MMIO8(SYS_BASE + 0x46)
+#define SYS_GLOB_RESET_KEEP MMIO8(SYS_BASE + 0x47)
 
 /* --- R8_RESET_STATUS bits ------------------------------------------------ */
 
 /** @defgroup sys_reset_bits SYS reset status bits
 @ingroup sys_defines
 @{*/
-#define RB_RESET_FLAG			0x07	/**< recent reset cause */
-#define RST_FLAG_SW			0x00	/**< software reset */
-#define RST_FLAG_RPOR			0x01	/**< real power-on reset */
-#define RST_FLAG_WTR			0x02	/**< watchdog timeout reset */
-#define RST_FLAG_MR			0x03	/**< external manual reset */
-#define RST_FLAG_GPWSM			0x05	/**< wake from shutdown */
+#define RB_RESET_FLAG 0x07  /**< recent reset cause */
+#define RST_FLAG_SW 0x00    /**< software reset */
+#define RST_FLAG_RPOR 0x01  /**< real power-on reset */
+#define RST_FLAG_WTR 0x02   /**< watchdog timeout reset */
+#define RST_FLAG_MR 0x03    /**< external manual reset */
+#define RST_FLAG_GPWSM 0x05 /**< wake from shutdown */
 /**@}*/
 
 /* --- R8_RST_WDOG_CTRL bits ----------------------------------------------- */
@@ -100,10 +100,10 @@ LGPL License Terms @ref lgpl_license
 /** @defgroup sys_wdog_bits SYS reset / watchdog control bits
 @ingroup sys_defines
 @{*/
-#define RB_SOFTWARE_RESET		0x01	/**< self-clearing global software reset */
-#define RB_WDOG_RST_EN			0x02	/**< reset on watchdog overflow */
-#define RB_WDOG_INT_EN			0x04	/**< watchdog overflow interrupt enable */
-#define RB_WDOG_INT_FLAG		0x10	/**< watchdog overflow flag, write 1 to clear */
+#define RB_SOFTWARE_RESET 0x01 /**< self-clearing global software reset */
+#define RB_WDOG_RST_EN 0x02    /**< reset on watchdog overflow */
+#define RB_WDOG_INT_EN 0x04    /**< watchdog overflow interrupt enable */
+#define RB_WDOG_INT_FLAG 0x10  /**< watchdog overflow flag, write 1 to clear */
 /**@}*/
 
 /* --- R8_GLOB_CFG_INFO bits ----------------------------------------------- */
@@ -112,25 +112,25 @@ LGPL License Terms @ref lgpl_license
 
 Read-only status latched at reset.
 @{*/
-#define RB_CFG_ROM_READ			0x01	/**< flash readable by an external programmer */
-#define RB_CFG_RESET_EN			0x04	/**< manual reset input enabled */
-#define RB_CFG_BOOT_EN			0x08	/**< boot loader enabled */
-#define RB_CFG_DEBUG_EN			0x10	/**< debug interface enabled */
-#define RB_BOOT_LOADER			0x20	/**< running the boot loader */
+#define RB_CFG_ROM_READ 0x01 /**< flash readable by an external programmer */
+#define RB_CFG_RESET_EN 0x04 /**< manual reset input enabled */
+#define RB_CFG_BOOT_EN 0x08  /**< boot loader enabled */
+#define RB_CFG_DEBUG_EN 0x10 /**< debug interface enabled */
+#define RB_BOOT_LOADER 0x20  /**< running the boot loader */
 /**@}*/
 
 /* --- Recent reset cause -------------------------------------------------- */
 
 /** Reason for the most recent reset, from R8_RESET_STATUS.RB_RESET_FLAG. */
 typedef enum {
-	SYS_RESET_SW = RST_FLAG_SW,		/**< software reset */
-	SYS_RESET_RPOR = RST_FLAG_RPOR,		/**< real power-on reset */
-	SYS_RESET_WDOG = RST_FLAG_WTR,		/**< watchdog timeout */
-	SYS_RESET_MANUAL = RST_FLAG_MR,		/**< external manual reset */
-	SYS_RESET_LOW_POWER_0 = 0x04,		/**< wake from low power, cause 0 */
-	SYS_RESET_SHUTDOWN_WAKE = RST_FLAG_GPWSM,	/**< wake from shutdown */
-	SYS_RESET_LOW_POWER_1 = 0x06,		/**< wake from low power, cause 1 */
-	SYS_RESET_LOW_POWER_2 = 0x07,		/**< wake from low power, cause 2 */
+	SYS_RESET_SW = RST_FLAG_SW,	/**< software reset */
+	SYS_RESET_RPOR = RST_FLAG_RPOR, /**< real power-on reset */
+	SYS_RESET_WDOG = RST_FLAG_WTR,	/**< watchdog timeout */
+	SYS_RESET_MANUAL = RST_FLAG_MR, /**< external manual reset */
+	SYS_RESET_LOW_POWER_0 = 0x04,	/**< wake from low power, cause 0 */
+	SYS_RESET_SHUTDOWN_WAKE = RST_FLAG_GPWSM, /**< wake from shutdown */
+	SYS_RESET_LOW_POWER_1 = 0x06, /**< wake from low power, cause 1 */
+	SYS_RESET_LOW_POWER_2 = 0x07, /**< wake from low power, cause 2 */
 } sys_reset_status_t;
 
 BEGIN_DECLS

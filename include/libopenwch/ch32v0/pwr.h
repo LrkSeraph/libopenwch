@@ -44,7 +44,7 @@ LGPL License Terms @ref lgpl_license
  * The PVD output can be routed to EXTI line 8 with exti_enable_request(), and
  * the auto-wakeup event to EXTI line 9.
  */
-#define PWR				PWR_BASE
+#define PWR PWR_BASE
 
 #include <libopenwch/ch32v0/common/pwr_common_v1.h>
 

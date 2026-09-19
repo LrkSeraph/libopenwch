@@ -57,17 +57,17 @@ specific memorymap.h header before including this header file. */
 /* --- Register accessors -------------------------------------------------- */
 
 /* Interrupt mask register (EXTI_INTENR) */
-#define EXTI_INTENR(exti)		MMIO32((exti) + 0x00)
+#define EXTI_INTENR(exti) MMIO32((exti) + 0x00)
 /* Event mask register (EXTI_EVENR) */
-#define EXTI_EVENR(exti)		MMIO32((exti) + 0x04)
+#define EXTI_EVENR(exti) MMIO32((exti) + 0x04)
 /* Rising trigger selection register (EXTI_RTENR) */
-#define EXTI_RTENR(exti)		MMIO32((exti) + 0x08)
+#define EXTI_RTENR(exti) MMIO32((exti) + 0x08)
 /* Falling trigger selection register (EXTI_FTENR) */
-#define EXTI_FTENR(exti)		MMIO32((exti) + 0x0c)
+#define EXTI_FTENR(exti) MMIO32((exti) + 0x0c)
 /* Software interrupt event register (EXTI_SWIEVR) */
-#define EXTI_SWIEVR(exti)		MMIO32((exti) + 0x10)
+#define EXTI_SWIEVR(exti) MMIO32((exti) + 0x10)
 /* Pending register (EXTI_INTFR) */
-#define EXTI_INTFR(exti)		MMIO32((exti) + 0x14)
+#define EXTI_INTFR(exti) MMIO32((exti) + 0x14)
 
 /* --- Line identifiers ---------------------------------------------------- */
 
@@ -75,17 +75,17 @@ specific memorymap.h header before including this header file. */
 @ingroup exti_defines
 
 @{*/
-#define EXTI0				(1 << 0)	/**< line 0 (GPIO) */
-#define EXTI1				(1 << 1)	/**< line 1 (GPIO) */
-#define EXTI2				(1 << 2)	/**< line 2 (GPIO) */
-#define EXTI3				(1 << 3)	/**< line 3 (GPIO) */
-#define EXTI4				(1 << 4)	/**< line 4 (GPIO) */
-#define EXTI5				(1 << 5)	/**< line 5 (GPIO) */
-#define EXTI6				(1 << 6)	/**< line 6 (GPIO) */
-#define EXTI7				(1 << 7)	/**< line 7 (GPIO) */
-#define EXTI8				(1 << 8)	/**< line 8 (PVD output) */
-#define EXTI9				(1 << 9)	/**< line 9 (auto-wakeup) */
-#define EXTI_LINE_ALL			0x03ffu		/**< lines 0..9 */
+#define EXTI0 (1 << 0)	      /**< line 0 (GPIO) */
+#define EXTI1 (1 << 1)	      /**< line 1 (GPIO) */
+#define EXTI2 (1 << 2)	      /**< line 2 (GPIO) */
+#define EXTI3 (1 << 3)	      /**< line 3 (GPIO) */
+#define EXTI4 (1 << 4)	      /**< line 4 (GPIO) */
+#define EXTI5 (1 << 5)	      /**< line 5 (GPIO) */
+#define EXTI6 (1 << 6)	      /**< line 6 (GPIO) */
+#define EXTI7 (1 << 7)	      /**< line 7 (GPIO) */
+#define EXTI8 (1 << 8)	      /**< line 8 (PVD output) */
+#define EXTI9 (1 << 9)	      /**< line 9 (auto-wakeup) */
+#define EXTI_LINE_ALL 0x03ffu /**< lines 0..9 */
 /**@}*/
 
 /* --- Interrupt/event edge selection -------------------------------------- */
@@ -95,15 +95,16 @@ specific memorymap.h header before including this header file. */
 
 @{*/
 enum exti_trigger_type {
-	EXTI_TRIGGER_RISING = 0,	/**< rising edge only */
-	EXTI_TRIGGER_FALLING,		/**< falling edge only */
-	EXTI_TRIGGER_BOTH,		/**< both edges */
+	EXTI_TRIGGER_RISING = 0, /**< rising edge only */
+	EXTI_TRIGGER_FALLING,	 /**< falling edge only */
+	EXTI_TRIGGER_BOTH,	 /**< both edges */
 };
 /**@}*/
 
 BEGIN_DECLS
 
-void exti_set_trigger(uint32_t exti, uint32_t line,
+void exti_set_trigger(uint32_t exti,
+		      uint32_t line,
 		      enum exti_trigger_type trigger);
 void exti_enable_request(uint32_t exti, uint32_t line);
 void exti_disable_request(uint32_t exti, uint32_t line);

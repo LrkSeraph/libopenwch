@@ -50,7 +50,7 @@ LGPL License Terms @ref lgpl_license
  * External triggers are routed through AFIO; the ADC1_ETRGREG and ADC1_ETRGINJ
  * remap bits in AFIO_PCFR1 move the trigger inputs to alternate pins.
  */
-#define ADC1				ADC1_BASE
+#define ADC1 ADC1_BASE
 
 #include <libopenwch/ch32v0/common/adc_common_v1.h>
 

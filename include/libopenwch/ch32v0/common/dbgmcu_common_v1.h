@@ -72,19 +72,19 @@ specific memorymap.h header before including this header file. */
  */
 
 /** Factory chip id word: [15:0] device id, [31:16] revision id. */
-#define DBGMCU_ID_WORD			MMIO32(DBGMCU_ID_BASE)
-#define DBGMCU_ID_DEVICE_MASK		0x0000ffffu
-#define DBGMCU_ID_REVISION_SHIFT	16
+#define DBGMCU_ID_WORD MMIO32(DBGMCU_ID_BASE)
+#define DBGMCU_ID_DEVICE_MASK 0x0000ffffu
+#define DBGMCU_ID_REVISION_SHIFT 16
 
 /* --- CSR 0x7c0 (debug control) bits -------------------------------------- */
 /*
  * These are the values WCH's EVT passes straight to the CSR.  Pass them to
  * dbgmcu_stop_peripheral() rather than writing the register by hand.
  */
-#define DBGMCU_IWDG_STOP		(1 << 0)	/**< IWDG stopped when halted */
-#define DBGMCU_WWDG_STOP		(1 << 1)	/**< WWDG stopped when halted */
-#define DBGMCU_TIM1_STOP		(1 << 4)	/**< TIM1 stopped when halted */
-#define DBGMCU_TIM2_STOP		(1 << 5)	/**< TIM2 stopped when halted */
+#define DBGMCU_IWDG_STOP (1 << 0) /**< IWDG stopped when halted */
+#define DBGMCU_WWDG_STOP (1 << 1) /**< WWDG stopped when halted */
+#define DBGMCU_TIM1_STOP (1 << 4) /**< TIM1 stopped when halted */
+#define DBGMCU_TIM2_STOP (1 << 5) /**< TIM2 stopped when halted */
 
 BEGIN_DECLS
 
@@ -100,8 +100,9 @@ void dbgmcu_set_control(uint32_t value);
  * Stop the given peripheral while the core is halted.  `mask` is one or more
  * DBGMCU_*_STOP bits; pass DBGMCU_ALL_STOP to stop every debuggable one.
  */
-#define DBGMCU_ALL_STOP	(DBGMCU_IWDG_STOP | DBGMCU_WWDG_STOP \
-			| DBGMCU_TIM1_STOP | DBGMCU_TIM2_STOP)
+#define DBGMCU_ALL_STOP                                                        \
+	(DBGMCU_IWDG_STOP | DBGMCU_WWDG_STOP | DBGMCU_TIM1_STOP |              \
+	 DBGMCU_TIM2_STOP)
 
 void dbgmcu_stop_peripheral(uint32_t mask);
 void dbgmcu_resume_peripheral(uint32_t mask);
@@ -111,7 +112,8 @@ END_DECLS
 #endif
 /** @cond */
 #else
-#warning "dbgmcu_common_v1.h should not be included explicitly, only via dbgmcu.h"
+#warning                                                                       \
+    "dbgmcu_common_v1.h should not be included explicitly, only via dbgmcu.h"
 #endif
 /** @endcond */
 /**@}*/

@@ -40,7 +40,7 @@ LGPL License Terms @ref lgpl_license
 /*
  * The CH32V00x has a single window watchdog on APB1, clocked from PCLK1.
  */
-#define WWDG				WWDG_BASE
+#define WWDG WWDG_BASE
 
 #include <libopenwch/ch32v0/common/wwdg_common_v1.h>
 

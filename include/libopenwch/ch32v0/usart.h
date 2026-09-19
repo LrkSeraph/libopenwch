@@ -43,7 +43,7 @@ LGPL License Terms @ref lgpl_license
  * or PD6/PD5 (full).  Configure the pins with gpio_set_mode(..., GPIO_MODE_AF_PP)
  * and select the remap with gpio_primary_remap(GPIO_REMAP_USART1_*).
  */
-#define USART1				USART1_BASE
+#define USART1 USART1_BASE
 
 #include <libopenwch/ch32v0/common/usart_common_v1.h>
 

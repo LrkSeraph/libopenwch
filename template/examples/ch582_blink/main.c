@@ -44,8 +44,8 @@
  * Board wiring.  Change these two lines for your own board.  PB4 is broken
  * out on most CH582/CH583 modules; the LED is active low on the WCH boards.
  */
-#define LED_PORT		GPIOB
-#define LED_PIN			GPIO4
+#define LED_PORT GPIOB
+#define LED_PIN GPIO4
 
 int main(void) {
 	uint32_t sysclk;
@@ -59,7 +59,7 @@ int main(void) {
 
 	/* Use SysTick as the time base: 1 ms ticks. */
 	qingke_systick_set_frequency(sysclk);
-	systick_set_clock_source(1);	/* run from the system clock */
+	systick_set_clock_source(1); /* run from the system clock */
 	systick_clear_interrupt();
 	systick_enable_counter();
 

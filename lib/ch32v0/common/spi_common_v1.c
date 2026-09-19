@@ -46,14 +46,12 @@
 
 /* --- Initialisation ------------------------------------------------------ */
 
-void spi_init_master(
-	uint32_t spi,
-	uint32_t br,
-	uint32_t cpol,
-	uint32_t cpha,
-	uint32_t dff,
-	uint32_t lsbfirst
-) {
+void spi_init_master(uint32_t spi,
+		     uint32_t br,
+		     uint32_t cpol,
+		     uint32_t cpha,
+		     uint32_t dff,
+		     uint32_t lsbfirst) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert(br <= (SPI_CTLR1_BR_MASK >> SPI_CTLR1_BR_SHIFT));
@@ -62,25 +60,21 @@ void spi_init_master(
 	openwch_assert((dff & (uint32_t)~SPI_CTLR1_DFF) == 0);
 	openwch_assert((lsbfirst & (uint32_t)~SPI_CTLR1_LSBFIRST) == 0);
 
-	reg = (uint16_t)((reg & ~(SPI_CTLR1_BR_MASK | SPI_CTLR1_CPOL
-					| SPI_CTLR1_CPHA | SPI_CTLR1_DFF
-					| SPI_CTLR1_LSBFIRST))
-			| ((br << SPI_CTLR1_BR_SHIFT) & SPI_CTLR1_BR_MASK)
-			| (cpol & SPI_CTLR1_CPOL)
-			| (cpha & SPI_CTLR1_CPHA)
-			| (dff & SPI_CTLR1_DFF)
-			| (lsbfirst & SPI_CTLR1_LSBFIRST)
-			| SPI_CTLR1_MSTR);
+	reg = (uint16_t)((reg & ~(SPI_CTLR1_BR_MASK | SPI_CTLR1_CPOL |
+				  SPI_CTLR1_CPHA | SPI_CTLR1_DFF |
+				  SPI_CTLR1_LSBFIRST)) |
+			 ((br << SPI_CTLR1_BR_SHIFT) & SPI_CTLR1_BR_MASK) |
+			 (cpol & SPI_CTLR1_CPOL) | (cpha & SPI_CTLR1_CPHA) |
+			 (dff & SPI_CTLR1_DFF) |
+			 (lsbfirst & SPI_CTLR1_LSBFIRST) | SPI_CTLR1_MSTR);
 	SPI_CTLR1(spi) = reg;
 }
 
-void spi_init_slave(
-	uint32_t spi,
-	uint32_t cpol,
-	uint32_t cpha,
-	uint32_t dff,
-	uint32_t lsbfirst
-) {
+void spi_init_slave(uint32_t spi,
+		    uint32_t cpol,
+		    uint32_t cpha,
+		    uint32_t dff,
+		    uint32_t lsbfirst) {
 	uint16_t reg = SPI_CTLR1(spi);
 
 	openwch_assert((cpol & (uint32_t)~SPI_CTLR1_CPOL) == 0);
@@ -93,13 +87,12 @@ void spi_init_slave(
 	 * driven by the master), so it is cleared along with MSTR to leave the
 	 * peripheral in a well-defined state.
 	 */
-	reg = (uint16_t)((reg & ~(SPI_CTLR1_BR_MASK | SPI_CTLR1_CPOL
-					| SPI_CTLR1_CPHA | SPI_CTLR1_DFF
-					| SPI_CTLR1_LSBFIRST | SPI_CTLR1_MSTR))
-			| (cpol & SPI_CTLR1_CPOL)
-			| (cpha & SPI_CTLR1_CPHA)
-			| (dff & SPI_CTLR1_DFF)
-			| (lsbfirst & SPI_CTLR1_LSBFIRST));
+	reg =
+	    (uint16_t)((reg & ~(SPI_CTLR1_BR_MASK | SPI_CTLR1_CPOL |
+				SPI_CTLR1_CPHA | SPI_CTLR1_DFF |
+				SPI_CTLR1_LSBFIRST | SPI_CTLR1_MSTR)) |
+		       (cpol & SPI_CTLR1_CPOL) | (cpha & SPI_CTLR1_CPHA) |
+		       (dff & SPI_CTLR1_DFF) | (lsbfirst & SPI_CTLR1_LSBFIRST));
 	SPI_CTLR1(spi) = reg;
 }
 
@@ -148,8 +141,8 @@ void spi_set_baudrate_prescaler(uint32_t spi, uint32_t br) {
 
 	openwch_assert(br <= (SPI_CTLR1_BR_MASK >> SPI_CTLR1_BR_SHIFT));
 
-	reg = (uint16_t)((reg & ~SPI_CTLR1_BR_MASK)
-			| ((br << SPI_CTLR1_BR_SHIFT) & SPI_CTLR1_BR_MASK));
+	reg = (uint16_t)((reg & ~SPI_CTLR1_BR_MASK) |
+			 ((br << SPI_CTLR1_BR_SHIFT) & SPI_CTLR1_BR_MASK));
 	SPI_CTLR1(spi) = reg;
 }
 
@@ -185,8 +178,8 @@ void spi_set_bit_order(uint32_t spi, uint32_t order) {
 
 	openwch_assert((order & (uint32_t)~SPI_CTLR1_LSBFIRST) == 0);
 
-	reg = (uint16_t)((reg & ~SPI_CTLR1_LSBFIRST)
-			| (order & SPI_CTLR1_LSBFIRST));
+	reg = (uint16_t)((reg & ~SPI_CTLR1_LSBFIRST) |
+			 (order & SPI_CTLR1_LSBFIRST));
 	SPI_CTLR1(spi) = reg;
 }
 

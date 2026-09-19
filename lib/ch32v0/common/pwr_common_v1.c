@@ -54,8 +54,8 @@ void pwr_disable_pvd(uint32_t pwr) {
 }
 
 void pwr_set_pvd_level(uint32_t pwr, enum pwr_pvd_level level) {
-	PWR_CTLR(pwr) = (PWR_CTLR(pwr) & ~PWR_CTLR_PLS_MASK)
-			| ((uint32_t)level & PWR_CTLR_PLS_MASK);
+	PWR_CTLR(pwr) = (PWR_CTLR(pwr) & ~PWR_CTLR_PLS_MASK) |
+			((uint32_t)level & PWR_CTLR_PLS_MASK);
 }
 
 void pwr_enable_auto_wakeup(uint32_t pwr) {
@@ -67,15 +67,15 @@ void pwr_disable_auto_wakeup(uint32_t pwr) {
 }
 
 void pwr_set_awu_prescaler(uint32_t pwr, enum pwr_awu_prescaler prescaler) {
-	PWR_AWUPSC(pwr) = (PWR_AWUPSC(pwr) & ~PWR_AWUPSC_MASK)
-			| ((uint32_t)prescaler & PWR_AWUPSC_MASK);
+	PWR_AWUPSC(pwr) = (PWR_AWUPSC(pwr) & ~PWR_AWUPSC_MASK) |
+			  ((uint32_t)prescaler & PWR_AWUPSC_MASK);
 }
 
 void pwr_set_awu_window(uint32_t pwr, uint8_t window) {
 	openwch_assert((window & ~PWR_AWUWR_MASK) == 0);
 
-	PWR_AWUWR(pwr) = (PWR_AWUWR(pwr) & ~PWR_AWUWR_MASK)
-			| ((uint32_t)window & PWR_AWUWR_MASK);
+	PWR_AWUWR(pwr) = (PWR_AWUWR(pwr) & ~PWR_AWUWR_MASK) |
+			 ((uint32_t)window & PWR_AWUWR_MASK);
 }
 
 void pwr_enter_standby_mode(uint32_t pwr) {
@@ -83,7 +83,7 @@ void pwr_enter_standby_mode(uint32_t pwr) {
 
 	/* SLEEPDEEP selects standby rather than sleep on the WFI below. */
 	PFIC->sctlr |= PFIC_SCTLR_SLEEPDEEP;
-	__asm__ volatile ("wfi");
+	__asm__ volatile("wfi");
 	PFIC->sctlr &= ~PFIC_SCTLR_SLEEPDEEP;
 }
 

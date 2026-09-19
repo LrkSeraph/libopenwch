@@ -60,37 +60,36 @@
 /* --- Field encodings used only by the low-power paths -------------------- */
 
 /* R8_XT32M_TUNE.RB_XT32M_I_BIAS: 0b11 = 150% of the nominal bias current. */
-#define PWR_XT32M_I_BIAS_MASK		0x03u
-#define PWR_XT32M_I_BIAS_150		0x03u
+#define PWR_XT32M_I_BIAS_MASK 0x03u
+#define PWR_XT32M_I_BIAS_150 0x03u
 
 /* R8_XT32K_TUNE.RB_XT32K_I_TUNE: 0b01 = standard current. */
-#define PWR_XT32K_I_TUNE_MASK		0x03u
-#define PWR_XT32K_I_TUNE_STANDARD	0x01u
+#define PWR_XT32K_I_TUNE_MASK 0x03u
+#define PWR_XT32K_I_TUNE_STANDARD 0x01u
 
 /* R8_PLL_CONFIG.RB_PLL_HALT: 1 = PLL halted for low power. */
-#define PWR_PLL_HALT			(1u << 5)
+#define PWR_PLL_HALT (1u << 5)
 
 /* R8_FLASH_CTRL value that parks the flash controller, as used by the EVT. */
-#define PWR_FLASH_PWR_DOWN		0x04u
+#define PWR_FLASH_PWR_DOWN 0x04u
 
 /* R16_RTC_CNT_32K above this count means more than about 500 ms of RTC
  * history, at which point the LSE can drop back to its standard drive. */
-#define PWR_RTC_32K_500MS		0x3fffu
+#define PWR_RTC_32K_500MS 0x3fffu
 
 /** The 32 kHz countdown register value that disables the internal RC trim. */
-#define PWR_INT32K_TUNE_OFF		0xffffu
+#define PWR_INT32K_TUNE_OFF 0xffffu
 
 /*
  * Wait for an event.  always_inline is required, not a hint: the call sites
  * are in .highcode and must not jump into flash while the flash is parked.
  */
-__attribute__((always_inline))
-static inline void pwr_wfi(void) {
-	__asm__ volatile ("wfi");
+__attribute__((always_inline)) static inline void pwr_wfi(void) {
+	__asm__ volatile("wfi");
 }
 
 /* Masks for the two R8_SLP_* registers the wake-up code touches. */
-#define PWR_SLP_WAKE_DLY_MASK		0x03u
+#define PWR_SLP_WAKE_DLY_MASK 0x03u
 
 /* --- DC/DC converter ----------------------------------------------------- */
 

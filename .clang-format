@@ -1,26 +1,42 @@
 # libopenwch formatting
 #
-# The rules that matter are enforced by `make stylecheck` (scripts/checkpatch.pl,
-# house rules patched in); this file exists so that editors and clang-format
-# agree with it.
+# clang-format is the authority on formatting.  It runs from the pre-commit
+# hook (.githooks/pre-commit, installed with `make hooks`) and never in CI.
+# The tree is kept clang-format clean, so `clang-format --dry-run -Werror`
+# over any tracked .c/.h file should report nothing.
 #
-# House style for function definitions:
+# What that produces for function definitions:
 #
 #     int foo(int a) {
 #     }
 #
-#     __attribute__((xxx))
-#     void bar(
-#     	int a,
-#     	int b
-#     ) {
+# and, when a signature does not fit in 80 columns, a break after the
+# declaration specifiers with the parameters aligned under the open paren:
+#
+#     __attribute__((weak)) void
+#     bar(int aaaaaaaaaaaaaaaaaaaaaaaaaa,
+#         int bbbbbbbbbbbbbbbbbbbbbbbbbb) {
 #     	foo(a);
 #     }
 #
-# clang-format cannot express the closing ") {" on a line of its own, so treat
-# `make stylecheck` as the authority and this file as a best effort.
+# Two things clang-format cannot express, which were therefore given up when
+# it became the formatter:
+#
+#   * a closing ") {" on a line of its own -- no such option exists, so
+#     parameters align under the open paren and ')' stays on the last one;
+#   * GNU __attribute__((...)) on a line of its own -- BreakAfterAttributes
+#     below applies to C++ [[...]] attributes and leaves GNU ones attached.
 #
 # BreakAfterAttributes needs clang-format 17 or newer; older releases ignore it.
+#
+# Generated sources are excluded on purpose -- both the pre-commit hook and
+# `make stylecheck` skip include/libopenwch/*/nvic.h, lib/*/vector_handlers.c,
+# lib/*/vector_names.c and include/libopencmsis/*/irqhandlers.h.  They are
+# untracked build artifacts produced by scripts/irq2nvic_h, and having the
+# generator shell out to clang-format would make the build depend on whether
+# clang-format happens to be installed.  The generator emits its own layout,
+# which is also a good deal more readable for the generated tables than the
+# packed grid clang-format would produce.
 BasedOnStyle: LLVM
 IndentWidth: 8
 TabWidth: 8

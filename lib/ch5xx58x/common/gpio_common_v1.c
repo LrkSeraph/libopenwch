@@ -143,8 +143,8 @@ static volatile uint16_t *gpio_irq_flag_reg(uint32_t gpioport) {
  *
  * WCH's EVT does the same shift: (pin & (Pin_22 | Pin_23)) >> 14.
  */
-#define GPIO_IRQ_ALIAS_PINS	(GPIO22 | GPIO23)
-#define GPIO_IRQ_ALIAS_SHIFT	14
+#define GPIO_IRQ_ALIAS_PINS (GPIO22 | GPIO23)
+#define GPIO_IRQ_ALIAS_SHIFT 14
 
 static uint32_t gpio_irq_fold(uint32_t gpioport, uint32_t gpios) {
 	if (gpioport != GPIOB_BASE) {
@@ -160,8 +160,8 @@ static uint32_t gpio_irq_fold(uint32_t gpioport, uint32_t gpios) {
 		return gpios;
 	}
 
-	return (gpios & ~GPIO_IRQ_ALIAS_PINS)
-		| ((gpios & GPIO_IRQ_ALIAS_PINS) >> GPIO_IRQ_ALIAS_SHIFT);
+	return (gpios & ~GPIO_IRQ_ALIAS_PINS) |
+	       ((gpios & GPIO_IRQ_ALIAS_PINS) >> GPIO_IRQ_ALIAS_SHIFT);
 }
 
 void gpio_set_irq_mode(uint32_t gpioport, uint32_t gpios, uint32_t mode) {

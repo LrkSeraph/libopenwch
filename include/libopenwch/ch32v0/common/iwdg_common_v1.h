@@ -53,20 +53,20 @@ specific memorymap.h header before including this header file. */
 /* --- Register accessors -------------------------------------------------- */
 
 /* Key register (IWDG_CTLR) */
-#define IWDG_CTLR(iwdg)			MMIO32((iwdg) + 0x00)
+#define IWDG_CTLR(iwdg) MMIO32((iwdg) + 0x00)
 /* Prescaler register (IWDG_PSCR) */
-#define IWDG_PSCR(iwdg)			MMIO32((iwdg) + 0x04)
+#define IWDG_PSCR(iwdg) MMIO32((iwdg) + 0x04)
 /* Reload register (IWDG_RLDR) */
-#define IWDG_RLDR(iwdg)			MMIO32((iwdg) + 0x08)
+#define IWDG_RLDR(iwdg) MMIO32((iwdg) + 0x08)
 /* Status register (IWDG_STATR) */
-#define IWDG_STATR(iwdg)		MMIO32((iwdg) + 0x0c)
+#define IWDG_STATR(iwdg) MMIO32((iwdg) + 0x0c)
 
 /* --- Key values ---------------------------------------------------------- */
 
-#define IWDG_KEY_WRITE_ACCESS_ENABLE	((uint16_t)0x5555)
-#define IWDG_KEY_WRITE_ACCESS_DISABLE	((uint16_t)0x0000)
-#define IWDG_KEY_RELOAD			((uint16_t)0xaaaa)
-#define IWDG_KEY_ENABLE			((uint16_t)0xcccc)
+#define IWDG_KEY_WRITE_ACCESS_ENABLE ((uint16_t)0x5555)
+#define IWDG_KEY_WRITE_ACCESS_DISABLE ((uint16_t)0x0000)
+#define IWDG_KEY_RELOAD ((uint16_t)0xaaaa)
+#define IWDG_KEY_ENABLE ((uint16_t)0xcccc)
 
 /* --- Prescaler values ---------------------------------------------------- */
 
@@ -74,27 +74,27 @@ specific memorymap.h header before including this header file. */
 @ingroup iwdg_defines
 
 @{*/
-#define IWDG_PSCR_DIV4			0x0
-#define IWDG_PSCR_DIV8			0x1
-#define IWDG_PSCR_DIV16			0x2
-#define IWDG_PSCR_DIV32			0x3
-#define IWDG_PSCR_DIV64			0x4
-#define IWDG_PSCR_DIV128		0x5
-#define IWDG_PSCR_DIV256		0x6
+#define IWDG_PSCR_DIV4 0x0
+#define IWDG_PSCR_DIV8 0x1
+#define IWDG_PSCR_DIV16 0x2
+#define IWDG_PSCR_DIV32 0x3
+#define IWDG_PSCR_DIV64 0x4
+#define IWDG_PSCR_DIV128 0x5
+#define IWDG_PSCR_DIV256 0x6
 /**@}*/
 
-#define IWDG_PSCR_PR_MASK		0x7u
-#define IWDG_RLDR_RL_MASK		0x0fffu
+#define IWDG_PSCR_PR_MASK 0x7u
+#define IWDG_RLDR_RL_MASK 0x0fffu
 
 /* --- IWDG_STATR bits ----------------------------------------------------- */
 
-#define IWDG_STATR_PVU			(1 << 0)	/**< prescaler update */
-#define IWDG_STATR_RVU			(1 << 1)	/**< reload update */
+#define IWDG_STATR_PVU (1 << 0) /**< prescaler update */
+#define IWDG_STATR_RVU (1 << 1) /**< reload update */
 
 /* --- Flag masks ---------------------------------------------------------- */
 
-#define IWDG_FLAG_PVU			IWDG_STATR_PVU
-#define IWDG_FLAG_RVU			IWDG_STATR_RVU
+#define IWDG_FLAG_PVU IWDG_STATR_PVU
+#define IWDG_FLAG_RVU IWDG_STATR_RVU
 
 BEGIN_DECLS
 

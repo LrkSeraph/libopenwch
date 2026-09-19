@@ -67,14 +67,14 @@ LGPL License Terms @ref lgpl_license
  */
 
 /* Safe-access signature bytes, written in this order. */
-#define SAFE_ACCESS_SIG1		0x57
-#define SAFE_ACCESS_SIG2		0xa8
-#define SAFE_ACCESS_SIG0		0x00
+#define SAFE_ACCESS_SIG1 0x57
+#define SAFE_ACCESS_SIG2 0xa8
+#define SAFE_ACCESS_SIG0 0x00
 
 /* Status bits readable back from R8_SAFE_ACCESS_SIG. */
-#define RWA_STATUS_MODE			0x03	/**< 0b11 = unlocked */
-#define RWA_STATUS_ACT			0x08	/**< 1 = writes accepted */
-#define RWA_STATUS_TIMER		0x70	/**< remaining window */
+#define RWA_STATUS_MODE 0x03  /**< 0b11 = unlocked */
+#define RWA_STATUS_ACT 0x08   /**< 1 = writes accepted */
+#define RWA_STATUS_TIMER 0x70 /**< remaining window */
 
 /*
  * always_inline is REQUIRED, not an optimisation hint.
@@ -86,7 +86,7 @@ LGPL License Terms @ref lgpl_license
  * on a slow clock certainly does not.  Inlining keeps the store a few
  * instructions behind the signature.
  */
-#define RWA_INLINE	__attribute__((always_inline)) static inline
+#define RWA_INLINE __attribute__((always_inline)) static inline
 
 BEGIN_DECLS
 
@@ -151,46 +151,46 @@ void rwa_close(void);
  */
 
 /** Write `value` to the RWA register `reg`. */
-#define RWA_WRITE(reg, value) \
-	do { \
-		uint32_t rwa_saved_ = rwa_unlock(); \
-		(reg) = (value); \
-		rwa_lock(rwa_saved_); \
+#define RWA_WRITE(reg, value)                                                  \
+	do {                                                                   \
+		uint32_t rwa_saved_ = rwa_unlock();                            \
+		(reg) = (value);                                               \
+		rwa_lock(rwa_saved_);                                          \
 	} while (0)
 
 /** Set the bits of `bits` in the RWA register `reg`. */
-#define RWA_SET_BITS(reg, bits) \
-	do { \
-		uint32_t rwa_saved_ = rwa_unlock(); \
-		(reg) |= (bits); \
-		rwa_lock(rwa_saved_); \
+#define RWA_SET_BITS(reg, bits)                                                \
+	do {                                                                   \
+		uint32_t rwa_saved_ = rwa_unlock();                            \
+		(reg) |= (bits);                                               \
+		rwa_lock(rwa_saved_);                                          \
 	} while (0)
 
 /** Clear the bits of `bits` in the RWA register `reg`. */
-#define RWA_CLEAR_BITS(reg, bits) \
-	do { \
-		uint32_t rwa_saved_ = rwa_unlock(); \
-		(reg) &= ~(bits); \
-		rwa_lock(rwa_saved_); \
+#define RWA_CLEAR_BITS(reg, bits)                                              \
+	do {                                                                   \
+		uint32_t rwa_saved_ = rwa_unlock();                            \
+		(reg) &= ~(bits);                                              \
+		rwa_lock(rwa_saved_);                                          \
 	} while (0)
 
 /** Read-modify-write: replace `mask` in `reg` with `value`. */
-#define RWA_MODIFY(reg, mask, value) \
-	do { \
-		uint32_t rwa_saved_ = rwa_unlock(); \
-		uint32_t rwa_tmp_ = (reg); \
-		rwa_tmp_ = (rwa_tmp_ & ~(uint32_t)(mask)) | \
-			   ((uint32_t)(value) & (uint32_t)(mask)); \
-		(reg) = rwa_tmp_; \
-		rwa_lock(rwa_saved_); \
+#define RWA_MODIFY(reg, mask, value)                                           \
+	do {                                                                   \
+		uint32_t rwa_saved_ = rwa_unlock();                            \
+		uint32_t rwa_tmp_ = (reg);                                     \
+		rwa_tmp_ = (rwa_tmp_ & ~(uint32_t)(mask)) |                    \
+			   ((uint32_t)(value) & (uint32_t)(mask));             \
+		(reg) = rwa_tmp_;                                              \
+		rwa_lock(rwa_saved_);                                          \
 	} while (0)
 
 /** 8-bit RWA write, for the byte-wide views of the same registers. */
-#define RWA_WRITE8(reg, value) \
-	do { \
-		uint32_t rwa_saved_ = rwa_unlock(); \
-		(reg) = (value); \
-		rwa_lock(rwa_saved_); \
+#define RWA_WRITE8(reg, value)                                                 \
+	do {                                                                   \
+		uint32_t rwa_saved_ = rwa_unlock();                            \
+		(reg) = (value);                                               \
+		rwa_lock(rwa_saved_);                                          \
 	} while (0)
 
 #endif

@@ -46,8 +46,8 @@ LGPL License Terms @ref lgpl_license
  * still passed explicitly to keep the driver usable from code that only knows
  * the SYS window.
  */
-#define ADC_BASE			SYS_BASE
-#define ADC				ADC_BASE
+#define ADC_BASE SYS_BASE
+#define ADC ADC_BASE
 
 #include <libopenwch/ch5xx58x/common/adc_common_v1.h>
 

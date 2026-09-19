@@ -126,7 +126,9 @@ void qingke_delay_us(uint32_t us) {
 		/* ticks = us * freq / 1000000, done without a 64-bit divide. */
 		uint64_t ticks = ((uint64_t)us * systick_freq) / 1000000u;
 		while (ticks > 0) {
-			uint32_t chunk = (ticks > 0x7fffffffu) ? 0x7fffffffu : (uint32_t)ticks;
+			uint32_t chunk = (ticks > 0x7fffffffu)
+					     ? 0x7fffffffu
+					     : (uint32_t)ticks;
 			systick_wait_ticks(chunk);
 			ticks -= chunk;
 		}

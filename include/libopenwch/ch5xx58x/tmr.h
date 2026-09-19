@@ -38,10 +38,10 @@ LGPL License Terms @ref lgpl_license
 #include <libopenwch/ch5xx58x/memorymap.h>
 
 /* Four identical timer blocks, each with one PWM/capture pin. */
-#define TMR0				TMR0_BASE
-#define TMR1				TMR1_BASE
-#define TMR2				TMR2_BASE
-#define TMR3				TMR3_BASE
+#define TMR0 TMR0_BASE
+#define TMR1 TMR1_BASE
+#define TMR2 TMR2_BASE
+#define TMR3 TMR3_BASE
 
 #include <libopenwch/ch5xx58x/common/tmr_common_v1.h>
 

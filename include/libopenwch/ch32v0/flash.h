@@ -42,7 +42,7 @@ LGPL License Terms @ref lgpl_license
  * The flash itself is visible at the start of the address space (and aliased
  * at 0x08000000); the option byte block is at OB_BASE.
  */
-#define FLASH				FLASH_R_BASE
+#define FLASH FLASH_R_BASE
 
 #include <libopenwch/ch32v0/common/flash_common_v1.h>
 

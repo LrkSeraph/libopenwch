@@ -63,76 +63,76 @@ LGPL License Terms @ref lgpl_license
 /* --- Register offsets ---------------------------------------------------- */
 
 /** Modem control, 8-bit. */
-#define UART_MCR_OFFSET			0x00
+#define UART_MCR_OFFSET 0x00
 /** Interrupt enable, 8-bit. */
-#define UART_IER_OFFSET			0x01
+#define UART_IER_OFFSET 0x01
 /** FIFO control, 8-bit. */
-#define UART_FCR_OFFSET			0x02
+#define UART_FCR_OFFSET 0x02
 /** Line control, 8-bit. */
-#define UART_LCR_OFFSET			0x03
+#define UART_LCR_OFFSET 0x03
 /** Interrupt identification, 8-bit, read only. */
-#define UART_IIR_OFFSET			0x04
+#define UART_IIR_OFFSET 0x04
 /** Line status, 8-bit, read only. */
-#define UART_LSR_OFFSET			0x05
+#define UART_LSR_OFFSET 0x05
 /** Modem status, 8-bit, read only. */
-#define UART_MSR_OFFSET			0x06
+#define UART_MSR_OFFSET 0x06
 /** Receiver buffer, 8-bit, read only. */
-#define UART_RBR_OFFSET			0x08
+#define UART_RBR_OFFSET 0x08
 /** Transmitter holding, 8-bit, write only. */
-#define UART_THR_OFFSET			0x08
+#define UART_THR_OFFSET 0x08
 /** Receiver FIFO count, 8-bit, read only. */
-#define UART_RFC_OFFSET			0x0a
+#define UART_RFC_OFFSET 0x0a
 /** Transmitter FIFO count, 8-bit, read only. */
-#define UART_TFC_OFFSET			0x0b
+#define UART_TFC_OFFSET 0x0b
 /** Divisor latch, LSB, 8-bit. */
-#define UART_DLL_OFFSET			0x0c
+#define UART_DLL_OFFSET 0x0c
 /** Divisor latch, MSB, 8-bit. */
-#define UART_DLM_OFFSET			0x0d
+#define UART_DLM_OFFSET 0x0d
 /** Divisor latch, 16-bit view over DLL and DLM. */
-#define UART_DL_OFFSET			0x0c
+#define UART_DL_OFFSET 0x0c
 /** Pre-divisor latch, 8-bit, low seven bits, 1..128. */
-#define UART_DIV_OFFSET			0x0e
+#define UART_DIV_OFFSET 0x0e
 /** Slave address, 8-bit; 0xff disables address matching. */
-#define UART_ADR_OFFSET			0x0f
+#define UART_ADR_OFFSET 0x0f
 
 /* --- Register accessors -------------------------------------------------- */
 
-#define UART_MCR(uart)			MMIO8((uart) + UART_MCR_OFFSET)
-#define UART_IER(uart)			MMIO8((uart) + UART_IER_OFFSET)
-#define UART_FCR(uart)			MMIO8((uart) + UART_FCR_OFFSET)
-#define UART_LCR(uart)			MMIO8((uart) + UART_LCR_OFFSET)
-#define UART_IIR(uart)			MMIO8((uart) + UART_IIR_OFFSET)
-#define UART_LSR(uart)			MMIO8((uart) + UART_LSR_OFFSET)
-#define UART_MSR(uart)			MMIO8((uart) + UART_MSR_OFFSET)
-#define UART_RBR(uart)			MMIO8((uart) + UART_RBR_OFFSET)
-#define UART_THR(uart)			MMIO8((uart) + UART_THR_OFFSET)
-#define UART_RFC(uart)			MMIO8((uart) + UART_RFC_OFFSET)
-#define UART_TFC(uart)			MMIO8((uart) + UART_TFC_OFFSET)
-#define UART_DLL(uart)			MMIO8((uart) + UART_DLL_OFFSET)
-#define UART_DLM(uart)			MMIO8((uart) + UART_DLM_OFFSET)
-#define UART_DL(uart)			MMIO16((uart) + UART_DL_OFFSET)
-#define UART_DIV(uart)			MMIO8((uart) + UART_DIV_OFFSET)
-#define UART_ADR(uart)			MMIO8((uart) + UART_ADR_OFFSET)
+#define UART_MCR(uart) MMIO8((uart) + UART_MCR_OFFSET)
+#define UART_IER(uart) MMIO8((uart) + UART_IER_OFFSET)
+#define UART_FCR(uart) MMIO8((uart) + UART_FCR_OFFSET)
+#define UART_LCR(uart) MMIO8((uart) + UART_LCR_OFFSET)
+#define UART_IIR(uart) MMIO8((uart) + UART_IIR_OFFSET)
+#define UART_LSR(uart) MMIO8((uart) + UART_LSR_OFFSET)
+#define UART_MSR(uart) MMIO8((uart) + UART_MSR_OFFSET)
+#define UART_RBR(uart) MMIO8((uart) + UART_RBR_OFFSET)
+#define UART_THR(uart) MMIO8((uart) + UART_THR_OFFSET)
+#define UART_RFC(uart) MMIO8((uart) + UART_RFC_OFFSET)
+#define UART_TFC(uart) MMIO8((uart) + UART_TFC_OFFSET)
+#define UART_DLL(uart) MMIO8((uart) + UART_DLL_OFFSET)
+#define UART_DLM(uart) MMIO8((uart) + UART_DLM_OFFSET)
+#define UART_DL(uart) MMIO16((uart) + UART_DL_OFFSET)
+#define UART_DIV(uart) MMIO8((uart) + UART_DIV_OFFSET)
+#define UART_ADR(uart) MMIO8((uart) + UART_ADR_OFFSET)
 
 /** FIFO depth, in bytes. */
-#define UART_FIFO_SIZE			8
+#define UART_FIFO_SIZE 8
 /** Largest RX FIFO trigger level the hardware offers. */
-#define UART_RECV_RDY_SZ		7
+#define UART_RECV_RDY_SZ 7
 
 /* --- MCR bits ------------------------------------------------------------ */
 
 /** @defgroup uart_mcr_bits UART modem control bits
 @ingroup uart_defines
 @{*/
-#define RB_MCR_DTR			0x01	/**< data terminal ready */
-#define RB_MCR_RTS			0x02	/**< request to send */
-#define RB_MCR_OUT1			0x04	/**< general-purpose output 1 */
-#define RB_MCR_OUT2			0x08	/**< general-purpose output 2 */
-#define RB_MCR_INT_OE			0x08	/**< interrupt output enable */
-#define RB_MCR_LOOP			0x10	/**< local loopback */
-#define RB_MCR_AU_FLOW_EN		0x20	/**< automatic flow control */
-#define RB_MCR_TNOW			0x40	/**< TNOW on the DTR pin */
-#define RB_MCR_HALF			0x80	/**< half duplex */
+#define RB_MCR_DTR 0x01	       /**< data terminal ready */
+#define RB_MCR_RTS 0x02	       /**< request to send */
+#define RB_MCR_OUT1 0x04       /**< general-purpose output 1 */
+#define RB_MCR_OUT2 0x08       /**< general-purpose output 2 */
+#define RB_MCR_INT_OE 0x08     /**< interrupt output enable */
+#define RB_MCR_LOOP 0x10       /**< local loopback */
+#define RB_MCR_AU_FLOW_EN 0x20 /**< automatic flow control */
+#define RB_MCR_TNOW 0x40       /**< TNOW on the DTR pin */
+#define RB_MCR_HALF 0x80       /**< half duplex */
 /**@}*/
 
 /* --- IER bits ------------------------------------------------------------ */
@@ -140,14 +140,14 @@ LGPL License Terms @ref lgpl_license
 /** @defgroup uart_ier_bits UART interrupt enable bits
 @ingroup uart_defines
 @{*/
-#define RB_IER_RECV_RDY			0x01	/**< receiver data available */
-#define RB_IER_THR_EMPTY		0x02	/**< transmitter holding empty */
-#define RB_IER_LINE_STAT		0x04	/**< receiver line status */
-#define RB_IER_MODEM_CHG		0x08	/**< modem status change (UART0 only) */
-#define RB_IER_DTR_EN			0x10	/**< DTR/TNOW output pin enable */
-#define RB_IER_RTS_EN			0x20	/**< RTS output pin enable */
-#define RB_IER_TXD_EN			0x40	/**< TXD output pin enable */
-#define RB_IER_RESET			0x80	/**< write-only self-clearing reset */
+#define RB_IER_RECV_RDY 0x01  /**< receiver data available */
+#define RB_IER_THR_EMPTY 0x02 /**< transmitter holding empty */
+#define RB_IER_LINE_STAT 0x04 /**< receiver line status */
+#define RB_IER_MODEM_CHG 0x08 /**< modem status change (UART0 only) */
+#define RB_IER_DTR_EN 0x10    /**< DTR/TNOW output pin enable */
+#define RB_IER_RTS_EN 0x20    /**< RTS output pin enable */
+#define RB_IER_TXD_EN 0x40    /**< TXD output pin enable */
+#define RB_IER_RESET 0x80     /**< write-only self-clearing reset */
 /**@}*/
 
 /* --- FCR bits and fields ------------------------------------------------- */
@@ -155,10 +155,10 @@ LGPL License Terms @ref lgpl_license
 /** @defgroup uart_fcr_bits UART FIFO control bits
 @ingroup uart_defines
 @{*/
-#define RB_FCR_FIFO_EN			0x01	/**< FIFO mode enable */
-#define RB_FCR_RX_FIFO_CLR		0x02	/**< self-clearing RX FIFO flush */
-#define RB_FCR_TX_FIFO_CLR		0x04	/**< self-clearing TX FIFO flush */
-#define RB_FCR_FIFO_TRIG		0xc0	/**< bits 7:6, RX FIFO trigger level */
+#define RB_FCR_FIFO_EN 0x01	/**< FIFO mode enable */
+#define RB_FCR_RX_FIFO_CLR 0x02 /**< self-clearing RX FIFO flush */
+#define RB_FCR_TX_FIFO_CLR 0x04 /**< self-clearing TX FIFO flush */
+#define RB_FCR_FIFO_TRIG 0xc0	/**< bits 7:6, RX FIFO trigger level */
 /**@}*/
 
 /* --- LCR bits and fields ------------------------------------------------- */
@@ -166,11 +166,11 @@ LGPL License Terms @ref lgpl_license
 /** @defgroup uart_lcr_bits UART line control bits
 @ingroup uart_defines
 @{*/
-#define RB_LCR_WORD_SZ			0x03	/**< bits 1:0, word length */
-#define RB_LCR_STOP_BIT			0x04	/**< 0 = 1 stop bit, 1 = 2 stop bits */
-#define RB_LCR_PAR_EN			0x08	/**< parity enable */
-#define RB_LCR_PAR_MOD			0x30	/**< bits 5:4, parity mode */
-#define RB_LCR_BREAK_EN			0x40	/**< break control */
+#define RB_LCR_WORD_SZ 0x03  /**< bits 1:0, word length */
+#define RB_LCR_STOP_BIT 0x04 /**< 0 = 1 stop bit, 1 = 2 stop bits */
+#define RB_LCR_PAR_EN 0x08   /**< parity enable */
+#define RB_LCR_PAR_MOD 0x30  /**< bits 5:4, parity mode */
+#define RB_LCR_BREAK_EN 0x40 /**< break control */
 /**@}*/
 
 /*
@@ -178,19 +178,19 @@ LGPL License Terms @ref lgpl_license
  * 00 = odd, 01 = even, 10 = mark, 11 = space.  Only meaningful while
  * RB_LCR_PAR_EN is set.
  */
-#define RB_LCR_PAR_MOD_ODD		0x00
-#define RB_LCR_PAR_MOD_EVEN		0x10
-#define RB_LCR_PAR_MOD_MARK		0x20
-#define RB_LCR_PAR_MOD_SPACE		0x30
+#define RB_LCR_PAR_MOD_ODD 0x00
+#define RB_LCR_PAR_MOD_EVEN 0x10
+#define RB_LCR_PAR_MOD_MARK 0x20
+#define RB_LCR_PAR_MOD_SPACE 0x30
 
 /* --- IIR bits and interrupt identifications ------------------------------ */
 
 /** @defgroup uart_iir_bits UART interrupt identification bits
 @ingroup uart_defines
 @{*/
-#define RB_IIR_NO_INT			0x01	/**< 1 = no interrupt is pending */
-#define RB_IIR_INT_MASK			0x0f	/**< interrupt identification mask */
-#define RB_IIR_FIFO_ID			0xc0	/**< FIFO mode indicator */
+#define RB_IIR_NO_INT 0x01   /**< 1 = no interrupt is pending */
+#define RB_IIR_INT_MASK 0x0f /**< interrupt identification mask */
+#define RB_IIR_FIFO_ID 0xc0  /**< FIFO mode indicator */
 /**@}*/
 
 /** @defgroup uart_irq_id UART interrupt identification values
@@ -198,13 +198,13 @@ LGPL License Terms @ref lgpl_license
 
 The low nibble of UART_IIR(), masked with RB_IIR_INT_MASK, is one of these.
 @{*/
-#define UART_II_MODEM_CHANGE		0x00	/**< modem status change (UART0) */
-#define UART_II_THR_EMPTY		0x02	/**< transmitter holding empty */
-#define UART_II_RX_READY		0x04	/**< receiver data available */
-#define UART_II_RX_TIMEOUT		0x0c	/**< receiver FIFO timeout */
-#define UART_II_LINE_STATUS		0x06	/**< receiver line status */
-#define UART_II_SLAVE_ADDR		0x0e	/**< slave address match */
-#define UART_II_NO_INTERRUPT		0x01	/**< no interrupt pending */
+#define UART_II_MODEM_CHANGE 0x00 /**< modem status change (UART0) */
+#define UART_II_THR_EMPTY 0x02	  /**< transmitter holding empty */
+#define UART_II_RX_READY 0x04	  /**< receiver data available */
+#define UART_II_RX_TIMEOUT 0x0c	  /**< receiver FIFO timeout */
+#define UART_II_LINE_STATUS 0x06  /**< receiver line status */
+#define UART_II_SLAVE_ADDR 0x0e	  /**< slave address match */
+#define UART_II_NO_INTERRUPT 0x01 /**< no interrupt pending */
 /**@}*/
 
 /* --- LSR bits ------------------------------------------------------------ */
@@ -212,14 +212,14 @@ The low nibble of UART_IIR(), masked with RB_IIR_INT_MASK, is one of these.
 /** @defgroup uart_lsr_bits UART line status bits
 @ingroup uart_defines
 @{*/
-#define RB_LSR_DATA_RDY			0x01	/**< receiver FIFO has data */
-#define RB_LSR_OVER_ERR			0x02	/**< receiver overrun, read-clear */
-#define RB_LSR_PAR_ERR			0x04	/**< parity error, read-clear */
-#define RB_LSR_FRAME_ERR		0x08	/**< framing error, read-clear */
-#define RB_LSR_BREAK_ERR		0x10	/**< break received, read-clear */
-#define RB_LSR_TX_FIFO_EMP		0x20	/**< transmitter FIFO empty */
-#define RB_LSR_TX_ALL_EMP		0x40	/**< transmitter completely empty */
-#define RB_LSR_ERR_RX_FIFO		0x80	/**< an error sits in the RX FIFO */
+#define RB_LSR_DATA_RDY 0x01	/**< receiver FIFO has data */
+#define RB_LSR_OVER_ERR 0x02	/**< receiver overrun, read-clear */
+#define RB_LSR_PAR_ERR 0x04	/**< parity error, read-clear */
+#define RB_LSR_FRAME_ERR 0x08	/**< framing error, read-clear */
+#define RB_LSR_BREAK_ERR 0x10	/**< break received, read-clear */
+#define RB_LSR_TX_FIFO_EMP 0x20 /**< transmitter FIFO empty */
+#define RB_LSR_TX_ALL_EMP 0x40	/**< transmitter completely empty */
+#define RB_LSR_ERR_RX_FIFO 0x80 /**< an error sits in the RX FIFO */
 /**@}*/
 
 /* --- MSR bits ------------------------------------------------------------ */
@@ -227,10 +227,10 @@ The low nibble of UART_IIR(), masked with RB_IIR_INT_MASK, is one of these.
 /** @defgroup uart_msr_bits UART modem status bits
 @ingroup uart_defines
 @{*/
-#define RB_MSR_CTS_CHG			0x01	/**< CTS changed, read-clear */
-#define RB_MSR_DSR_CHG			0x02	/**< DSR changed, read-clear */
-#define RB_MSR_CTS			0x10	/**< current CTS level */
-#define RB_MSR_DSR			0x20	/**< current DSR level */
+#define RB_MSR_CTS_CHG 0x01 /**< CTS changed, read-clear */
+#define RB_MSR_DSR_CHG 0x02 /**< DSR changed, read-clear */
+#define RB_MSR_CTS 0x10	    /**< current CTS level */
+#define RB_MSR_DSR 0x20	    /**< current DSR level */
 /**@}*/
 
 /* --- Line-status flags --------------------------------------------------- */
@@ -241,14 +241,14 @@ The low nibble of UART_IIR(), masked with RB_IIR_INT_MASK, is one of these.
 Passed to uart_get_flag(), which returns the bits of UART_LSR() that are set
 in the requested mask.
 @{*/
-#define UART_FLAG_RX_DATA_READY		RB_LSR_DATA_RDY
-#define UART_FLAG_RX_OVERRUN		RB_LSR_OVER_ERR
-#define UART_FLAG_RX_PARITY_ERROR	RB_LSR_PAR_ERR
-#define UART_FLAG_RX_FRAME_ERROR	RB_LSR_FRAME_ERR
-#define UART_FLAG_RX_BREAK		RB_LSR_BREAK_ERR
-#define UART_FLAG_TX_FIFO_EMPTY		RB_LSR_TX_FIFO_EMP
-#define UART_FLAG_TX_ALL_EMPTY		RB_LSR_TX_ALL_EMP
-#define UART_FLAG_RX_FIFO_ERROR		RB_LSR_ERR_RX_FIFO
+#define UART_FLAG_RX_DATA_READY RB_LSR_DATA_RDY
+#define UART_FLAG_RX_OVERRUN RB_LSR_OVER_ERR
+#define UART_FLAG_RX_PARITY_ERROR RB_LSR_PAR_ERR
+#define UART_FLAG_RX_FRAME_ERROR RB_LSR_FRAME_ERR
+#define UART_FLAG_RX_BREAK RB_LSR_BREAK_ERR
+#define UART_FLAG_TX_FIFO_EMPTY RB_LSR_TX_FIFO_EMP
+#define UART_FLAG_TX_ALL_EMPTY RB_LSR_TX_ALL_EMP
+#define UART_FLAG_RX_FIFO_ERROR RB_LSR_ERR_RX_FIFO
 /**@}*/
 
 /* --- Word length --------------------------------------------------------- */
@@ -256,10 +256,10 @@ in the requested mask.
 /** @defgroup uart_databits UART word lengths
 @ingroup uart_defines
 @{*/
-#define UART_DATA_5BITS			5
-#define UART_DATA_6BITS			6
-#define UART_DATA_7BITS			7
-#define UART_DATA_8BITS			8
+#define UART_DATA_5BITS 5
+#define UART_DATA_6BITS 6
+#define UART_DATA_7BITS 7
+#define UART_DATA_8BITS 8
 /**@}*/
 
 /* --- Stop bits ----------------------------------------------------------- */
@@ -267,29 +267,29 @@ in the requested mask.
 /** @defgroup uart_stopbits UART stop-bit counts
 @ingroup uart_defines
 @{*/
-#define UART_STOPBITS_1			1
-#define UART_STOPBITS_2			2
+#define UART_STOPBITS_1 1
+#define UART_STOPBITS_2 2
 /**@}*/
 
 /* --- Parity -------------------------------------------------------------- */
 
 /** UART parity selection. */
 typedef enum {
-	UART_PARITY_NONE = 0,	/**< no parity bit */
-	UART_PARITY_ODD,	/**< odd parity */
-	UART_PARITY_EVEN,	/**< even parity */
-	UART_PARITY_MARK,	/**< mark (always 1) */
-	UART_PARITY_SPACE,	/**< space (always 0) */
+	UART_PARITY_NONE = 0, /**< no parity bit */
+	UART_PARITY_ODD,      /**< odd parity */
+	UART_PARITY_EVEN,     /**< even parity */
+	UART_PARITY_MARK,     /**< mark (always 1) */
+	UART_PARITY_SPACE,    /**< space (always 0) */
 } uart_parity_t;
 
 /* --- Receiver FIFO trigger level ----------------------------------------- */
 
 /** UART receiver FIFO trigger level. */
 typedef enum {
-	UART_FIFO_TRIGGER_1 = 0,	/**< interrupt at 1 byte */
-	UART_FIFO_TRIGGER_2,		/**< interrupt at 2 bytes */
-	UART_FIFO_TRIGGER_4,		/**< interrupt at 4 bytes */
-	UART_FIFO_TRIGGER_7,		/**< interrupt at 7 bytes */
+	UART_FIFO_TRIGGER_1 = 0, /**< interrupt at 1 byte */
+	UART_FIFO_TRIGGER_2,	 /**< interrupt at 2 bytes */
+	UART_FIFO_TRIGGER_4,	 /**< interrupt at 4 bytes */
+	UART_FIFO_TRIGGER_7,	 /**< interrupt at 7 bytes */
 } uart_fifo_trigger_t;
 
 BEGIN_DECLS

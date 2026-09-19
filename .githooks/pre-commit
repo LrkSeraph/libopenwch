@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# libopenwch pre-commit hook: run clang-format over the C sources being
+# committed, and re-stage whatever it rewrites.
+#
+# Deliberate properties:
+#
+#   * If clang-format is not installed the hook does nothing and the commit
+#     proceeds.  Formatting is a convenience, not a precondition for
+#     contributing, and a contributor without LLVM should not be blocked.
+#
+#   * Formatting never happens in CI.  This hook is the only automated
+#     formatter, so a commit either arrives already formatted or is formatted
+#     as it is made -- never silently rewritten after the fact.
+#
+# Install it once per clone:
+#
+#     make hooks            # or: git config core.hooksPath .githooks
+#
+
+# No formatter, nothing to enforce.
+if ! command -v clang-format >/dev/null 2>&1; then
+	exit 0
+fi
+
+# Generated sources are not tracked, so they cannot normally be staged; skip
+# them anyway so a forced `git add -f` cannot reformat them.
+files=$(git diff --cached --name-only --diff-filter=ACMR -- '*.c' '*.h' \
+	| grep -Ev '(^|/)(nvic\.h|irqhandlers\.h|vector_handlers\.c|vector_names\.c)$' \
+	|| true)
+
+[ -n "$files" ] || exit 0
+
+reformatted=""
+for f in $files; do
+	[ -f "$f" ] || continue
+
+	before=$(git hash-object -- "$f")
+	clang-format -i -style=file -- "$f" || {
+		echo "pre-commit: clang-format failed on $f" >&2
+		exit 1
+	}
+	after=$(git hash-object -- "$f")
+
+	[ "$before" = "$after" ] || reformatted="$reformatted $f"
+done
+
+if [ -n "$reformatted" ]; then
+	echo "pre-commit: clang-format rewrote and re-staged:"
+	for f in $reformatted; do
+		echo "  $f"
+	done
+fi
+
+# Re-stage: the working tree now holds the formatted version.
+git add -- $files

@@ -36,7 +36,7 @@
 #include <libopenwch/ch32v0/usart.h>
 #include <libopenwch/qingke/sync.h>
 
-#define BAUD			115200
+#define BAUD 115200
 
 /*
  * Which pin mapping to use.
@@ -45,7 +45,7 @@
  *   2 - PD0 (TX) / PD1 (RX), partial remap 2
  *   3 - PD6 (TX) / PD5 (RX), full remap
  */
-#define UART_PIN_MAPPING	1
+#define UART_PIN_MAPPING 1
 
 static void console_init(void) {
 	rcc_periph_clock_enable(RCC_USART1);
@@ -65,22 +65,22 @@ static void console_init(void) {
 #if UART_PIN_MAPPING == 1
 	gpio_primary_remap(GPIO_REMAP_USART1_PARTIAL1);
 	rcc_periph_clock_enable(RCC_GPIOD);
-	gpio_set_mode(GPIOD, GPIO_MODE_AF_PP, GPIO5);	/* TX */
-	gpio_set_mode(GPIOD, GPIO_MODE_IN_FLOATING, GPIO6);	/* RX */
+	gpio_set_mode(GPIOD, GPIO_MODE_AF_PP, GPIO5);	    /* TX */
+	gpio_set_mode(GPIOD, GPIO_MODE_IN_FLOATING, GPIO6); /* RX */
 #elif UART_PIN_MAPPING == 2
 	gpio_primary_remap(GPIO_REMAP_USART1_PARTIAL2);
 	rcc_periph_clock_enable(RCC_GPIOD);
-	gpio_set_mode(GPIOD, GPIO_MODE_AF_PP, GPIO0);	/* TX */
-	gpio_set_mode(GPIOD, GPIO_MODE_IN_FLOATING, GPIO1);	/* RX */
+	gpio_set_mode(GPIOD, GPIO_MODE_AF_PP, GPIO0);	    /* TX */
+	gpio_set_mode(GPIOD, GPIO_MODE_IN_FLOATING, GPIO1); /* RX */
 #elif UART_PIN_MAPPING == 3
 	gpio_primary_remap(GPIO_REMAP_USART1_FULL);
 	rcc_periph_clock_enable(RCC_GPIOD);
-	gpio_set_mode(GPIOD, GPIO_MODE_AF_PP, GPIO6);	/* TX */
-	gpio_set_mode(GPIOD, GPIO_MODE_IN_FLOATING, GPIO5);	/* RX */
+	gpio_set_mode(GPIOD, GPIO_MODE_AF_PP, GPIO6);	    /* TX */
+	gpio_set_mode(GPIOD, GPIO_MODE_IN_FLOATING, GPIO5); /* RX */
 #else
 	rcc_periph_clock_enable(RCC_GPIOA);
-	gpio_set_mode(GPIOA, GPIO_MODE_AF_PP, GPIO9);	/* TX */
-	gpio_set_mode(GPIOA, GPIO_MODE_IN_FLOATING, GPIO10);	/* RX */
+	gpio_set_mode(GPIOA, GPIO_MODE_AF_PP, GPIO9);	     /* TX */
+	gpio_set_mode(GPIOA, GPIO_MODE_IN_FLOATING, GPIO10); /* RX */
 #endif
 
 	usart_enable(USART1);

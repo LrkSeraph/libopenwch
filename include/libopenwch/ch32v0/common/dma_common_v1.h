@@ -59,22 +59,18 @@ specific memorymap.h header before including this header file. */
 /* --- Register accessors -------------------------------------------------- */
 
 /** DMA interrupt flag register (global, one nibble per channel). */
-#define DMA_INTFR(dma)			MMIO32((dma) + 0x00)
+#define DMA_INTFR(dma) MMIO32((dma) + 0x00)
 /** DMA interrupt flag clear register (global, one nibble per channel). */
-#define DMA_INTFCR(dma)			MMIO32((dma) + 0x04)
+#define DMA_INTFCR(dma) MMIO32((dma) + 0x04)
 
 /** DMA channel configuration register. */
-#define DMA_CFGR(dma, channel)		MMIO32((dma) + 0x08 + \
-					       0x14 * ((channel) - 1))
+#define DMA_CFGR(dma, channel) MMIO32((dma) + 0x08 + 0x14 * ((channel) - 1))
 /** DMA channel number-of-data register. */
-#define DMA_CNTR(dma, channel)		MMIO32((dma) + 0x0c + \
-					       0x14 * ((channel) - 1))
+#define DMA_CNTR(dma, channel) MMIO32((dma) + 0x0c + 0x14 * ((channel) - 1))
 /** DMA channel peripheral address register. */
-#define DMA_PADDR(dma, channel)		MMIO32((dma) + 0x10 + \
-					       0x14 * ((channel) - 1))
+#define DMA_PADDR(dma, channel) MMIO32((dma) + 0x10 + 0x14 * ((channel) - 1))
 /** DMA channel memory address register. */
-#define DMA_MADDR(dma, channel)		MMIO32((dma) + 0x14 + \
-					       0x14 * ((channel) - 1))
+#define DMA_MADDR(dma, channel) MMIO32((dma) + 0x14 + 0x14 * ((channel) - 1))
 
 /* --- INTFR / INTFCR bits ------------------------------------------------- */
 
@@ -84,59 +80,59 @@ specific memorymap.h header before including this header file. */
  * the one-based channel number by DMA_FLAG_OFFSET().
  */
 
-#define DMA_GIF				(1 << 0)	/**< global interrupt flag */
-#define DMA_TCIF			(1 << 1)	/**< transfer complete flag */
-#define DMA_HTIF			(1 << 2)	/**< half transfer flag */
-#define DMA_TEIF			(1 << 3)	/**< transfer error flag */
+#define DMA_GIF (1 << 0)  /**< global interrupt flag */
+#define DMA_TCIF (1 << 1) /**< transfer complete flag */
+#define DMA_HTIF (1 << 2) /**< half transfer flag */
+#define DMA_TEIF (1 << 3) /**< transfer error flag */
 
 /** Mask of the four flags belonging to one channel. */
-#define DMA_FLAG_MASK			0x0000000fu
+#define DMA_FLAG_MASK 0x0000000fu
 
 /** Bit offset of @p channel's four-bit flag group in INTFR / INTFCR. */
-#define DMA_FLAG_OFFSET(channel)	(4 * ((channel) - 1))
+#define DMA_FLAG_OFFSET(channel) (4 * ((channel) - 1))
 
 /* --- CFGR bits ----------------------------------------------------------- */
 
-#define DMA_CFGR_EN			(1 << 0)	/**< channel enable */
-#define DMA_CFGR_TCIE			(1 << 1)	/**< transfer complete IE */
-#define DMA_CFGR_HTIE			(1 << 2)	/**< half transfer IE */
-#define DMA_CFGR_TEIE			(1 << 3)	/**< transfer error IE */
-#define DMA_CFGR_DIR			(1 << 4)	/**< 1 = read from memory */
-#define DMA_CFGR_CIRC			(1 << 5)	/**< circular mode */
-#define DMA_CFGR_PINC			(1 << 6)	/**< peripheral increment */
-#define DMA_CFGR_MINC			(1 << 7)	/**< memory increment */
+#define DMA_CFGR_EN (1 << 0)   /**< channel enable */
+#define DMA_CFGR_TCIE (1 << 1) /**< transfer complete IE */
+#define DMA_CFGR_HTIE (1 << 2) /**< half transfer IE */
+#define DMA_CFGR_TEIE (1 << 3) /**< transfer error IE */
+#define DMA_CFGR_DIR (1 << 4)  /**< 1 = read from memory */
+#define DMA_CFGR_CIRC (1 << 5) /**< circular mode */
+#define DMA_CFGR_PINC (1 << 6) /**< peripheral increment */
+#define DMA_CFGR_MINC (1 << 7) /**< memory increment */
 
-#define DMA_CFGR_PSIZE_SHIFT		8
-#define DMA_CFGR_PSIZE_MASK		(0x3u << 8)
-#define DMA_CFGR_MSIZE_SHIFT		10
-#define DMA_CFGR_MSIZE_MASK		(0x3u << 10)
-#define DMA_CFGR_PL_SHIFT		12
-#define DMA_CFGR_PL_MASK		(0x3u << 12)
+#define DMA_CFGR_PSIZE_SHIFT 8
+#define DMA_CFGR_PSIZE_MASK (0x3u << 8)
+#define DMA_CFGR_MSIZE_SHIFT 10
+#define DMA_CFGR_MSIZE_MASK (0x3u << 10)
+#define DMA_CFGR_PL_SHIFT 12
+#define DMA_CFGR_PL_MASK (0x3u << 12)
 
-#define DMA_CFGR_MEM2MEM		(1 << 14)	/**< memory to memory mode */
+#define DMA_CFGR_MEM2MEM (1 << 14) /**< memory to memory mode */
 
 /* --- Configuration enumerations ------------------------------------------ */
 
 /** @defgroup dma_channel DMA Channel Number
 @ingroup dma_defines
 @{*/
-#define DMA_CHANNEL1			1
-#define DMA_CHANNEL2			2
-#define DMA_CHANNEL3			3
-#define DMA_CHANNEL4			4
-#define DMA_CHANNEL5			5
-#define DMA_CHANNEL6			6
-#define DMA_CHANNEL7			7
+#define DMA_CHANNEL1 1
+#define DMA_CHANNEL2 2
+#define DMA_CHANNEL3 3
+#define DMA_CHANNEL4 4
+#define DMA_CHANNEL5 5
+#define DMA_CHANNEL6 6
+#define DMA_CHANNEL7 7
 /**@}*/
 
 /** @defgroup dma_priority DMA Channel Priority
 @ingroup dma_defines
 @{*/
-#define DMA_PRIORITY_LOW		0x0
-#define DMA_PRIORITY_MEDIUM		0x1
-#define DMA_PRIORITY_HIGH		0x2
-#define DMA_PRIORITY_VERY_HIGH		0x3
-#define DMA_PRIORITY_MASK		0x3u
+#define DMA_PRIORITY_LOW 0x0
+#define DMA_PRIORITY_MEDIUM 0x1
+#define DMA_PRIORITY_HIGH 0x2
+#define DMA_PRIORITY_VERY_HIGH 0x3
+#define DMA_PRIORITY_MASK 0x3u
 /**@}*/
 
 /** @defgroup dma_size DMA Transfer Word Size
@@ -146,10 +142,10 @@ The same two-bit encoding is used for the peripheral and the memory side, so
 one constant works with both dma_set_peripheral_size() and
 dma_set_memory_size().
 @{*/
-#define DMA_SIZE_8BIT			0x0
-#define DMA_SIZE_16BIT			0x1
-#define DMA_SIZE_32BIT			0x2
-#define DMA_SIZE_MASK			0x3u
+#define DMA_SIZE_8BIT 0x0
+#define DMA_SIZE_16BIT 0x1
+#define DMA_SIZE_32BIT 0x2
+#define DMA_SIZE_MASK 0x3u
 /**@}*/
 
 /* --- Function prototypes ------------------------------------------------- */
@@ -159,7 +155,8 @@ BEGIN_DECLS
 /* --- Channel setup ------------------------------------------------------- */
 
 void dma_channel_reset(uint32_t dma, uint8_t channel);
-void dma_set_peripheral_address(uint32_t dma, uint8_t channel,
+void dma_set_peripheral_address(uint32_t dma,
+				uint8_t channel,
 				uint32_t address);
 void dma_set_memory_address(uint32_t dma, uint8_t channel, uint32_t address);
 void dma_set_number_of_data(uint32_t dma, uint8_t channel, uint16_t number);

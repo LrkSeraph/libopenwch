@@ -67,78 +67,79 @@ LGPL License Terms @ref lgpl_license
 
 /* --- Register accessors -------------------------------------------------- */
 
-#define SPI_CTRL_MOD(spi)		MMIO8((spi) + 0x00)	/**< mode control */
-#define SPI_CTRL_CFG(spi)		MMIO8((spi) + 0x01)	/**< configuration control */
-#define SPI_INTER_EN(spi)		MMIO8((spi) + 0x02)	/**< interrupt enable */
-#define SPI_CLOCK_DIV(spi)		MMIO8((spi) + 0x03)	/**< master clock divisor */
-#define SPI_SLAVE_PRESET(spi)		MMIO8((spi) + 0x03)	/**< slave preset byte */
-#define SPI_BUFFER(spi)			MMIO8((spi) + 0x04)	/**< single-byte buffer */
-#define SPI_RUN_FLAG(spi)		MMIO8((spi) + 0x05)	/**< work flag */
-#define SPI_INT_FLAG(spi)		MMIO8((spi) + 0x06)	/**< interrupt flags, RW1 */
-#define SPI_FIFO_COUNT(spi)		MMIO8((spi) + 0x07)	/**< FIFO occupancy */
-#define SPI_TOTAL_CNT(spi)		MMIO16((spi) + 0x0c)	/**< total byte count */
-#define SPI_FIFO(spi)			MMIO8((spi) + 0x10)	/**< FIFO data port */
-#define SPI_DMA_NOW(spi)		MMIO32((spi) + 0x14)	/**< DMA current address */
-#define SPI_DMA_BEG(spi)		MMIO32((spi) + 0x18)	/**< DMA begin address */
-#define SPI_DMA_END(spi)		MMIO32((spi) + 0x1c)	/**< DMA end address */
+#define SPI_CTRL_MOD(spi) MMIO8((spi) + 0x00)	  /**< mode control */
+#define SPI_CTRL_CFG(spi) MMIO8((spi) + 0x01)	  /**< configuration control */
+#define SPI_INTER_EN(spi) MMIO8((spi) + 0x02)	  /**< interrupt enable */
+#define SPI_CLOCK_DIV(spi) MMIO8((spi) + 0x03)	  /**< master clock divisor */
+#define SPI_SLAVE_PRESET(spi) MMIO8((spi) + 0x03) /**< slave preset byte */
+#define SPI_BUFFER(spi) MMIO8((spi) + 0x04)	  /**< single-byte buffer */
+#define SPI_RUN_FLAG(spi) MMIO8((spi) + 0x05)	  /**< work flag */
+#define SPI_INT_FLAG(spi) MMIO8((spi) + 0x06)	  /**< interrupt flags, RW1 */
+#define SPI_FIFO_COUNT(spi) MMIO8((spi) + 0x07)	  /**< FIFO occupancy */
+#define SPI_TOTAL_CNT(spi) MMIO16((spi) + 0x0c)	  /**< total byte count */
+#define SPI_FIFO(spi) MMIO8((spi) + 0x10)	  /**< FIFO data port */
+#define SPI_DMA_NOW(spi) MMIO32((spi) + 0x14)	  /**< DMA current address */
+#define SPI_DMA_BEG(spi) MMIO32((spi) + 0x18)	  /**< DMA begin address */
+#define SPI_DMA_END(spi) MMIO32((spi) + 0x1c)	  /**< DMA end address */
 
 /* --- CTRL_MOD bits ------------------------------------------------------- */
 
-#define RB_SPI_MODE_SLAVE	0x01	/**< 0 = master, 1 = slave */
-#define RB_SPI_ALL_CLEAR	0x02	/**< force-clear FIFO and counters */
-#define RB_SPI_2WIRE_MOD	0x04	/**< slave 2-wire (SCK + SDX) mode */
-#define RB_SPI_MST_SCK_MOD	0x08	/**< master clock mode: 0 = mode 0, 1 = mode 3 */
-#define RB_SPI_SLV_CMD_MOD	0x08	/**< slave command mode (same bit as above) */
-#define RB_SPI_FIFO_DIR		0x10	/**< FIFO direction: 0 = out, 1 = in */
-#define RB_SPI_SCK_OE		0x20	/**< SCK output enable */
-#define RB_SPI_MOSI_OE		0x40	/**< MOSI output enable (SPI1: SDO_OE) */
-#define RB_SPI_MISO_OE		0x80	/**< MISO output enable (SPI1: SDI_OE) */
+#define RB_SPI_MODE_SLAVE 0x01 /**< 0 = master, 1 = slave */
+#define RB_SPI_ALL_CLEAR 0x02  /**< force-clear FIFO and counters */
+#define RB_SPI_2WIRE_MOD 0x04  /**< slave 2-wire (SCK + SDX) mode */
+#define RB_SPI_MST_SCK_MOD                                                     \
+	0x08 /**< master clock mode: 0 = mode 0, 1 = mode 3 */
+#define RB_SPI_SLV_CMD_MOD 0x08 /**< slave command mode (same bit as above) */
+#define RB_SPI_FIFO_DIR 0x10	/**< FIFO direction: 0 = out, 1 = in */
+#define RB_SPI_SCK_OE 0x20	/**< SCK output enable */
+#define RB_SPI_MOSI_OE 0x40	/**< MOSI output enable (SPI1: SDO_OE) */
+#define RB_SPI_MISO_OE 0x80	/**< MISO output enable (SPI1: SDI_OE) */
 
 /** Output drivers a master must switch on. */
-#define SPI_CTRL_MOD_MASTER_OE	(RB_SPI_SCK_OE | RB_SPI_MOSI_OE)
+#define SPI_CTRL_MOD_MASTER_OE (RB_SPI_SCK_OE | RB_SPI_MOSI_OE)
 /** Output driver a slave must switch on. */
-#define SPI_CTRL_MOD_SLAVE_OE	(RB_SPI_MISO_OE)
+#define SPI_CTRL_MOD_SLAVE_OE (RB_SPI_MISO_OE)
 /** Every output driver, for spi_disable(). */
-#define SPI_CTRL_MOD_OE_MASK	(RB_SPI_SCK_OE | RB_SPI_MOSI_OE | RB_SPI_MISO_OE)
+#define SPI_CTRL_MOD_OE_MASK (RB_SPI_SCK_OE | RB_SPI_MOSI_OE | RB_SPI_MISO_OE)
 
 /* --- CTRL_CFG bits ------------------------------------------------------- */
 
-#define RB_SPI_DMA_ENABLE	0x01	/**< DMA mode enable */
-#define RB_SPI_DMA_LOOP		0x04	/**< DMA address loop enable */
-#define RB_SPI_AUTO_IF		0x10	/**< buffer/FIFO access clears BYTE_END */
-#define RB_SPI_BIT_ORDER	0x20	/**< 0 = MSB first, 1 = LSB first */
-#define RB_SPI_MST_DLY_EN	0x40	/**< master input delay enable */
+#define RB_SPI_DMA_ENABLE 0x01 /**< DMA mode enable */
+#define RB_SPI_DMA_LOOP 0x04   /**< DMA address loop enable */
+#define RB_SPI_AUTO_IF 0x10    /**< buffer/FIFO access clears BYTE_END */
+#define RB_SPI_BIT_ORDER 0x20  /**< 0 = MSB first, 1 = LSB first */
+#define RB_SPI_MST_DLY_EN 0x40 /**< master input delay enable */
 
 /* --- INTER_EN bits ------------------------------------------------------- */
 
-#define RB_SPI_IE_CNT_END	0x01	/**< total byte count reached */
-#define RB_SPI_IE_BYTE_END	0x02	/**< one byte exchanged */
-#define RB_SPI_IE_FIFO_HF	0x04	/**< FIFO half full / half empty */
-#define RB_SPI_IE_DMA_END	0x08	/**< DMA complete */
-#define RB_SPI_IE_FIFO_OV	0x10	/**< FIFO overrun */
-#define RB_SPI_IE_FST_BYTE	0x80	/**< slave first byte / command received */
+#define RB_SPI_IE_CNT_END 0x01	/**< total byte count reached */
+#define RB_SPI_IE_BYTE_END 0x02 /**< one byte exchanged */
+#define RB_SPI_IE_FIFO_HF 0x04	/**< FIFO half full / half empty */
+#define RB_SPI_IE_DMA_END 0x08	/**< DMA complete */
+#define RB_SPI_IE_FIFO_OV 0x10	/**< FIFO overrun */
+#define RB_SPI_IE_FST_BYTE 0x80 /**< slave first byte / command received */
 
 /* --- RUN_FLAG bits ------------------------------------------------------- */
 
-#define RB_SPI_SLV_CMD_ACT	0x10	/**< slave first byte / command flag */
-#define RB_SPI_FIFO_READY	0x20	/**< FIFO ready status */
-#define RB_SPI_SLV_CS_LOAD	0x40	/**< slave chip-select loading status */
-#define RB_SPI_SLV_SELECT	0x80	/**< slave selection status */
+#define RB_SPI_SLV_CMD_ACT 0x10 /**< slave first byte / command flag */
+#define RB_SPI_FIFO_READY 0x20	/**< FIFO ready status */
+#define RB_SPI_SLV_CS_LOAD 0x40 /**< slave chip-select loading status */
+#define RB_SPI_SLV_SELECT 0x80	/**< slave selection status */
 
 /* --- INT_FLAG bits ------------------------------------------------------- */
 
-#define RB_SPI_IF_CNT_END	0x01	/**< RW1: total byte count reached */
-#define RB_SPI_IF_BYTE_END	0x02	/**< RW1: one byte exchanged */
-#define RB_SPI_IF_FIFO_HF	0x04	/**< RW1: FIFO half full / half empty */
-#define RB_SPI_IF_DMA_END	0x08	/**< RW1: DMA complete */
-#define RB_SPI_IF_FIFO_OV	0x10	/**< RW1: FIFO overrun */
-#define RB_SPI_FREE		0x40	/**< RO: interface idle, byte finished */
-#define RB_SPI_IF_FST_BYTE	0x80	/**< RW1: slave first byte received */
+#define RB_SPI_IF_CNT_END 0x01	/**< RW1: total byte count reached */
+#define RB_SPI_IF_BYTE_END 0x02 /**< RW1: one byte exchanged */
+#define RB_SPI_IF_FIFO_HF 0x04	/**< RW1: FIFO half full / half empty */
+#define RB_SPI_IF_DMA_END 0x08	/**< RW1: DMA complete */
+#define RB_SPI_IF_FIFO_OV 0x10	/**< RW1: FIFO overrun */
+#define RB_SPI_FREE 0x40	/**< RO: interface idle, byte finished */
+#define RB_SPI_IF_FST_BYTE 0x80 /**< RW1: slave first byte received */
 
 /** FIFO depth, in bytes. */
-#define SPI_FIFO_SIZE		8
+#define SPI_FIFO_SIZE 8
 /** Largest transfer a single TOTAL_CNT write can describe (12 bits). */
-#define SPI_TOTAL_CNT_MAX	0x0fffu
+#define SPI_TOTAL_CNT_MAX 0x0fffu
 
 /* --- Data mode ----------------------------------------------------------- */
 
@@ -158,10 +159,10 @@ Mode 0 idles SCK low and samples on the first edge; mode 3 idles SCK high and
 samples on the second edge.
 @{*/
 typedef enum {
-	SPI_MODE0_MSB	= 1,	/**< mode 0, MSB first */
-	SPI_MODE0_LSB	= 0,	/**< mode 0, LSB first */
-	SPI_MODE3_MSB	= 3,	/**< mode 3, MSB first */
-	SPI_MODE3_LSB	= 2,	/**< mode 3, LSB first */
+	SPI_MODE0_MSB = 1, /**< mode 0, MSB first */
+	SPI_MODE0_LSB = 0, /**< mode 0, LSB first */
+	SPI_MODE3_MSB = 3, /**< mode 3, MSB first */
+	SPI_MODE3_LSB = 2, /**< mode 3, LSB first */
 } spi_mode_t;
 /**@}*/
 
@@ -172,16 +173,16 @@ typedef enum {
 
 Masks for spi_enable_irq() / spi_disable_irq().
 @{*/
-#define SPI_IRQ_CNT_END		RB_SPI_IE_CNT_END
-#define SPI_IRQ_BYTE_END	RB_SPI_IE_BYTE_END
-#define SPI_IRQ_FIFO_HALF	RB_SPI_IE_FIFO_HF
-#define SPI_IRQ_DMA_END		RB_SPI_IE_DMA_END
-#define SPI_IRQ_FIFO_OVERRUN	RB_SPI_IE_FIFO_OV
-#define SPI_IRQ_FIRST_BYTE	RB_SPI_IE_FST_BYTE
+#define SPI_IRQ_CNT_END RB_SPI_IE_CNT_END
+#define SPI_IRQ_BYTE_END RB_SPI_IE_BYTE_END
+#define SPI_IRQ_FIFO_HALF RB_SPI_IE_FIFO_HF
+#define SPI_IRQ_DMA_END RB_SPI_IE_DMA_END
+#define SPI_IRQ_FIFO_OVERRUN RB_SPI_IE_FIFO_OV
+#define SPI_IRQ_FIRST_BYTE RB_SPI_IE_FST_BYTE
 /** Every interrupt bit INTER_EN defines. */
-#define SPI_IRQ_MASK		(RB_SPI_IE_CNT_END | RB_SPI_IE_BYTE_END \
-				| RB_SPI_IE_FIFO_HF | RB_SPI_IE_DMA_END \
-				| RB_SPI_IE_FIFO_OV | RB_SPI_IE_FST_BYTE)
+#define SPI_IRQ_MASK                                                           \
+	(RB_SPI_IE_CNT_END | RB_SPI_IE_BYTE_END | RB_SPI_IE_FIFO_HF |          \
+	 RB_SPI_IE_DMA_END | RB_SPI_IE_FIFO_OV | RB_SPI_IE_FST_BYTE)
 /**@}*/
 
 /* --- Flags --------------------------------------------------------------- */
@@ -193,22 +194,22 @@ Masks for spi_get_flag() / spi_clear_flag(), taken from INT_FLAG.  Only the
 RW1 bits can be cleared by spi_clear_flag(); RB_SPI_FREE is read-only and is
 therefore excluded from SPI_FLAG_CLEAR_MASK.
 @{*/
-#define SPI_FLAG_CNT_END	RB_SPI_IF_CNT_END
-#define SPI_FLAG_BYTE_END	RB_SPI_IF_BYTE_END
-#define SPI_FLAG_FIFO_HALF	RB_SPI_IF_FIFO_HF
-#define SPI_FLAG_DMA_END	RB_SPI_IF_DMA_END
-#define SPI_FLAG_FIFO_OVERRUN	RB_SPI_IF_FIFO_OV
-#define SPI_FLAG_FREE		RB_SPI_FREE
-#define SPI_FLAG_FIRST_BYTE	RB_SPI_IF_FST_BYTE
+#define SPI_FLAG_CNT_END RB_SPI_IF_CNT_END
+#define SPI_FLAG_BYTE_END RB_SPI_IF_BYTE_END
+#define SPI_FLAG_FIFO_HALF RB_SPI_IF_FIFO_HF
+#define SPI_FLAG_DMA_END RB_SPI_IF_DMA_END
+#define SPI_FLAG_FIFO_OVERRUN RB_SPI_IF_FIFO_OV
+#define SPI_FLAG_FREE RB_SPI_FREE
+#define SPI_FLAG_FIRST_BYTE RB_SPI_IF_FST_BYTE
 /** Every readable INT_FLAG bit. */
-#define SPI_FLAG_MASK		(RB_SPI_IF_CNT_END | RB_SPI_IF_BYTE_END \
-				| RB_SPI_IF_FIFO_HF | RB_SPI_IF_DMA_END \
-				| RB_SPI_IF_FIFO_OV | RB_SPI_FREE \
-				| RB_SPI_IF_FST_BYTE)
+#define SPI_FLAG_MASK                                                          \
+	(RB_SPI_IF_CNT_END | RB_SPI_IF_BYTE_END | RB_SPI_IF_FIFO_HF |          \
+	 RB_SPI_IF_DMA_END | RB_SPI_IF_FIFO_OV | RB_SPI_FREE |                 \
+	 RB_SPI_IF_FST_BYTE)
 /** The write-one-to-clear subset of SPI_FLAG_MASK. */
-#define SPI_FLAG_CLEAR_MASK	(RB_SPI_IF_CNT_END | RB_SPI_IF_BYTE_END \
-				| RB_SPI_IF_FIFO_HF | RB_SPI_IF_DMA_END \
-				| RB_SPI_IF_FIFO_OV | RB_SPI_IF_FST_BYTE)
+#define SPI_FLAG_CLEAR_MASK                                                    \
+	(RB_SPI_IF_CNT_END | RB_SPI_IF_BYTE_END | RB_SPI_IF_FIFO_HF |          \
+	 RB_SPI_IF_DMA_END | RB_SPI_IF_FIFO_OV | RB_SPI_IF_FST_BYTE)
 /**@}*/
 
 BEGIN_DECLS

@@ -45,15 +45,15 @@ LGPL License Terms @ref lgpl_license
  * is why libopenwch can keep the familiar nvic_*() API names.
  */
 
-#define CORE_PERIPH_BASE	(0xE0000000U)
+#define CORE_PERIPH_BASE (0xE0000000U)
 
-#define PFIC_BASE		(CORE_PERIPH_BASE + 0xE000)
-#define SYS_TICK_BASE		(CORE_PERIPH_BASE + 0xF000)
+#define PFIC_BASE (CORE_PERIPH_BASE + 0xE000)
+#define SYS_TICK_BASE (CORE_PERIPH_BASE + 0xF000)
 
 /* WCH vendor-specific CSRs (machine mode). */
-#define CSR_INTSYSCR		0x804	/* interrupt nesting + hardware stack */
-#define CSR_QMISC		0xbc0	/* pipeline / dynamic-prediction control */
-#define CSR_QSTATUS		0xfe0
+#define CSR_INTSYSCR 0x804 /* interrupt nesting + hardware stack */
+#define CSR_QMISC 0xbc0	   /* pipeline / dynamic-prediction control */
+#define CSR_QSTATUS 0xfe0
 
 #endif
 /**@}*/

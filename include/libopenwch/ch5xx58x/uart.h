@@ -43,10 +43,10 @@ LGPL License Terms @ref lgpl_license
  * gpio.h) plus the pin configuration.  Each UART has a default pin pair and
  * one alternate pair; see the CH58x datasheet.
  */
-#define UART0				UART0_BASE
-#define UART1				UART1_BASE
-#define UART2				UART2_BASE
-#define UART3				UART3_BASE
+#define UART0 UART0_BASE
+#define UART1 UART1_BASE
+#define UART2 UART2_BASE
+#define UART3 UART3_BASE
 
 #include <libopenwch/ch5xx58x/common/uart_common_v1.h>
 

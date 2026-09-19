@@ -42,84 +42,110 @@ LGPL License Terms @ref lgpl_license
  */
 
 /* mstatus */
-#define CSR_MSTATUS_MIE		(1 << 3)	/* machine interrupt enable */
-#define CSR_MSTATUS_MPIE	(1 << 7)	/* previous MIE */
-#define CSR_MSTATUS_MPP		(3 << 11)	/* previous privilege */
-#define CSR_MSTATUS_FS		(3 << 13)	/* floating point state */
+#define CSR_MSTATUS_MIE (1 << 3)  /* machine interrupt enable */
+#define CSR_MSTATUS_MPIE (1 << 7) /* previous MIE */
+#define CSR_MSTATUS_MPP (3 << 11) /* previous privilege */
+#define CSR_MSTATUS_FS (3 << 13)  /* floating point state */
 
 /* INTSYSCR (0x804) */
-#define INTSYSCR_INEST		(1 << 0)	/* interrupt nesting enable */
-#define INTSYSCR_HWSTK		(1 << 1)	/* hardware stack push enable */
+#define INTSYSCR_INEST (1 << 0) /* interrupt nesting enable */
+#define INTSYSCR_HWSTK (1 << 1) /* hardware stack push enable */
 
 /* mcause */
-#define CSR_MCAUSE_INT		(1u << 31)	/* 1 = interrupt, 0 = exception */
-#define CSR_MCAUSE_CODE_MASK	0x7fffffffu
+#define CSR_MCAUSE_INT (1u << 31) /* 1 = interrupt, 0 = exception */
+#define CSR_MCAUSE_CODE_MASK 0x7fffffffu
 
 /* The QingKe exception/interrupt codes that have a fixed vector slot. */
-#define QINGKE_EXC_INSN_MISALIGN	0
-#define QINGKE_EXC_INSN_ACCESS		1
-#define QINGKE_EXC_ILLEGAL_INSN		2
-#define QINGKE_EXC_BREAKPOINT		3
-#define QINGKE_EXC_LOAD_MISALIGN	4
-#define QINGKE_EXC_LOAD_ACCESS		5
-#define QINGKE_EXC_STORE_MISALIGN	6
-#define QINGKE_EXC_STORE_ACCESS		7
-#define QINGKE_EXC_ECALL_U		8
-#define QINGKE_EXC_ECALL_M		11
+#define QINGKE_EXC_INSN_MISALIGN 0
+#define QINGKE_EXC_INSN_ACCESS 1
+#define QINGKE_EXC_ILLEGAL_INSN 2
+#define QINGKE_EXC_BREAKPOINT 3
+#define QINGKE_EXC_LOAD_MISALIGN 4
+#define QINGKE_EXC_LOAD_ACCESS 5
+#define QINGKE_EXC_STORE_MISALIGN 6
+#define QINGKE_EXC_STORE_ACCESS 7
+#define QINGKE_EXC_ECALL_U 8
+#define QINGKE_EXC_ECALL_M 11
 
 /* The interrupt slots that are not peripheral interrupts. */
-#define QINGKE_IRQ_SYSTICK	12
-#define QINGKE_IRQ_SOFTWARE	14
+#define QINGKE_IRQ_SYSTICK 12
+#define QINGKE_IRQ_SOFTWARE 14
 
 #ifndef __ASSEMBLER__
 
 BEGIN_DECLS
 
 /* Raw CSR accessors.  The csr number must be a compile-time constant. */
-#define OPENWCH_CSR_READ(csr) \
-	({ uint32_t __v; __asm__ volatile ("csrr %0, " #csr : "=r" (__v)); __v; })
+#define OPENWCH_CSR_READ(csr)                                                  \
+	({                                                                     \
+		uint32_t __v;                                                  \
+		__asm__ volatile("csrr %0, " #csr : "=r"(__v));                \
+		__v;                                                           \
+	})
 
-#define OPENWCH_CSR_WRITE(csr, val) \
-	__asm__ volatile ("csrw " #csr ", %0" : : "rK" ((uint32_t)(val)) : "memory")
+#define OPENWCH_CSR_WRITE(csr, val)                                            \
+	__asm__ volatile("csrw " #csr ", %0"                                   \
+			 :                                                     \
+			 : "rK"((uint32_t)(val))                               \
+			 : "memory")
 
-#define OPENWCH_CSR_SET(csr, bits) \
-	__asm__ volatile ("csrs " #csr ", %0" : : "rK" ((uint32_t)(bits)) : "memory")
+#define OPENWCH_CSR_SET(csr, bits)                                             \
+	__asm__ volatile("csrs " #csr ", %0"                                   \
+			 :                                                     \
+			 : "rK"((uint32_t)(bits))                              \
+			 : "memory")
 
-#define OPENWCH_CSR_CLEAR(csr, bits) \
-	__asm__ volatile ("csrc " #csr ", %0" : : "rK" ((uint32_t)(bits)) : "memory")
+#define OPENWCH_CSR_CLEAR(csr, bits)                                           \
+	__asm__ volatile("csrc " #csr ", %0"                                   \
+			 :                                                     \
+			 : "rK"((uint32_t)(bits))                              \
+			 : "memory")
 
-#define OPENWCH_CSR_READ_NUM(num) \
-	({ uint32_t __v; __asm__ volatile ("csrr %0, %1" : "=r" (__v) : "i" (num)); __v; })
+#define OPENWCH_CSR_READ_NUM(num)                                              \
+	({                                                                     \
+		uint32_t __v;                                                  \
+		__asm__ volatile("csrr %0, %1" : "=r"(__v) : "i"(num));        \
+		__v;                                                           \
+	})
 
-#define OPENWCH_CSR_WRITE_NUM(num, val) \
-	__asm__ volatile ("csrw %0, %1" : : "i" (num), "rK" ((uint32_t)(val)) : "memory")
+#define OPENWCH_CSR_WRITE_NUM(num, val)                                        \
+	__asm__ volatile("csrw %0, %1"                                         \
+			 :                                                     \
+			 : "i"(num), "rK"((uint32_t)(val))                     \
+			 : "memory")
 
-#define OPENWCH_CSR_SET_NUM(num, bits) \
-	__asm__ volatile ("csrs %0, %1" : : "i" (num), "rK" ((uint32_t)(bits)) : "memory")
+#define OPENWCH_CSR_SET_NUM(num, bits)                                         \
+	__asm__ volatile("csrs %0, %1"                                         \
+			 :                                                     \
+			 : "i"(num), "rK"((uint32_t)(bits))                    \
+			 : "memory")
 
-#define OPENWCH_CSR_CLEAR_NUM(num, bits) \
-	__asm__ volatile ("csrc %0, %1" : : "i" (num), "rK" ((uint32_t)(bits)) : "memory")
+#define OPENWCH_CSR_CLEAR_NUM(num, bits)                                       \
+	__asm__ volatile("csrc %0, %1"                                         \
+			 :                                                     \
+			 : "i"(num), "rK"((uint32_t)(bits))                    \
+			 : "memory")
 
 /* Named accessors.  Some of these CSRs exist only on newer QingKe cores, so
  * they are expressed with their numeric encoding. */
-#define mstatus_read()		OPENWCH_CSR_READ_NUM(0x300)
-#define mstatus_write(v)	OPENWCH_CSR_WRITE_NUM(0x300, (v))
-#define mtvec_read()		OPENWCH_CSR_READ_NUM(0x305)
-#define mtvec_write(v)		OPENWCH_CSR_WRITE_NUM(0x305, (v))
-#define mepc_read()		OPENWCH_CSR_READ_NUM(0x341)
-#define mepc_write(v)		OPENWCH_CSR_WRITE_NUM(0x341, (v))
-#define mcause_read()		OPENWCH_CSR_READ_NUM(0x342)
-#define mtval_read()		OPENWCH_CSR_READ_NUM(0x343)
-#define intsyscr_read()		OPENWCH_CSR_READ_NUM(0x804)
-#define intsyscr_write(v)	OPENWCH_CSR_WRITE_NUM(0x804, (v))
+#define mstatus_read() OPENWCH_CSR_READ_NUM(0x300)
+#define mstatus_write(v) OPENWCH_CSR_WRITE_NUM(0x300, (v))
+#define mtvec_read() OPENWCH_CSR_READ_NUM(0x305)
+#define mtvec_write(v) OPENWCH_CSR_WRITE_NUM(0x305, (v))
+#define mepc_read() OPENWCH_CSR_READ_NUM(0x341)
+#define mepc_write(v) OPENWCH_CSR_WRITE_NUM(0x341, (v))
+#define mcause_read() OPENWCH_CSR_READ_NUM(0x342)
+#define mtval_read() OPENWCH_CSR_READ_NUM(0x343)
+#define intsyscr_read() OPENWCH_CSR_READ_NUM(0x804)
+#define intsyscr_write(v) OPENWCH_CSR_WRITE_NUM(0x804, (v))
 
 /* Memory ordering helper used around peripheral register sequences. */
 static inline void qingke_fence_i(void) {
-	__asm__ volatile ("fence.i" ::: "memory");
+	__asm__ volatile("fence.i" ::: "memory");
 }
 
 static inline void qingke_nop(void) {
-	__asm__ volatile ("nop");
+	__asm__ volatile("nop");
 }
 
 /*

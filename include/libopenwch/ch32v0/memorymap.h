@@ -39,56 +39,56 @@ LGPL License Terms @ref lgpl_license
 /* --- CH32V00x specific peripheral definitions ---------------------------- */
 
 /* The CH32V00x keeps the STM32-style three-bus memory map. */
-#define FLASH_BASE			(0x00000000U)
-#define INFO_BASE			(0x1ffff000U)
-#define PERIPH_BASE			(0x40000000U)
-#define PERIPH_BASE_APB1		(PERIPH_BASE + 0x00000)
-#define PERIPH_BASE_APB2		(PERIPH_BASE + 0x10000)
-#define PERIPH_BASE_AHB			(PERIPH_BASE + 0x20000)
+#define FLASH_BASE (0x00000000U)
+#define INFO_BASE (0x1ffff000U)
+#define PERIPH_BASE (0x40000000U)
+#define PERIPH_BASE_APB1 (PERIPH_BASE + 0x00000)
+#define PERIPH_BASE_APB2 (PERIPH_BASE + 0x10000)
+#define PERIPH_BASE_AHB (PERIPH_BASE + 0x20000)
 
 /* Factory-programmed information blocks. */
-#define ESIG_BASE			(0x1ffff7e0U)
-#define OB_BASE				(0x1ffff800U)
-#define VENDOR_CFG0_BASE		(0x1ffff7d4U)
+#define ESIG_BASE (0x1ffff7e0U)
+#define OB_BASE (0x1ffff800U)
+#define VENDOR_CFG0_BASE (0x1ffff7d4U)
 
 /* --- APB1 ---------------------------------------------------------------- */
-#define TIM2_BASE			(PERIPH_BASE_APB1 + 0x0000)
-#define WWDG_BASE			(PERIPH_BASE_APB1 + 0x2c00)
-#define IWDG_BASE			(PERIPH_BASE_APB1 + 0x3000)
-#define I2C1_BASE			(PERIPH_BASE_APB1 + 0x5400)
-#define PWR_BASE			(PERIPH_BASE_APB1 + 0x7000)
+#define TIM2_BASE (PERIPH_BASE_APB1 + 0x0000)
+#define WWDG_BASE (PERIPH_BASE_APB1 + 0x2c00)
+#define IWDG_BASE (PERIPH_BASE_APB1 + 0x3000)
+#define I2C1_BASE (PERIPH_BASE_APB1 + 0x5400)
+#define PWR_BASE (PERIPH_BASE_APB1 + 0x7000)
 
 /* --- APB2 ---------------------------------------------------------------- */
-#define AFIO_BASE			(PERIPH_BASE_APB2 + 0x0000)
-#define EXTI_BASE			(PERIPH_BASE_APB2 + 0x0400)
-#define GPIOA_BASE			(PERIPH_BASE_APB2 + 0x0800)
+#define AFIO_BASE (PERIPH_BASE_APB2 + 0x0000)
+#define EXTI_BASE (PERIPH_BASE_APB2 + 0x0400)
+#define GPIOA_BASE (PERIPH_BASE_APB2 + 0x0800)
 /* PERIPH_BASE_APB2 + 0x0c00 is reserved (no GPIOB on this family) */
-#define GPIOC_BASE			(PERIPH_BASE_APB2 + 0x1000)
-#define GPIOD_BASE			(PERIPH_BASE_APB2 + 0x1400)
-#define ADC1_BASE			(PERIPH_BASE_APB2 + 0x2400)
-#define TIM1_BASE			(PERIPH_BASE_APB2 + 0x2c00)
-#define SPI1_BASE			(PERIPH_BASE_APB2 + 0x3000)
-#define USART1_BASE			(PERIPH_BASE_APB2 + 0x3800)
+#define GPIOC_BASE (PERIPH_BASE_APB2 + 0x1000)
+#define GPIOD_BASE (PERIPH_BASE_APB2 + 0x1400)
+#define ADC1_BASE (PERIPH_BASE_APB2 + 0x2400)
+#define TIM1_BASE (PERIPH_BASE_APB2 + 0x2c00)
+#define SPI1_BASE (PERIPH_BASE_APB2 + 0x3000)
+#define USART1_BASE (PERIPH_BASE_APB2 + 0x3800)
 
 /* --- AHB ----------------------------------------------------------------- */
-#define DMA1_BASE			(PERIPH_BASE_AHB + 0x0000)
-#define DMA1_CHANNEL1_BASE		(PERIPH_BASE_AHB + 0x0008)
-#define DMA1_CHANNEL2_BASE		(PERIPH_BASE_AHB + 0x001c)
-#define DMA1_CHANNEL3_BASE		(PERIPH_BASE_AHB + 0x0030)
-#define DMA1_CHANNEL4_BASE		(PERIPH_BASE_AHB + 0x0044)
-#define DMA1_CHANNEL5_BASE		(PERIPH_BASE_AHB + 0x0058)
-#define DMA1_CHANNEL6_BASE		(PERIPH_BASE_AHB + 0x006c)
-#define DMA1_CHANNEL7_BASE		(PERIPH_BASE_AHB + 0x0080)
-#define RCC_BASE			(PERIPH_BASE_AHB + 0x1000)
-#define FLASH_R_BASE			(PERIPH_BASE_AHB + 0x2000)
-#define EXTEN_BASE			(PERIPH_BASE_AHB + 0x3800)
+#define DMA1_BASE (PERIPH_BASE_AHB + 0x0000)
+#define DMA1_CHANNEL1_BASE (PERIPH_BASE_AHB + 0x0008)
+#define DMA1_CHANNEL2_BASE (PERIPH_BASE_AHB + 0x001c)
+#define DMA1_CHANNEL3_BASE (PERIPH_BASE_AHB + 0x0030)
+#define DMA1_CHANNEL4_BASE (PERIPH_BASE_AHB + 0x0044)
+#define DMA1_CHANNEL5_BASE (PERIPH_BASE_AHB + 0x0058)
+#define DMA1_CHANNEL6_BASE (PERIPH_BASE_AHB + 0x006c)
+#define DMA1_CHANNEL7_BASE (PERIPH_BASE_AHB + 0x0080)
+#define RCC_BASE (PERIPH_BASE_AHB + 0x1000)
+#define FLASH_R_BASE (PERIPH_BASE_AHB + 0x2000)
+#define EXTEN_BASE (PERIPH_BASE_AHB + 0x3800)
 /*
  * There is no memory-mapped DBGMCU block on this family: the debug control
  * register (which WCH's EVT calls CFGR0) lives in CSR 0x7c0 and is reached
  * with csrr/csrw, and the chip revision/device id live in the factory block
  * at 0x1ffff7c4.  See include/libopenwch/ch32v0/dbgmcu.h.
  */
-#define DBGMCU_ID_BASE			(0x1ffff7c4U)
+#define DBGMCU_ID_BASE (0x1ffff7c4U)
 
 #endif
 /**@}*/

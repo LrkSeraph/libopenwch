@@ -49,27 +49,27 @@ LGPL License Terms @ref lgpl_license
  */
 
 typedef struct {
-	volatile uint32_t ctlr;		/**< 0x00 control */
-	volatile uint32_t sr;		/**< 0x04 status */
-	volatile uint32_t cnt;		/**< 0x08 counter (low word) */
-	volatile uint32_t cnt_hi;	/**< 0x0c counter high word */
-	volatile uint32_t cmp;		/**< 0x10 compare (low word) */
-	volatile uint32_t cmp_hi;	/**< 0x14 compare high word */
+	volatile uint32_t ctlr;	  /**< 0x00 control */
+	volatile uint32_t sr;	  /**< 0x04 status */
+	volatile uint32_t cnt;	  /**< 0x08 counter (low word) */
+	volatile uint32_t cnt_hi; /**< 0x0c counter high word */
+	volatile uint32_t cmp;	  /**< 0x10 compare (low word) */
+	volatile uint32_t cmp_hi; /**< 0x14 compare high word */
 } systick_reg_t;
 
-#define SYSTICK		((systick_reg_t *)SYS_TICK_BASE)
+#define SYSTICK ((systick_reg_t *)SYS_TICK_BASE)
 
 /* ctlr bits */
-#define SYSTICK_CTLR_EN		(1 << 0)	/**< counter enable */
-#define SYSTICK_CTLR_IE		(1 << 1)	/**< interrupt enable */
-#define SYSTICK_CTLR_CLKSRC	(1 << 2)	/**< 0 = HCLK/8, 1 = HCLK */
-#define SYSTICK_CTLR_AUTORELOAD	(1 << 3)	/**< auto reload on compare */
-#define SYSTICK_CTLR_INIT	(1 << 5)	/**< initialise / reload */
-#define SYSTICK_CTLR_MODE	(1 << 31)	/**< 1 = one-shot */
+#define SYSTICK_CTLR_EN (1 << 0)	 /**< counter enable */
+#define SYSTICK_CTLR_IE (1 << 1)	 /**< interrupt enable */
+#define SYSTICK_CTLR_CLKSRC (1 << 2)	 /**< 0 = HCLK/8, 1 = HCLK */
+#define SYSTICK_CTLR_AUTORELOAD (1 << 3) /**< auto reload on compare */
+#define SYSTICK_CTLR_INIT (1 << 5)	 /**< initialise / reload */
+#define SYSTICK_CTLR_MODE (1 << 31)	 /**< 1 = one-shot */
 
 /* sr bits */
-#define SYSTICK_SR_CMP		(1 << 0)	/**< compare match */
-#define SYSTICK_SR_OV		(1 << 1)	/**< counter overflow */
+#define SYSTICK_SR_CMP (1 << 0) /**< compare match */
+#define SYSTICK_SR_OV (1 << 1)	/**< counter overflow */
 
 BEGIN_DECLS
 

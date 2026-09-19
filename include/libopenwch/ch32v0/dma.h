@@ -50,7 +50,7 @@ LGPL License Terms @ref lgpl_license
  * Remember to enable the DMA clock gate with rcc_periph_clock_enable() and to
  * route the request from the peripheral side.
  */
-#define DMA1				DMA1_BASE
+#define DMA1 DMA1_BASE
 
 #include <libopenwch/ch32v0/common/dma_common_v1.h>
 

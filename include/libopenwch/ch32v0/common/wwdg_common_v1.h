@@ -53,28 +53,28 @@ specific memorymap.h header before including this header file. */
 /* --- Register accessors -------------------------------------------------- */
 
 /* Control register (WWDG_CTLR) */
-#define WWDG_CTLR(wwdg)			MMIO32((wwdg) + 0x00)
+#define WWDG_CTLR(wwdg) MMIO32((wwdg) + 0x00)
 /* Configuration register (WWDG_CFGR) */
-#define WWDG_CFGR(wwdg)			MMIO32((wwdg) + 0x04)
+#define WWDG_CFGR(wwdg) MMIO32((wwdg) + 0x04)
 /* Status register (WWDG_STATR) */
-#define WWDG_STATR(wwdg)		MMIO32((wwdg) + 0x08)
+#define WWDG_STATR(wwdg) MMIO32((wwdg) + 0x08)
 
 /* --- WWDG_CTLR bits ------------------------------------------------------ */
 
-#define WWDG_CTLR_T_MASK		0x7fu		/**< counter field */
-#define WWDG_CTLR_WDGA			(1 << 7)	/**< activation */
+#define WWDG_CTLR_T_MASK 0x7fu	/**< counter field */
+#define WWDG_CTLR_WDGA (1 << 7) /**< activation */
 
 /* --- WWDG_CFGR bits ------------------------------------------------------ */
 
-#define WWDG_CFGR_W_MASK		0x7fu		/**< window field */
-#define WWDG_CFGR_WDGTB_MASK		(0x3u << 7)	/**< prescaler field */
-#define WWDG_CFGR_WDGTB_0		(1 << 7)
-#define WWDG_CFGR_WDGTB_1		(1 << 8)
-#define WWDG_CFGR_EWI			(1 << 9)	/**< early wakeup IE */
+#define WWDG_CFGR_W_MASK 0x7fu		 /**< window field */
+#define WWDG_CFGR_WDGTB_MASK (0x3u << 7) /**< prescaler field */
+#define WWDG_CFGR_WDGTB_0 (1 << 7)
+#define WWDG_CFGR_WDGTB_1 (1 << 8)
+#define WWDG_CFGR_EWI (1 << 9) /**< early wakeup IE */
 
 /* --- WWDG_STATR bits ----------------------------------------------------- */
 
-#define WWDG_STATR_EWIF			(1 << 0)	/**< early wakeup flag */
+#define WWDG_STATR_EWIF (1 << 0) /**< early wakeup flag */
 
 /* --- Prescaler values ---------------------------------------------------- */
 
@@ -82,10 +82,10 @@ specific memorymap.h header before including this header file. */
 @ingroup wwdg_defines
 
 @{*/
-#define WWDG_PRESCALER_1		0x0u
-#define WWDG_PRESCALER_2		WWDG_CFGR_WDGTB_0
-#define WWDG_PRESCALER_4		WWDG_CFGR_WDGTB_1
-#define WWDG_PRESCALER_8		(WWDG_CFGR_WDGTB_0 | WWDG_CFGR_WDGTB_1)
+#define WWDG_PRESCALER_1 0x0u
+#define WWDG_PRESCALER_2 WWDG_CFGR_WDGTB_0
+#define WWDG_PRESCALER_4 WWDG_CFGR_WDGTB_1
+#define WWDG_PRESCALER_8 (WWDG_CFGR_WDGTB_0 | WWDG_CFGR_WDGTB_1)
 /**@}*/
 
 BEGIN_DECLS

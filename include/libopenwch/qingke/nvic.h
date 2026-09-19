@@ -90,7 +90,7 @@ void nvic_generate_software_interrupt(void);
 END_DECLS
 
 /* Build a priority byte: pre-emption level 0..15, sub-priority 0..7. */
-#define OPENWCH_NVIC_PRIO(preempt, sub) \
+#define OPENWCH_NVIC_PRIO(preempt, sub)                                        \
 	((uint8_t)((((preempt) & 0xf) << 4) | (((sub) & 0x7) << 1)))
 
 /* Include the per-device generated IRQ numbers, if available.  The pattern

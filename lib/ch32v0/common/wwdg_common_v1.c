@@ -42,15 +42,15 @@
 void wwdg_set_prescaler(uint32_t wwdg, uint32_t prescaler) {
 	openwch_assert((prescaler & ~WWDG_CFGR_WDGTB_MASK) == 0);
 
-	WWDG_CFGR(wwdg) = (WWDG_CFGR(wwdg) & ~WWDG_CFGR_WDGTB_MASK)
-			| (prescaler & WWDG_CFGR_WDGTB_MASK);
+	WWDG_CFGR(wwdg) = (WWDG_CFGR(wwdg) & ~WWDG_CFGR_WDGTB_MASK) |
+			  (prescaler & WWDG_CFGR_WDGTB_MASK);
 }
 
 void wwdg_set_window(uint32_t wwdg, uint8_t window) {
 	openwch_assert((window & ~WWDG_CFGR_W_MASK) == 0);
 
-	WWDG_CFGR(wwdg) = (WWDG_CFGR(wwdg) & ~WWDG_CFGR_W_MASK)
-			| ((uint32_t)window & WWDG_CFGR_W_MASK);
+	WWDG_CFGR(wwdg) = (WWDG_CFGR(wwdg) & ~WWDG_CFGR_W_MASK) |
+			  ((uint32_t)window & WWDG_CFGR_W_MASK);
 }
 
 void wwdg_enable_interrupt(uint32_t wwdg) {

@@ -49,8 +49,8 @@ LGPL License Terms @ref lgpl_license
  * gpio_set_mode(..., GPIO_MODE_AF_PP) and pick the pinout with
  * gpio_primary_remap(GPIO_REMAP_TIM1_*) / (GPIO_REMAP_TIM2_*).
  */
-#define TIM1				TIM1_BASE
-#define TIM2				TIM2_BASE
+#define TIM1 TIM1_BASE
+#define TIM2 TIM2_BASE
 
 #include <libopenwch/ch32v0/common/tim_common_v1.h>
 

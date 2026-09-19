@@ -43,8 +43,8 @@
 #include <libopenwch/qingke/assert.h>
 
 /* Start-up delays, in iterations of two nops, as used by WCH's EVT. */
-#define CLK_XT32M_STARTUP_LOOPS		1200u
-#define CLK_PLL_LOCK_LOOPS		2000u
+#define CLK_XT32M_STARTUP_LOOPS 1200u
+#define CLK_PLL_LOCK_LOOPS 2000u
 
 /** Burn a few cycles so the peripheral can act on the previous write. */
 static void clk_short_delay(uint32_t loops) {
@@ -139,7 +139,8 @@ void clk_32k_select(uint32_t source) {
 	 * R8_CK32K_CONFIG selects between the 32.768 kHz crystal and the
 	 * internal RC.  Its documented values are 0 (LSI) and 0x80 (LSE).
 	 */
-	RWA_WRITE8(MMIO8(SYS_BASE + 0x2f), (source == CLK_SOURCE_LSE) ? 0x80u : 0x00u);
+	RWA_WRITE8(MMIO8(SYS_BASE + 0x2f),
+		   (source == CLK_SOURCE_LSE) ? 0x80u : 0x00u);
 }
 
 /* --- System clock -------------------------------------------------------- */
@@ -163,7 +164,8 @@ void clk_set_sys_clock(clk_source_t source) {
 		clk_pll_enable();
 
 		RWA_MODIFY(MMIO16(R16_CLK_SYS_CFG), 0x00ffu,
-			   (uint32_t)(cfg & (CLK_SYS_CFG_MOD_MASK | CLK_SYS_CFG_DIV_MASK)));
+			   (uint32_t)(cfg & (CLK_SYS_CFG_MOD_MASK |
+					     CLK_SYS_CFG_DIV_MASK)));
 		clk_short_delay(4);
 
 		/*
@@ -182,7 +184,8 @@ void clk_set_sys_clock(clk_source_t source) {
 		clk_hse_enable();
 
 		RWA_MODIFY(MMIO16(R16_CLK_SYS_CFG), 0x00ffu,
-			   (uint32_t)(cfg & (CLK_SYS_CFG_MOD_MASK | CLK_SYS_CFG_DIV_MASK)));
+			   (uint32_t)(cfg & (CLK_SYS_CFG_MOD_MASK |
+					     CLK_SYS_CFG_DIV_MASK)));
 		clk_short_delay(4);
 
 		RWA_WRITE8(FLASH_CFG, 0x51u);
@@ -207,7 +210,7 @@ uint32_t clk_get_sys_clock(void) {
 	default:
 		/* 32 kHz domain.  R8_CK32K_CONFIG decides which source. */
 		return (MMIO8(SYS_BASE + 0x2f) & 0x80u) ? CLK_LSE_FREQUENCY
-						       : CLK_LSI_FREQUENCY;
+							: CLK_LSI_FREQUENCY;
 	}
 }
 

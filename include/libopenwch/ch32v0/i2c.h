@@ -44,7 +44,7 @@ LGPL License Terms @ref lgpl_license
  * and select the remap with gpio_primary_remap(GPIO_REMAP_I2C1_*) -- the bus
  * requires open-drain outputs, so never use GPIO_MODE_AF_PP here.
  */
-#define I2C1				I2C1_BASE
+#define I2C1 I2C1_BASE
 
 #include <libopenwch/ch32v0/common/i2c_common_v1.h>
 

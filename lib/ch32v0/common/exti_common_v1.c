@@ -38,11 +38,9 @@
 #include <libopenwch/ch32v0/exti.h>
 #include <libopenwch/qingke/assert.h>
 
-void exti_set_trigger(
-	uint32_t exti,
-	uint32_t line,
-	enum exti_trigger_type trigger
-) {
+void exti_set_trigger(uint32_t exti,
+		      uint32_t line,
+		      enum exti_trigger_type trigger) {
 	openwch_assert((line & ~EXTI_LINE_ALL) == 0);
 	openwch_assert(line != 0);
 

@@ -58,52 +58,52 @@ LGPL License Terms @ref lgpl_license
 
 /* --- Register accessors -------------------------------------------------- */
 
-#define GPIO_DIR(port)			MMIO32((port) + GPIO_DIR_OFFSET)
-#define GPIO_PIN(port)			MMIO32((port) + GPIO_PIN_OFFSET)
-#define GPIO_OUT(port)			MMIO32((port) + GPIO_OUT_OFFSET)
-#define GPIO_CLR(port)			MMIO32((port) + GPIO_CLR_OFFSET)
-#define GPIO_PU(port)			MMIO32((port) + GPIO_PU_OFFSET)
-#define GPIO_PD_DRV(port)		MMIO32((port) + GPIO_PD_DRV_OFFSET)
+#define GPIO_DIR(port) MMIO32((port) + GPIO_DIR_OFFSET)
+#define GPIO_PIN(port) MMIO32((port) + GPIO_PIN_OFFSET)
+#define GPIO_OUT(port) MMIO32((port) + GPIO_OUT_OFFSET)
+#define GPIO_CLR(port) MMIO32((port) + GPIO_CLR_OFFSET)
+#define GPIO_PU(port) MMIO32((port) + GPIO_PU_OFFSET)
+#define GPIO_PD_DRV(port) MMIO32((port) + GPIO_PD_DRV_OFFSET)
 
 /* --- Pin identifiers ----------------------------------------------------- */
 
 /** @defgroup gpio_pin_id GPIO Pin Identifiers
 @ingroup gpio_defines
 @{*/
-#define GPIO0				(1u << 0)
-#define GPIO1				(1u << 1)
-#define GPIO2				(1u << 2)
-#define GPIO3				(1u << 3)
-#define GPIO4				(1u << 4)
-#define GPIO5				(1u << 5)
-#define GPIO6				(1u << 6)
-#define GPIO7				(1u << 7)
-#define GPIO8				(1u << 8)
-#define GPIO9				(1u << 9)
-#define GPIO10				(1u << 10)
-#define GPIO11				(1u << 11)
-#define GPIO12				(1u << 12)
-#define GPIO13				(1u << 13)
-#define GPIO14				(1u << 14)
-#define GPIO15				(1u << 15)
+#define GPIO0 (1u << 0)
+#define GPIO1 (1u << 1)
+#define GPIO2 (1u << 2)
+#define GPIO3 (1u << 3)
+#define GPIO4 (1u << 4)
+#define GPIO5 (1u << 5)
+#define GPIO6 (1u << 6)
+#define GPIO7 (1u << 7)
+#define GPIO8 (1u << 8)
+#define GPIO9 (1u << 9)
+#define GPIO10 (1u << 10)
+#define GPIO11 (1u << 11)
+#define GPIO12 (1u << 12)
+#define GPIO13 (1u << 13)
+#define GPIO14 (1u << 14)
+#define GPIO15 (1u << 15)
 
 /* GPIOB goes up to PB23. */
-#define GPIO16				(1u << 16)
-#define GPIO17				(1u << 17)
-#define GPIO18				(1u << 18)
-#define GPIO19				(1u << 19)
-#define GPIO20				(1u << 20)
-#define GPIO21				(1u << 21)
-#define GPIO22				(1u << 22)
-#define GPIO23				(1u << 23)
+#define GPIO16 (1u << 16)
+#define GPIO17 (1u << 17)
+#define GPIO18 (1u << 18)
+#define GPIO19 (1u << 19)
+#define GPIO20 (1u << 20)
+#define GPIO21 (1u << 21)
+#define GPIO22 (1u << 22)
+#define GPIO23 (1u << 23)
 
-#define GPIO_ALL		0xffffffffu
+#define GPIO_ALL 0xffffffffu
 /**@}*/
 
 /** Number of pins on GPIOA. */
-#define GPIOA_PIN_COUNT			16
+#define GPIOA_PIN_COUNT 16
 /** Number of pins on GPIOB. */
-#define GPIOB_PIN_COUNT			24
+#define GPIOB_PIN_COUNT 24
 
 /* --- Pin modes ----------------------------------------------------------- */
 
@@ -113,20 +113,20 @@ LGPL License Terms @ref lgpl_license
 Unlike the CH32V00x, the mode here also selects the output drive strength,
 because that is the same register bit as the input pull-down.
 @{*/
-#define GPIO_MODE_INPUT_FLOAT		0	/**< floating input */
-#define GPIO_MODE_INPUT_PU		1	/**< input with pull-up */
-#define GPIO_MODE_INPUT_PD		2	/**< input with pull-down */
-#define GPIO_MODE_OUTPUT_PP_5MA		3	/**< push-pull output, 5 mA */
-#define GPIO_MODE_OUTPUT_PP_20MA	4	/**< push-pull output, 20 mA */
+#define GPIO_MODE_INPUT_FLOAT 0	   /**< floating input */
+#define GPIO_MODE_INPUT_PU 1	   /**< input with pull-up */
+#define GPIO_MODE_INPUT_PD 2	   /**< input with pull-down */
+#define GPIO_MODE_OUTPUT_PP_5MA 3  /**< push-pull output, 5 mA */
+#define GPIO_MODE_OUTPUT_PP_20MA 4 /**< push-pull output, 20 mA */
 /**@}*/
 
 /** @defgroup gpio_irq_mode GPIO Interrupt Modes
 @ingroup gpio_defines
 @{*/
-#define GPIO_IRQ_LOW_LEVEL		0
-#define GPIO_IRQ_HIGH_LEVEL		1
-#define GPIO_IRQ_FALLING_EDGE		2
-#define GPIO_IRQ_RISING_EDGE		3
+#define GPIO_IRQ_LOW_LEVEL 0
+#define GPIO_IRQ_HIGH_LEVEL 1
+#define GPIO_IRQ_FALLING_EDGE 2
+#define GPIO_IRQ_RISING_EDGE 3
 /**@}*/
 
 /* --- Pin alternate function remap ---------------------------------------- */
@@ -139,21 +139,21 @@ The CH58x has no per-pin alternate-function number.  A function is enabled by
 own output driver, and (c) configuring the pin with gpio_set_mode().  These are
 the R16_PIN_ALTERNATE bits.
 @{*/
-#define GPIO_REMAP_TMR0			(1u << 0)
-#define GPIO_REMAP_TMR1			(1u << 1)
-#define GPIO_REMAP_TMR2			(1u << 2)
-#define GPIO_REMAP_TMR3			(1u << 3)
-#define GPIO_REMAP_UART0		(1u << 4)
-#define GPIO_REMAP_UART1		(1u << 5)
-#define GPIO_REMAP_UART2		(1u << 6)
-#define GPIO_REMAP_UART3		(1u << 7)
-#define GPIO_REMAP_SPI0			(1u << 8)
-#define GPIO_REMAP_PWMX			(1u << 10)
-#define GPIO_REMAP_I2C			(1u << 11)
-#define GPIO_REMAP_MODEM		(1u << 12)
-#define GPIO_REMAP_INTX			(1u << 13)	/**< PB22/23 as EXTI24/25 */
-#define GPIO_REMAP_UART0_INV		(1u << 14)
-#define GPIO_REMAP_RF_ANT_SW		(1u << 15)
+#define GPIO_REMAP_TMR0 (1u << 0)
+#define GPIO_REMAP_TMR1 (1u << 1)
+#define GPIO_REMAP_TMR2 (1u << 2)
+#define GPIO_REMAP_TMR3 (1u << 3)
+#define GPIO_REMAP_UART0 (1u << 4)
+#define GPIO_REMAP_UART1 (1u << 5)
+#define GPIO_REMAP_UART2 (1u << 6)
+#define GPIO_REMAP_UART3 (1u << 7)
+#define GPIO_REMAP_SPI0 (1u << 8)
+#define GPIO_REMAP_PWMX (1u << 10)
+#define GPIO_REMAP_I2C (1u << 11)
+#define GPIO_REMAP_MODEM (1u << 12)
+#define GPIO_REMAP_INTX (1u << 13) /**< PB22/23 as EXTI24/25 */
+#define GPIO_REMAP_UART0_INV (1u << 14)
+#define GPIO_REMAP_RF_ANT_SW (1u << 15)
 /**@}*/
 
 /* --- Analog input enable ------------------------------------------------- */
@@ -164,23 +164,23 @@ the R16_PIN_ALTERNATE bits.
 R16_PIN_ANALOG_IE disables the digital input buffer on pins used as analog
 inputs (ADC / touch-key channels), which is required for an accurate reading.
 @{*/
-#define GPIO_ANALOG_ADC0		(1u << 0)
-#define GPIO_ANALOG_ADC1		(1u << 1)
-#define GPIO_ANALOG_ADC2		(1u << 2)
-#define GPIO_ANALOG_ADC3		(1u << 3)
-#define GPIO_ANALOG_ADC4		(1u << 4)
-#define GPIO_ANALOG_ADC5		(1u << 5)
-#define GPIO_ANALOG_ADC6		(1u << 6)
-#define GPIO_ANALOG_ADC7		(1u << 7)
-#define GPIO_ANALOG_ADC8		(1u << 8)
-#define GPIO_ANALOG_ADC9		(1u << 9)
-#define GPIO_ANALOG_ADC10		(1u << 10)
-#define GPIO_ANALOG_ADC11		(1u << 11)
-#define GPIO_ANALOG_ADC12		(1u << 12)
-#define GPIO_ANALOG_ADC13		(1u << 13)
-#define GPIO_ANALOG_USB			(1u << 14)
-#define GPIO_ANALOG_USB_DP_PU		(1u << 15)
-#define GPIO_ANALOG_XT32K		(1u << 16)
+#define GPIO_ANALOG_ADC0 (1u << 0)
+#define GPIO_ANALOG_ADC1 (1u << 1)
+#define GPIO_ANALOG_ADC2 (1u << 2)
+#define GPIO_ANALOG_ADC3 (1u << 3)
+#define GPIO_ANALOG_ADC4 (1u << 4)
+#define GPIO_ANALOG_ADC5 (1u << 5)
+#define GPIO_ANALOG_ADC6 (1u << 6)
+#define GPIO_ANALOG_ADC7 (1u << 7)
+#define GPIO_ANALOG_ADC8 (1u << 8)
+#define GPIO_ANALOG_ADC9 (1u << 9)
+#define GPIO_ANALOG_ADC10 (1u << 10)
+#define GPIO_ANALOG_ADC11 (1u << 11)
+#define GPIO_ANALOG_ADC12 (1u << 12)
+#define GPIO_ANALOG_ADC13 (1u << 13)
+#define GPIO_ANALOG_USB (1u << 14)
+#define GPIO_ANALOG_USB_DP_PU (1u << 15)
+#define GPIO_ANALOG_XT32K (1u << 16)
 /**@}*/
 
 BEGIN_DECLS

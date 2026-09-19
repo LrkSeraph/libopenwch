@@ -40,7 +40,7 @@ LGPL License Terms @ref lgpl_license
 /* The PWMX block is a single instance; there is no PWM0..PWM3 here.  The
  * TMR0..TMR3 blocks each drive one pin that is also called PWM0..PWM3, and
  * those live in tmr.h. */
-#define PWMX				PWMX_BASE
+#define PWMX PWMX_BASE
 
 #include <libopenwch/ch5xx58x/common/pwm_common_v1.h>
 

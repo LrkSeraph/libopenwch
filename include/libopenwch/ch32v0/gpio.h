@@ -40,16 +40,16 @@ LGPL License Terms @ref lgpl_license
  * The CH32V00x only exposes ports A, C and D, and they are 8 bits wide.
  * There is no GPIOB.
  */
-#define GPIOA				GPIOA_BASE
-#define GPIOC				GPIOC_BASE
-#define GPIOD				GPIOD_BASE
+#define GPIOA GPIOA_BASE
+#define GPIOC GPIOC_BASE
+#define GPIOD GPIOD_BASE
 
 /* GPIO alternate-function / remap register (AFIO_PCFR1) */
-#define AFIO_PCFR1			MMIO32(AFIO_BASE + 0x00)
+#define AFIO_PCFR1 MMIO32(AFIO_BASE + 0x00)
 /* External interrupt configuration register (AFIO_EXTICR) */
-#define AFIO_EXTICR			MMIO32(AFIO_BASE + 0x08)
+#define AFIO_EXTICR MMIO32(AFIO_BASE + 0x08)
 /* Event output control register (AFIO_ECR) */
-#define AFIO_ECR			MMIO32(AFIO_BASE + 0x14)
+#define AFIO_ECR MMIO32(AFIO_BASE + 0x14)
 
 /*
  * AFIO_PCFR1 bits.
@@ -68,34 +68,34 @@ LGPL License Terms @ref lgpl_license
  *
  * (For I2C1 only 0b01 and 0b11 are meaningful; 0b10 is not documented.)
  */
-#define AFIO_PCFR1_SPI1_RM		(1 << 0)
-#define AFIO_PCFR1_I2C1_RM		(1 << 1)
-#define AFIO_PCFR1_USART1_RM		(1 << 2)
-#define AFIO_PCFR1_TIM1_RM_SHIFT	6
-#define AFIO_PCFR1_TIM1_RM_MASK		(0x3u << 6)
-#define AFIO_PCFR1_TIM2_RM_SHIFT	8
-#define AFIO_PCFR1_TIM2_RM_MASK		(0x3u << 8)
+#define AFIO_PCFR1_SPI1_RM (1 << 0)
+#define AFIO_PCFR1_I2C1_RM (1 << 1)
+#define AFIO_PCFR1_USART1_RM (1 << 2)
+#define AFIO_PCFR1_TIM1_RM_SHIFT 6
+#define AFIO_PCFR1_TIM1_RM_MASK (0x3u << 6)
+#define AFIO_PCFR1_TIM2_RM_SHIFT 8
+#define AFIO_PCFR1_TIM2_RM_MASK (0x3u << 8)
 /* Port A1/A2 mapped onto OSCIN/OSCOUT instead of PD0/PD1. */
-#define AFIO_PCFR1_PA12_RM		(1 << 15)
-#define AFIO_PCFR1_ADC1_ETRGINJ_RM	(1 << 17)
-#define AFIO_PCFR1_ADC1_ETRGREG_RM	(1 << 18)
+#define AFIO_PCFR1_PA12_RM (1 << 15)
+#define AFIO_PCFR1_ADC1_ETRGINJ_RM (1 << 17)
+#define AFIO_PCFR1_ADC1_ETRGREG_RM (1 << 18)
 /* Second remap bit of the USART1 / I2C1 two-bit code. */
-#define AFIO_PCFR1_USART1_REMAP1	(1 << 21)
-#define AFIO_PCFR1_I2C1_REMAP1		(1 << 22)
+#define AFIO_PCFR1_USART1_REMAP1 (1 << 21)
+#define AFIO_PCFR1_I2C1_REMAP1 (1 << 22)
 /* TIM1_CH1 channel selection. */
-#define AFIO_PCFR1_TIM1_1_RM		(1 << 23)
-#define AFIO_PCFR1_SWCFG_SHIFT		24
-#define AFIO_PCFR1_SWCFG_MASK		(0x7u << 24)
+#define AFIO_PCFR1_TIM1_1_RM (1 << 23)
+#define AFIO_PCFR1_SWCFG_SHIFT 24
+#define AFIO_PCFR1_SWCFG_MASK (0x7u << 24)
 
 /* Debug-interface (SWD/SDI) disable, per WCH's EVT (not in the SVD). */
-#define AFIO_PCFR1_SDI_DISABLE		(1 << 10)
+#define AFIO_PCFR1_SDI_DISABLE (1 << 10)
 /* LSI clock calibration output, per WCH's EVT (not in the SVD). */
-#define AFIO_PCFR1_LSI_CAL		(1 << 7)
+#define AFIO_PCFR1_LSI_CAL (1 << 7)
 
 /* AFIO_EXTICR: two bits per EXTI line selecting the port. */
-#define AFIO_EXTICR_PORTA		0x0
-#define AFIO_EXTICR_PORTC		0x2
-#define AFIO_EXTICR_PORTD		0x3
+#define AFIO_EXTICR_PORTA 0x0
+#define AFIO_EXTICR_PORTC 0x2
+#define AFIO_EXTICR_PORTD 0x3
 
 #include <libopenwch/ch32v0/common/gpio_common_v1.h>
 

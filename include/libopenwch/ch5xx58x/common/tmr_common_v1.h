@@ -75,54 +75,54 @@ LGPL License Terms @ref lgpl_license
 /* --- Register offsets ---------------------------------------------------- */
 
 /** Mode control, 8-bit. */
-#define TMR_CTRL_MOD			0x00
+#define TMR_CTRL_MOD 0x00
 /** DMA control, 8-bit; TMR1/TMR2 only. */
-#define TMR_CTRL_DMA			0x01
+#define TMR_CTRL_DMA 0x01
 /** Interrupt enable, 8-bit. */
-#define TMR_INTER_EN			0x02
+#define TMR_INTER_EN 0x02
 /** Status word, 32-bit. */
-#define TMR_STATUS			0x04
+#define TMR_STATUS 0x04
 /** Interrupt flag, 8-bit, write 1 to clear. */
-#define TMR_INT_FLAG			0x06
+#define TMR_INT_FLAG 0x06
 /** Capture FIFO occupancy, 8-bit, read only. */
-#define TMR_FIFO_COUNT			0x07
+#define TMR_FIFO_COUNT 0x07
 /** Current count, 32-bit. */
-#define TMR_COUNT			0x08
+#define TMR_COUNT 0x08
 /** End-of-cycle value, 32-bit, only the low 26 bits are used. */
-#define TMR_CNT_END			0x0c
+#define TMR_CNT_END 0x0c
 /** Capture / PWM data FIFO, 32-bit, only the low 26 bits are used. */
-#define TMR_FIFO			0x10
+#define TMR_FIFO 0x10
 /** DMA current address, 32-bit; TMR1/TMR2 only. */
-#define TMR_DMA_NOW			0x14
+#define TMR_DMA_NOW 0x14
 /** DMA start address, 32-bit; TMR1/TMR2 only. */
-#define TMR_DMA_BEG			0x18
+#define TMR_DMA_BEG 0x18
 /** DMA end address, 32-bit; TMR1/TMR2 only. */
-#define TMR_DMA_END			0x1c
+#define TMR_DMA_END 0x1c
 
 /** Capture FIFO depth, in entries. */
-#define TMR_FIFO_SIZE			8
+#define TMR_FIFO_SIZE 8
 
 /*
  * The counter width.  WCH's drivers use 67108864 (2^26) as "the longest
  * period", but CNT_END is only implemented for the low 26 bits, so the
  * largest value a full wrap can come back from is 2^26 - 1.
  */
-#define TMR_COUNT_MAX			0x3ffffffu
+#define TMR_COUNT_MAX 0x3ffffffu
 
 /* --- Register accessors -------------------------------------------------- */
 
-#define TMR_CTRL_MOD_REG(tmr)		MMIO8((tmr) + TMR_CTRL_MOD)
-#define TMR_CTRL_DMA_REG(tmr)		MMIO8((tmr) + TMR_CTRL_DMA)
-#define TMR_INTER_EN_REG(tmr)		MMIO8((tmr) + TMR_INTER_EN)
-#define TMR_STATUS_REG(tmr)		MMIO32((tmr) + TMR_STATUS)
-#define TMR_INT_FLAG_REG(tmr)		MMIO8((tmr) + TMR_INT_FLAG)
-#define TMR_FIFO_COUNT_REG(tmr)		MMIO8((tmr) + TMR_FIFO_COUNT)
-#define TMR_COUNT_REG(tmr)		MMIO32((tmr) + TMR_COUNT)
-#define TMR_CNT_END_REG(tmr)		MMIO32((tmr) + TMR_CNT_END)
-#define TMR_FIFO_REG(tmr)		MMIO32((tmr) + TMR_FIFO)
-#define TMR_DMA_NOW_REG(tmr)		MMIO32((tmr) + TMR_DMA_NOW)
-#define TMR_DMA_BEG_REG(tmr)		MMIO32((tmr) + TMR_DMA_BEG)
-#define TMR_DMA_END_REG(tmr)		MMIO32((tmr) + TMR_DMA_END)
+#define TMR_CTRL_MOD_REG(tmr) MMIO8((tmr) + TMR_CTRL_MOD)
+#define TMR_CTRL_DMA_REG(tmr) MMIO8((tmr) + TMR_CTRL_DMA)
+#define TMR_INTER_EN_REG(tmr) MMIO8((tmr) + TMR_INTER_EN)
+#define TMR_STATUS_REG(tmr) MMIO32((tmr) + TMR_STATUS)
+#define TMR_INT_FLAG_REG(tmr) MMIO8((tmr) + TMR_INT_FLAG)
+#define TMR_FIFO_COUNT_REG(tmr) MMIO8((tmr) + TMR_FIFO_COUNT)
+#define TMR_COUNT_REG(tmr) MMIO32((tmr) + TMR_COUNT)
+#define TMR_CNT_END_REG(tmr) MMIO32((tmr) + TMR_CNT_END)
+#define TMR_FIFO_REG(tmr) MMIO32((tmr) + TMR_FIFO)
+#define TMR_DMA_NOW_REG(tmr) MMIO32((tmr) + TMR_DMA_NOW)
+#define TMR_DMA_BEG_REG(tmr) MMIO32((tmr) + TMR_DMA_BEG)
+#define TMR_DMA_END_REG(tmr) MMIO32((tmr) + TMR_DMA_END)
 
 /* --- CTRL_MOD bits ------------------------------------------------------- */
 
@@ -131,14 +131,14 @@ LGPL License Terms @ref lgpl_license
 The low nibble defines the direction; bits 5:4 and 7:6 are re-used depending
 on RB_TMR_MODE_IN.
 @{*/
-#define RB_TMR_MODE_IN			0x01	/**< 0 = timer/PWM, 1 = capture/count */
-#define RB_TMR_ALL_CLEAR		0x02	/**< force-clear the FIFO and the count */
-#define RB_TMR_COUNT_EN			0x04	/**< counting enable */
-#define RB_TMR_OUT_EN			0x08	/**< output (PWM) enable */
-#define RB_TMR_OUT_POLAR		0x10	/**< 0 = active high, 1 = active low */
-#define RB_TMR_CAP_COUNT		0x10	/**< with MODE_IN: 1 = edge count */
-#define RB_TMR_PWM_REPEAT		0xc0	/**< bits 7:6, PWM repeat count */
-#define RB_TMR_CAP_EDGE			0xc0	/**< bits 7:6, capture edge mode */
+#define RB_TMR_MODE_IN 0x01    /**< 0 = timer/PWM, 1 = capture/count */
+#define RB_TMR_ALL_CLEAR 0x02  /**< force-clear the FIFO and the count */
+#define RB_TMR_COUNT_EN 0x04   /**< counting enable */
+#define RB_TMR_OUT_EN 0x08     /**< output (PWM) enable */
+#define RB_TMR_OUT_POLAR 0x10  /**< 0 = active high, 1 = active low */
+#define RB_TMR_CAP_COUNT 0x10  /**< with MODE_IN: 1 = edge count */
+#define RB_TMR_PWM_REPEAT 0xc0 /**< bits 7:6, PWM repeat count */
+#define RB_TMR_CAP_EDGE 0xc0   /**< bits 7:6, capture edge mode */
 /**@}*/
 
 /* --- CTRL_DMA bits (TMR1/TMR2 only) -------------------------------------- */
@@ -146,8 +146,8 @@ on RB_TMR_MODE_IN.
 /** @defgroup tmr_dma_bits TMR CTRL_DMA bits
 @ingroup tmr_defines
 @{*/
-#define RB_TMR_DMA_ENABLE		0x01	/**< DMA enable */
-#define RB_TMR_DMA_LOOP			0x04	/**< restart at DMA_BEG when DMA_END is hit */
+#define RB_TMR_DMA_ENABLE 0x01 /**< DMA enable */
+#define RB_TMR_DMA_LOOP 0x04   /**< restart at DMA_BEG when DMA_END is hit */
 /**@}*/
 
 /* --- Interrupt and flag bits --------------------------------------------- */
@@ -157,25 +157,25 @@ on RB_TMR_MODE_IN.
 The same bit positions are used in TMR_INTER_EN and TMR_INT_FLAG.  The last
 two are meaningless on TMR0 and TMR3, which have no DMA controller.
 @{*/
-#define RB_TMR_IE_CYC_END		0x01	/**< capture timeout or PWM cycle end */
-#define RB_TMR_IE_DATA_ACT		0x02	/**< capture data ready or PWM trigger */
-#define RB_TMR_IE_FIFO_HF		0x04	/**< capture FIFO >= 4, PWM FIFO <= 3 */
-#define RB_TMR_IE_DMA_END		0x08	/**< DMA complete; TMR1/TMR2 only */
-#define RB_TMR_IE_FIFO_OV		0x10	/**< capture FIFO full / PWM FIFO empty */
+#define RB_TMR_IE_CYC_END 0x01	/**< capture timeout or PWM cycle end */
+#define RB_TMR_IE_DATA_ACT 0x02 /**< capture data ready or PWM trigger */
+#define RB_TMR_IE_FIFO_HF 0x04	/**< capture FIFO >= 4, PWM FIFO <= 3 */
+#define RB_TMR_IE_DMA_END 0x08	/**< DMA complete; TMR1/TMR2 only */
+#define RB_TMR_IE_FIFO_OV 0x10	/**< capture FIFO full / PWM FIFO empty */
 
-#define RB_TMR_IF_CYC_END		0x01
-#define RB_TMR_IF_DATA_ACT		0x02
-#define RB_TMR_IF_FIFO_HF		0x04
-#define RB_TMR_IF_DMA_END		0x08	/**< TMR1/TMR2 only */
-#define RB_TMR_IF_FIFO_OV		0x10
+#define RB_TMR_IF_CYC_END 0x01
+#define RB_TMR_IF_DATA_ACT 0x02
+#define RB_TMR_IF_FIFO_HF 0x04
+#define RB_TMR_IF_DMA_END 0x08 /**< TMR1/TMR2 only */
+#define RB_TMR_IF_FIFO_OV 0x10
 /**@}*/
 
 /** Every bit the flag register is guaranteed to have on all four instances. */
-#define TMR_IF_ALL			0x1f
+#define TMR_IF_ALL 0x1f
 /** The bits TMR0 and TMR3 do not have. */
-#define TMR_IF_DMA_ONLY			0x08
+#define TMR_IF_DMA_ONLY 0x08
 /** Every interrupt enable the four instances share. */
-#define TMR_IE_ALL			0x1f
+#define TMR_IE_ALL 0x1f
 
 /* --- Timer modes --------------------------------------------------------- */
 
@@ -185,10 +185,10 @@ Passed to tmr_set_mode().  RB_TMR_ALL_CLEAR is deliberately not offered: it is
 a self-clearing strobe, and tmr_set_mode() already pulses it so that whatever
 is being configured starts from a clean FIFO and count.
 @{*/
-#define TMR_MODE_TIMER			0x00	/**< count Tsys, interrupt at CNT_END */
-#define TMR_MODE_PWM			0x00	/**< produce a PWM waveform */
-#define TMR_MODE_CAPTURE		0x01	/**< capture edges, RB_TMR_MODE_IN */
-#define TMR_MODE_COUNT			0x11	/**< count edges, MODE_IN | CAP_COUNT */
+#define TMR_MODE_TIMER 0x00   /**< count Tsys, interrupt at CNT_END */
+#define TMR_MODE_PWM 0x00     /**< produce a PWM waveform */
+#define TMR_MODE_CAPTURE 0x01 /**< capture edges, RB_TMR_MODE_IN */
+#define TMR_MODE_COUNT 0x11   /**< count edges, MODE_IN | CAP_COUNT */
 /**@}*/
 
 /* --- Capture sub-modes --------------------------------------------------- */
@@ -198,18 +198,18 @@ is being configured starts from a clean FIFO and count.
 A capture unit latches the count on an edge, and the same two bits select which
 edge pairs delimit a capture window.
 @{*/
-#define TMR_CAPTURE_DISABLE		0x00	/**< no capture and no edge count */
-#define TMR_CAPTURE_EDGE		0x40	/**< any edge to any edge */
-#define TMR_CAPTURE_FALLING		0x80	/**< falling edge to falling edge */
-#define TMR_CAPTURE_RISING		0xc0	/**< rising edge to rising edge */
+#define TMR_CAPTURE_DISABLE 0x00 /**< no capture and no edge count */
+#define TMR_CAPTURE_EDGE 0x40	 /**< any edge to any edge */
+#define TMR_CAPTURE_FALLING 0x80 /**< falling edge to falling edge */
+#define TMR_CAPTURE_RISING 0xc0	 /**< rising edge to rising edge */
 /**@}*/
 
 /* --- PWM waveform polarity ----------------------------------------------- */
 
 /** @defgroup tmr_polarity TMR PWM Polarity
 @{*/
-#define TMR_POLARITY_ACTIVE_HIGH	0x00	/**< idle low, active high */
-#define TMR_POLARITY_ACTIVE_LOW		0x10	/**< idle high, active low */
+#define TMR_POLARITY_ACTIVE_HIGH 0x00 /**< idle low, active high */
+#define TMR_POLARITY_ACTIVE_LOW 0x10  /**< idle high, active low */
 /**@}*/
 
 /* --- PWM repeat count ---------------------------------------------------- */
@@ -218,24 +218,23 @@ edge pairs delimit a capture window.
 
 How many effective-level periods are emitted per trigger.
 @{*/
-#define TMR_PWM_REPEAT_1		0x00
-#define TMR_PWM_REPEAT_4		0x40
-#define TMR_PWM_REPEAT_8		0x80
-#define TMR_PWM_REPEAT_16		0xc0
+#define TMR_PWM_REPEAT_1 0x00
+#define TMR_PWM_REPEAT_4 0x40
+#define TMR_PWM_REPEAT_8 0x80
+#define TMR_PWM_REPEAT_16 0xc0
 /**@}*/
 
 /* --- DMA modes ----------------------------------------------------------- */
 
 /** @defgroup tmr_dma_modes TMR DMA Modes
 @{*/
-#define TMR_DMA_DISABLE			0x00	/**< stop and disable the DMA engine */
-#define TMR_DMA_SINGLE			0x01	/**< one pass from DMA_BEG to DMA_END */
-#define TMR_DMA_LOOP			0x05	/**< restart at DMA_BEG, DMA_LOOP */
+#define TMR_DMA_DISABLE 0x00 /**< stop and disable the DMA engine */
+#define TMR_DMA_SINGLE 0x01  /**< one pass from DMA_BEG to DMA_END */
+#define TMR_DMA_LOOP 0x05    /**< restart at DMA_BEG, DMA_LOOP */
 /**@}*/
 
 /** True when `tmr` is a TMR1/TMR2-style instance with a DMA controller. */
-#define TMR_HAS_DMA(tmr) \
-	(((tmr) == TMR1_BASE) || ((tmr) == TMR2_BASE))
+#define TMR_HAS_DMA(tmr) (((tmr) == TMR1_BASE) || ((tmr) == TMR2_BASE))
 
 BEGIN_DECLS
 

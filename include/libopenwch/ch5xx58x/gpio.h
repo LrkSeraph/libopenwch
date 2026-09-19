@@ -38,15 +38,15 @@ LGPL License Terms @ref lgpl_license
 #include <libopenwch/ch5xx58x/memorymap.h>
 
 /* The CH58x has two ports: GPIOA (16 pins) and GPIOB (24 pins). */
-#define GPIOA				GPIOA_BASE
-#define GPIOB				GPIOB_BASE
+#define GPIOA GPIOA_BASE
+#define GPIOB GPIOB_BASE
 
 /*
  * Pin alternate function selection (R16_PIN_ALTERNATE) and analog input
  * enable (R16_PIN_ANALOG_IE).  Both are plain read/write.
  */
-#define GPIO_PIN_ALTERNATE		MMIO16(R16_PIN_ALTERNATE)
-#define GPIO_PIN_ANALOG_IE		MMIO16(R16_PIN_ANALOG_IE)
+#define GPIO_PIN_ALTERNATE MMIO16(R16_PIN_ALTERNATE)
+#define GPIO_PIN_ANALOG_IE MMIO16(R16_PIN_ANALOG_IE)
 
 #include <libopenwch/ch5xx58x/common/gpio_common_v1.h>
 
