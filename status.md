@@ -12,11 +12,11 @@
 | 项 | 值 |
 |---|---|
 | 当前阶段 | **P2 进行中（CH32V00x 外设驱动）** |
-| 阶段进度 | P0: 100% ｜ P1: 100% ｜ **P2: 15%**（memorymap + gpio + rcc）｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
-| 最近更新 | P2.1–P2.2 完成：`ch32v0/memorymap.h`、`gpio`（含 AFIO/EXTI 源选择）、`rcc`（HSI/HSE→48 MHz、外设时钟、复位、时钟测量） |
+| 阶段进度 | P0: 100% ｜ P1: 100% ｜ **P2: 40%**（memorymap + gpio + rcc + 应用模板）｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
+| 最近更新 | P2.1–P2.2 完成（memorymap / gpio / rcc）；新增 P2.6 用户应用模板 `template/`，两个示例均可构建，并借此发现并修正 3 个构建系统缺陷 |
 | 构建状态 | ✅ `make` 全绿：`lib/libopenwch_ch32v0.a`、`lib/libopenwch_ch5xx58x.a` |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
-| 仓库状态 | ✅ 已提交基线 `9a8ed34`（56 文件 / 10303 行），构建后工作区依然干净 |
+| 仓库状态 | ✅ 4 个提交，最新 `7b0df2f`；构建后工作区依然干净 |
 
 ### 可复现的验证命令与结果
 
@@ -135,7 +135,26 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 - [x] 用真实程序验证：编译 + 链接 + 反汇编确认写入的 nibble 与 WCH EVT 一致
 
 **待办**：`usart`、`tim`、`spi`、`i2c`、`adc`、`dma`、`exti`、`flash`、
-`iwdg`/`wwdg`、`pwr`、`opa`、`dbgmcu`；`examples/`；`tests/`。
+`iwdg`/`wwdg`、`pwr`、`opa`、`dbgmcu`；库内 `examples/`；`tests/` 自动化。
+
+### P2.6 — 用户应用模板（`template/`）
+
+- [x] `template/rules/toolchain.mk` —— RISC-V 前缀探测链、`PREFIX` 覆盖、
+      工具链缺失硬报错、minichlink 的 `monitor`/`unbrick`
+- [x] `template/rules/rules.mk` —— `PROJECT`/`DEVICE` 驱动；`-nostartfiles`；
+      `.elf/.bin/.hex/.map/.list`；`flash`/`size`/`clean`；
+      `LIBOPENCHW_NOSTDLIB` 选项
+- [x] `template/examples/blink`（CH32V003，1124 B text）与
+      `template/examples/ch582_blink`（CH58x 核心层，376 B text）
+- [x] `template/README.md`（完整变量参考）、`.gitignore`、`.vscode/{c_cpp_properties,settings,tasks,launch}.json`
+- [x] 验证 `DEVICE=` 切换会正确改变 ISA 与链接脚本
+
+**该模板暴露并已修正 3 个库侧缺陷**（详见 `phase.md`「P2 实现记录（模板 / 应用侧）」）：
+
+1. `CC ?= $(PREFIX)-gcc` 永不生效（GNU make 预定义 `CC=cc`）→ 曾静默使用宿主编译器
+2. `ZMMUL_OK` 只在 `gcc-config.mk` 探测，应用侧从不 include 它 → `_zmmul` 永不追加
+3. `libopenwch_ch32v0.a` 曾用 `_zmmul` 编译 → 链接出的 CH32V003 映像声明了该型号没有的扩展；
+   现已改为纯 `rv32ec`（核心与外设中无任何 mul/div，已用 objdump 验证）
 
 ### 相对初版规划的设计修正
 
@@ -203,8 +222,11 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
    `pwr`、`opa`、`syscfg`、`dbgmcu`。
 4. **P2.4** 每加一个外设就在 `lib/ch32v0/Makefile` 的 `OBJS` 中启用对应行，并跑一次 `make`。
 5. **P2.5** `examples/ch32v003/blink` 与 `usart_echo`，用 `OPENWCH_DIR` + `DEVICE` 构建。
-6. **P3** 同法推进 CH58x（先 `rwa.c`，再 `clk.c`，其余依赖它）。
-7. **P4** 把链接冒烟测试固化为 `tests/` 用例；补 Doxygen、CI、`NOTICE`。
+6. **P2.6** 模板骨架已完成（`template/`，两个示例可构建）。新增外设时在
+   `template/examples/` 下补对应示例即可。
+7. **P3** 同法推进 CH58x（先 `rwa.c`，再 `clk.c`，其余依赖它）；届时
+   `template/examples/ch582_blink` 可换成真正的 blink。
+8. **P4** 把链接冒烟测试固化为 `tests/` 用例；补 Doxygen、CI、`NOTICE`。
 
 ---
 
@@ -227,6 +249,10 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
 | 归档 ISA 标签 | `readelf -A` | ✅ `rv32e...zicsr...zifencei` / `rv32i_m_a_c...` |
 | 公开 API 命名审查 | `grep` 核心层函数名 | ✅ 全部 lowercase_snake_case，无驼峰 |
 | `make stylecheck` | `scripts/checkpatch.pl` | ⚠️ 仅 `volatile`/断言宏误报（见 K1） |
+| 模板 blink 构建 | `make -C template/examples/blink` | ✅ 1124 B text / 156 B data |
+| 模板 CH58x 构建 | `make -C template/examples/ch582_blink` | ✅ 376 B text |
+| 模板 `DEVICE=` 切换 | `make DEVICE=ch32v003f4p6 / ch32v002f4p6` | ✅ ISA 分别不含/含 `zmmul` |
+| 同族换型号 | `make -C template/examples/ch582_blink DEVICE=ch584m` | ✅ 构建成功 |
 
 ---
 
@@ -237,3 +263,5 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
 | 初始轮 | 创建 `project.md`、`phase.md`、`status.md`、`AGENTS.md`；完成四工程勘察与设计决策 |
 | 第 2 轮 | 用户确认 Q1–Q4；实测工具链能力；完成 **P0**（骨架 + `mk/` + `scripts/` + `ld/` + 根 Makefile）与 **P1**（`qingke/` 核心层）；两族归档构建成功并通过链接冒烟测试；修正 8 项设计问题（见 `phase.md`） |
 | 第 2 轮末 | 按用户要求提交已验证基线：`9a8ed34` "Initial libopenwch: libopencm3-style build system and QingKe core layer"（56 文件）。生成物已由 `.gitignore` 排除，提交后 `make clean && make && make genlinktests` 仍全绿且工作区干净 |
+| 第 3 轮 | P2.1–P2.2：`ch32v0/memorymap.h` + `gpio` + `rcc`，提交 `8026add`。发现 GPIO nibble 不是 `(MODE,CNF)` 位域（穷举无解），改为不透明值，`gpio_set_mode()` 签名有意偏离 libopencm3 |
+| 第 4 轮 | P2.6：新增 `template/` 应用骨架（rules/ + 两个示例 + VSCode 配置），提交 `7b0df2f`。模板暴露并修正 3 个库侧缺陷（`CC ?=` 失效、`ZMMUL_OK` 未在应用侧探测、族归档 ISA 标签过宽） |
