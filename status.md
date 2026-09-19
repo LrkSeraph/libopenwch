@@ -16,7 +16,7 @@
 | 最近更新 | CI 收敛轮：GitHub Actions 暴露并修复 4 个真实缺陷——`apitest` 未按 `TARGETS` 收敛、工作流在 job 级误用 `runner` 上下文导致整个工作流校验失败、冒烟测试隐式依赖 newlib（Debian 工具链根本没有）、模板引用了不存在的 `lib/mini_libc.a`。现补齐按族构建的 **mini-libc**，并新增 CI job 在无 newlib 工具链上验证 freestanding 路径。累计 **518 个公开函数**，两族均 0 警告 0 重名 0 命名违规 |
 | 构建状态 | ✅ `make` 全绿：两族库归档 + 两族 mini-libc 归档，共 **4 个归档** |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
-| 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0** |
+| 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0**；CI **8/8 全绿** |
 | 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest` / 四个示例 × 两种链接模式） |
 | freestanding 状态 | ✅ 冒烟测试与模板 freestanding 模式均以 `-nostdlib` + 按族 mini-libc 链接，可在**无 newlib** 的 Debian/Ubuntu 包上工作。注意起动代码是否调用 `memcpy`/`memset` 取决于编译器版本，故 mini-libc 是**必需**而非可选 |
 
@@ -369,6 +369,7 @@ P3 已全部完成，见上一节。P4 待办：
 | 模板默认模式 | `make -C template/examples/blink` | ✅ newlib 路径仍正常 |
 | 全示例双模式 | 4 个示例 × {默认, `LIBOPENWCH_NOSTDLIB=1`} | ✅ 8/8 构建成功 |
 | 干净克隆完整回归 | `git clone` → `make` / `genlinktests` / `apitest` / 示例 | ✅ 4 个归档、6/6、链接通过、8/8 |
+| **GitHub Actions 全绿** | run `35454506264`（`48a7f0b`） | ✅ 8/8 job 通过：3 工具链（debian / xpack / plain-elf）× 2 族 + 双族单次 make + 无 newlib freestanding |
 
 ---
 
