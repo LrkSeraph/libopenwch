@@ -170,11 +170,15 @@ doc/  tests/  examples/
 ## License
 
 Library code (`include/`, `lib/`, `ld/`, `mk/`) is
-**LGPL-3.0-or-later** — see `COPYING.LGPL3`.  This is the same split libopencm3
-uses, so applications that merely link against the library are unaffected.
+**LGPL-3.0-or-later** — see `LICENSE` (or the identical `COPYING.LGPL3`).  This
+is the same split libopencm3 uses, so applications that merely link against the
+library are unaffected.
 
-`scripts/checkpatch.pl` is imported from the Linux kernel and is **GPL-2.0**.
-It is a development tool and is not part of the library.
+`scripts/checkpatch.pl` is imported from the Linux kernel and is **GPL-2.0**
+(see `COPYING.GPL2`).  It is a development tool and is not part of the library.
+
+`COPYING.GPL3` is shipped because the GNU LGPL version 3 is defined as the GNU
+GPL version 3 plus additional permissions.  See `NOTICE` for full provenance.
 
 ## References
 

@@ -9,13 +9,20 @@ documentation only.
 License summary
 ---------------
 
-  Library code                LGPL-3.0-or-later     COPYING.LGPL3
-  (include/, lib/, ld/, mk/)
-  scripts/checkpatch.pl       GPL-2.0               (see the file header)
+  Library code                LGPL-3.0-or-later     LICENSE
+  (include/, lib/, ld/, mk/)                        COPYING.LGPL3
+  scripts/checkpatch.pl       GPL-2.0               COPYING.GPL2
   Documentation and governance
   (project.md, phase.md,       CC0-1.0 / public domain
    status.md, AGENTS.md,       (original prose, no restriction intended)
    README.md, NOTICE)
+
+`LICENSE` carries the GNU LGPL version 3 text and is the top-level entry point
+for license scanners.  `COPYING.LGPL3` is the same text under its libopencm3
+name.  Because the LGPL version 3 is defined as the GPL version 3 plus
+additional permissions, `COPYING.GPL3` is also shipped: it is the text the LGPL
+incorporates by reference.  `COPYING.GPL2` exists solely for
+`scripts/checkpatch.pl`, which is GPL-2.0-only and cannot be relicensed.
 
 Applications that merely link against libopenwch are unaffected by the LGPL;
 the same is true of libopencm3, from which this split is inherited.
@@ -40,6 +47,8 @@ several scripts are derived from libopencm3 and remain under the LGPL:
   include/libopencm3/**        header conventions, Doxygen style, MMIO macros
   HACKING, HACKING_COMMON_DOC  coding rules and the new-family checklist
   COPYING.LGPL3, COPYING.GPL3  taken verbatim
+  LICENSE                      LGPL-3.0 text, same as COPYING.LGPL3
+  COPYING.GPL2                 GNU GPL version 2, for scripts/checkpatch.pl
 
 The individual copyright notices in those files are retained.
 
