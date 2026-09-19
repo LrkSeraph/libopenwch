@@ -224,13 +224,20 @@ CH58x 共 **202 个公开函数**。两族合计 **518 个**。
 12. **CH58x 的 RWA helper 必须 `always_inline`**。若编译成真实函数，16 个系统时钟的
     解锁窗口要跨过 `ret`、返回和调用方的地址计算才轮到寄存器写入，不保证完成。
     反汇编确认 `clk_set_sys_clock()` 内联了 8 个窗口、没有外部 helper 调用
-13. **`memorymap.h` 的 CH58x 身份/复位寄存器偏移写错了**：`R8_CHIP_ID` 应为
+13. **`.highcode` 必须显式指定 PHDRS 段**。`ld/linker.ld.S` 里 `.highcode` 原本没有
+    程序头归属，当该段**为空**时链接器能容忍，一旦有真实内容就报
+    `section '.highcode' can't be allocated in segment N`。CH58x 的 `pwr` 驱动给
+    `pwr_enter_*` 打了 `OPENWCH_HIGH_CODE`，于是 CH58x 的 API 测试把它拉进了镜像，
+    暴露了这个 bug。`.highcode` 的 VMA 在 RAM、LMA 在 flash，和 `.data` 同构，
+    因此已显式归到 `:data` 段。这是"验证要在真实使用路径上做"的一个例子：
+    不调用 `pwr_enter_*` 的 `ch582_blink` 示例完全不会触发它
+14. **`memorymap.h` 的 CH58x 身份/复位寄存器偏移写错了**：`R8_CHIP_ID` 应为
     `SYS_BASE+0x41`（原写 `+0x46`，那是 `R8_RST_WDOG_CTRL`），
     `R8_GLOB_RESET_KEEP` 应为 `+0x47`（原写 `+0x44`）。两个独立的实现代理同时报出
     了这个问题。已按 `CH583SFR.h` 修正并补齐 `R8_RESET_STATUS`/`R8_GLOB_CFG_INFO`/
     `R8_WDOG_COUNT`/`R8_SLP_*`/`R8_CK32K_CONFIG`/`R8_BAT_DET_*`。
     教训：这类偏移写错不会编译报错，只会静默读到旁边的寄存器
-14. **AFIO remap 位定义取自 SVD 而非 EVT 的打包 token**。EVT 把"值/位号/半字选择/
+15. **AFIO remap 位定义取自 SVD 而非 EVT 的打包 token**。EVT 把"值/位号/半字选择/
     类别"打包进一个 32 位 token 再运行时解包，极易出错；libopenwch 改为直接暴露
     SVD 中的字段，并为 USART1/I2C1/TIM1/TIM2 提供 2-bit 字段级 helper。
     这一改动同时修正了原先写错的 `AFIO_PCFR1_PA1_PA2_REMAP`（应为 bit 15，不是 12）
@@ -339,6 +346,8 @@ P3 已全部完成，见上一节。P4 待办：
 | 两族函数总数 | `nm --defined-only lib/*.a` | ✅ ch32v0=316，ch5xx58x=202，合计 518 |
 | 两族归档审计 | 重名符号 / 命名违规 | ✅ 均为 0 |
 | CH582 真 blink | `make -C template/examples/ch582_blink` | ✅ 2808 B |
+| `.highcode` 段可链接 | 最小复现 + `make apitest` | ✅ 修复后 `in_ram` 落在 0x20000000 |
+| RWA 解锁序列 | `objdump -d clk.o` | ✅ 8 个内联 `0x57`/`0xA8` 窗口 |
 
 ---
 

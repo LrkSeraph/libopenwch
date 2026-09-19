@@ -139,8 +139,17 @@ SECTIONS
 	.highcodelalign : {
 		. = ALIGN(4);
 		PROVIDE(_highcode_lma = .);
-	} >rom
+	} >rom :text
 
+	/*
+	 * .highcode runs from RAM but is loaded from flash, exactly like .data,
+	 * so it MUST be assigned to the `data` program header.  Left unassigned,
+	 * ld picks a segment by itself and fails with
+	 *	"section `.highcode' can't be allocated in segment N"
+	 * as soon as the section actually has content -- which only happens
+	 * when the application pulls in a driver that tags functions
+	 * OPENWCH_HIGH_CODE (the CH58x power driver does).
+	 */
 	.highcode : {
 		. = ALIGN(4);
 		PROVIDE(_highcode_vma_start = .);
@@ -148,7 +157,7 @@ SECTIONS
 		KEEP(*(.highcode.*))
 		. = ALIGN(4);
 		PROVIDE(_highcode_vma_end = .);
-	} >ram AT >rom
+	} >ram AT >rom :data
 #endif
 
 	.text : {
