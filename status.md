@@ -16,7 +16,7 @@
 | 最近更新 | 完成 P0 构建系统 + P1 `qingke/` 核心层；两个族均可编译出静态库并通过链接冒烟测试 |
 | 构建状态 | ✅ `make` 全绿：`lib/libopenwch_ch32v0.a`、`lib/libopenwch_ch5xx58x.a` |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
-| 仓库状态 | 📄 源码树完整，`git init` 已执行（尚未提交） |
+| 仓库状态 | ✅ 已提交基线 `9a8ed34`（56 文件 / 10303 行），构建后工作区依然干净 |
 
 ### 可复现的验证命令与结果
 
@@ -213,3 +213,4 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
 |---|---|
 | 初始轮 | 创建 `project.md`、`phase.md`、`status.md`、`AGENTS.md`；完成四工程勘察与设计决策 |
 | 第 2 轮 | 用户确认 Q1–Q4；实测工具链能力；完成 **P0**（骨架 + `mk/` + `scripts/` + `ld/` + 根 Makefile）与 **P1**（`qingke/` 核心层）；两族归档构建成功并通过链接冒烟测试；修正 8 项设计问题（见 `phase.md`） |
+| 第 2 轮末 | 按用户要求提交已验证基线：`9a8ed34` "Initial libopenwch: libopencm3-style build system and QingKe core layer"（56 文件）。生成物已由 `.gitignore` 排除，提交后 `make clean && make && make genlinktests` 仍全绿且工作区干净 |
