@@ -194,7 +194,10 @@ flash: $(PROJECT).bin
 	$(Q)$(MINICHLINK) -w $< $(WRITE_SECTION) $(MINICHLINK_FLAGS)
 
 clean:
-	$(Q)rm -rf $(BUILD_DIR) $(GENERATED_BINS) $(LDSCRIPT)
+	$(Q)rm -rf $(BUILD_DIR) $(GENERATED_BINS)
+	## Remove every device's generated script, not just the currently selected
+	## one, so that switching DEVICE does not leave stale scripts behind.
+	$(Q)rm -f generated.*.ld
 
 .PHONY: all clean flash size
 
