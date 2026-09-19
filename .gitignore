@@ -11,6 +11,11 @@
 *.out
 *.stylecheck
 
+# The vendored WCH BLE stack is a *source* artifact, not a build product: it is
+# closed-source and cannot be rebuilt from this repository, so the wildcard
+# above must not swallow it.  Same trap as the hand-written nvic.h files below.
+!lib/ble/wch/LIBCH58xBLE.a
+
 # Generated linker scripts and IRQ headers
 generated.*.ld
 

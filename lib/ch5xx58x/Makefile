@@ -42,12 +42,13 @@ OPENWCH_TOP	:= $(abspath $(CURDIR)/../..)
 OPENWCH_INC	:= $(OPENWCH_TOP)/include
 OPENWCH_QINGKE	:= $(OPENWCH_TOP)/lib/qingke
 OPENWCH_MINILIB	:= $(OPENWCH_TOP)/lib/mini_libc
+OPENWCH_BLE	:= $(OPENWCH_TOP)/lib/ble
 OPENWCH_COMMON	:= $(CURDIR)/common
 
 CC		:= $(PREFIX)-gcc
 AR		:= $(PREFIX)-ar
 
-VPATH += .:$(OPENWCH_QINGKE):$(OPENWCH_COMMON):$(OPENWCH_MINILIB)
+VPATH += .:$(OPENWCH_QINGKE):$(OPENWCH_COMMON):$(OPENWCH_MINILIB):$(OPENWCH_BLE)
 
 ##
 ## The freestanding mini libc for this family, in its own archive.  Built and
@@ -79,6 +80,17 @@ OBJS += spi.o spi_common_v1.o
 OBJS += i2c.o i2c_common_v1.o
 OBJS += uart.o uart_common_v1.o
 OBJS += sys.o sys_common_v1.o
+
+##
+## Bluetooth LE.
+##
+## This is the layer over WCH's closed-source stack, not the stack itself: the
+## objects below call into LIBCH58xBLE.a, which an application links
+## separately (see README).  They live in this archive because the stack is
+## CH58x-only, and they cost nothing to an application that never references
+## them -- an archive member is only pulled in to satisfy an undefined symbol.
+##
+OBJS += ble.o ble_tmos.o ble_gap.o ble_gatt.o
 
 ##
 ## Compile flags: RV32IMAC, no float ABI.

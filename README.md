@@ -146,6 +146,59 @@ int main(void)
 }
 ```
 
+## Bluetooth LE (CH58x)
+
+The CH582/CH583 have a Bluetooth LE radio.  The radio is driven by **WCH's
+closed-source stack**, which this project vendors under `lib/ble/wch/` and
+wraps in a thin, lowercase_snake_case layer:
+
+```c
+BLE_HEAP_DEFINE(ble_heap, BLE_HEAP_SIZE_DEFAULT);
+
+ble_config_default(&config);
+config.heap = ble_heap;
+config.heap_size = sizeof(ble_heap);
+config.mac = device_mac;          /* you supply the address */
+
+if (ble_init(&config) != BLE_INIT_OK) {
+	for (;;) {
+	}
+}
+
+ble_gap_role_peripheral_init();
+app_task = ble_tmos_task_register(app_event_handler);
+ble_gap_role_set_param(BLE_GAP_ROLE_PARAM_ADVERT_DATA, sizeof(data), data);
+ble_gap_role_peripheral_start_device(app_task, 0, &role_cbs);
+
+for (;;) {
+	ble_tmos_process();
+}
+```
+
+`template/examples/ch582_ble_advertise/` is that program complete: it
+advertises as "libopenwch" and lights an LED when a central connects.
+
+```sh
+cd template/examples/ch582_ble_advertise
+make            # LIBOPENWCH_BLE=1 and LIBOPENWCH_NOSTDLIB=1 are the defaults here
+make flash
+```
+
+**The layer is a wrapper, not a stack.**  WCH's stack keeps its own
+event-driven design: an application registers one TMOS task, receives
+connection events as messages, and calls `ble_tmos_process()` forever.  The
+layer renames and documents that API; it does not hide it.
+
+**What it covers:** TMOS, GAP parameters, the peripheral role, the GATT
+server, and start-up.  **What it does not:** the central/observer/broadcaster
+roles, the bonding manager, OTA and mesh.  Those remain reachable through
+WCH's own names in the vendor header, which is installed alongside the layer.
+See `lib/ble/README`.
+
+**Licensing and memory.**  `lib/ble/wch/` is WCH's, under **Apache-2.0**, not
+the LGPL that covers the rest of this project — see `NOTICE`.  The stack needs
+a heap the application declares (`BLE_HEAP_DEFINE`) and about 145 KB of flash.
+
 ## Starting a project
 
 `template/` is an application skeleton, the counterpart of
@@ -192,12 +245,14 @@ include/libopenwch/
     ch32v0/             CH32V00x family headers and irq.json
     ch5xx58x/           CH58x family headers and irq.json
     dispatch/           device -> family header dispatch
+    ble/                Bluetooth LE layer (ble/wch/ is WCH's, Apache-2.0)
 lib/
     Makefile.include    single-archive rules
     qingke/             core layer implementation
     ch32v0/             CH32V00x family build
     ch5xx58x/           CH58x family build
     mini_libc/          freestanding string/memory routines
+    ble/                Bluetooth LE layer; ble/wch/ is WCH's binary
 template/           application skeleton (rules/, examples/)
 doc/  tests/  examples/
 ```

@@ -12,9 +12,10 @@
 | 项 | 值 |
 |---|---|
 | 当前阶段 | **P3 完成；P4 软件部分完成，硬件在环受阻** |
-| 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ P5: 0% |
-| 最近更新 | 风格统一轮：全树重排为 house style（函数定义 `{` 与 `)` 同行、属性独立成行、参数表按 80 列断开且无尾随逗号）；`checkpatch.pl` 的括号规则反转为强制新风格，`make stylecheck` 成为门禁并接入 CI。此前 CI 收敛轮修复 4 个真实缺陷
+| 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ **P5: BLE 层已完成**，其余扩展族/USB 未开始 |
+| 最近更新 | BLE 层：在 WCH 闭源 `LIBCH58xBLE.a`（Apache-2.0，已 vendor）之上实现外设角色的 `ble_*` 薄层（28 个函数），`LIBOPENWCH_BLE=1` 按需链接，新增可广播的 BLE 示例；公开函数 **546**。此前风格统一轮：
 | 构建状态 | ✅ `make` 全绿：两族库归档 + 两族 mini-libc 归档，共 **4 个归档** |
+| BLE | ✅ 外设角色可用（TMOS / GAP / GAPRole peripheral / GATT server）；central+observer+broadcaster、配对、OTA、mesh 未做。栈为 WCH 闭源二进制，**Apache-2.0** |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
 | 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0**；CI **8/8 全绿**（不含风格 job） |
 | 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest` / 四个示例 × 两种链接模式） |
@@ -388,6 +389,14 @@ P3 已全部完成，见上一节。P4 待办：
 | 重排后构建与 API | `make` / `nm --defined-only lib/*.a` | ✅ 0 警告 0 错误；公开函数 518 不变 |
 | 重排后测试 | `make genlinktests` / `make apitest` / 四个示例 × 两种链接模式 | ✅ 6/6、链接通过、8/8 |
 | stylecheck（第二意见） | `make stylecheck` | ✅ `STYLE clean` |
+| BLE 二进制 ISA | `readelf -h`（解包成员） | ✅ ELF32 / RVC / soft-float ABI，与 `rv32imac/ilp32` 兼容 |
+| BLE 二进制依赖 | `ld -m elf32lriscv -r` 合并后 `nm -u` | ✅ 仅 `__ashldi3`/`__divdi3`/`__ludivdi3` 等 libgcc 与 `memcpy`（本库全有） |
+| BLE 层编译 | 4 个 `.c` 以族严格告警集编译 | ✅ 0 警告 |
+| BLE 层链接 | `make apitest`（ch5xx58x，链接 vendor 栈） | ✅ 链接成功；镜像含 `BLE_LibInit`/`LL_Init`/`GAPRole_PeripheralInit` 与 33 个 `ble_*` |
+| 栈的 `.highcode` 放置 | `readelf -l` 示例镜像 | ✅ VMA `0x20000000` / LMA `0x94`，由启动代码从 flash 搬运 |
+| BLE 示例 | `template/examples/ch582_ble_advertise` 构建 | ✅ text 146628 / data 512 / bss 7560，生成 elf/bin/hex |
+| 堆位置 | `nm` 示例镜像 | ✅ `ble_heap` 落在 `.bss` |
+| 公开函数总数 | `nm --defined-only lib/*.a` | ✅ 546（ch32v0 316 + ch5xx58x 230），较前 +28 |
 | 钩子：无 clang-format 时放行 | `PATH= clang-format` 不可见时不拦截 | ✅ `exit 0`，提交照常 |
 
 ---
@@ -410,3 +419,4 @@ P3 已全部完成，见上一节。P4 待办：
 | 第 11 轮（风格统一轮） | 按用户指定的 house style 重排全树：函数定义的 `{` 与 `)` **同行**；作用于整个函数的 `__attribute__` **单独一行**并置于返回类型之前；参数表超过 80 列则**每行一个参数**、`) {` 独占一行，且**末尾不加逗号**——C 标准不允许，已实测 `-std=c99` 与 `-std=c23` 均报语法错误。共重排 555 个函数定义（533 个并括号 + 22 个断参）、42 个文件。**反转** `scripts/checkpatch.pl` 的 `OPEN_BRACE` 规则（现在报错的是「把 `{` 留在签名下一行」），并按项目已知的有意写法 `--ignore` 了 8 类误报（VOLATILE / NEW_TYPEDEFS / CAMELCASE / COMPLEX_MACRO / SPACING / AVOID_EXTERNS / STORAGE_CLASS / BRACES），顺带修掉 checkpatch 中一处 `raw_line()` 未定义值引起的 Perl 警告。`make stylecheck` 由「仅报告」改为**门禁**（有发现即退出非零，并列出全部问题文件），新增 CI `style` job。`scripts/irq2nvic_h` 同步改为生成 house style，以免重新生成后风格回退。`.clang-format`、`HACKING`、`AGENTS.md` 更新；README 移除 libopencm3↔libopenwch 对照块 |
 | 第 12 轮（clang-format 接管格式化） | 按用户要求把格式化职责交给 **clang-format**：`.clang-format` 设为 `BreakBeforeBraces: Attach` + `BreakAfterAttributes: Always` 并对全树重跑（91 个文件），上一轮用 Python 变换脚本得到的版式被 clang-format 的输出取代；新增 `.githooks/pre-commit`（提交时对暂存的 `.c`/`.h` 跑 clang-format 并重新 `git add`，**未安装 clang-format 时直接 `exit 0` 放行**）以及 `make hooks` / `make unhooks`；**移除 CI 的 style job**——格式化只发生在提交时。**实测发现两点 clang-format 无法表达**：它没有「`) {` 独占一行」的选项（断行后参数与左括号对齐、`)` 留在最后一个参数上），且 `BreakAfterAttributes` 只对 C++ `[[...]]` 生效、GNU `__attribute__((...))` 仍与声明同行；按「格式器优先」处理并写入 `.clang-format` / `HACKING` / `AGENTS.md`。checkpatch 的 `LEADING_SPACE` 与 `SUSPECT_CODE_INDENT` 因与 clang-format 的空格对齐必然冲突而加入忽略清单。README 新增 Formatting 小节与 Layout 条目 |
 | 第 13 轮（钩子归位） | 按用户要求取消 `make hooks` / `make unhooks`：pre-commit 钩子直接放在 **`.git/hooks/pre-commit`**（每 clone 本地一份、不进版本库），删除已跟踪的 `.githooks/` 目录并 `git config --unset core.hooksPath` 回到 git 默认位置。Makefile 去掉 hooks 目标与相关注释，`.clang-format` / `HACKING` / `AGENTS.md` / `README.md` 同步改掉 `make hooks` 的说明 |
+| 第 14 轮（BLE 层） | 按用户要求「使用闭源二进制并在其上构建 BLE 层」：把 WCH 的 `LIBCH58xBLE.a`（1.1 MB，Apache-2.0）与其 `CH58xBLE_LIB.h` 原样 vendor 到 `lib/ble/wch/`、`include/libopenwch/ble/wch/`，并新增 `lib/ble/README` 与 NOTICE 章节说明**该目录是 Apache-2.0、不是 LGPL**。在其上实现 **外设角色** 的 `ble_*` 薄层（28 个公开函数）：TMOS 任务/消息、GAP 参数、GAPRole 外设状态机、GATT server、启动序列；`.gitignore` 对 `*.a` 的忽略用负向规则放行该二进制（与此前 nvic.h 同类陷阱）。构建上新增 `LIBOPENWCH_BLE=1`（模板）按需链接，非 BLE 应用不会被拉入协议栈；ch5xx58x 冒烟测试改为链接该二进制，从而真正验证层与栈的解析。新增示例 `template/examples/ch582_ble_advertise`（广播为 "libopenwch"，连接后点亮 PB4）。**实测**：二进制为 ELF32/RVC/soft-float，可用 `elf32lriscv` 与我们 rv32imac 目标合并链接，其外部依赖只有 libgcc 与 `memcpy`（均由本库提供）；栈的 `.highcode` 段由现有链接脚本以「RAM VMA + flash LMA」正确搬运。公开函数 518 → **546** |

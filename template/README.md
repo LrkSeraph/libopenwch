@@ -35,6 +35,7 @@ Two examples are included and both build today:
 | `examples/uart_echo` | `ch32v003f4p6` | ch32v0 | USART1 echo at 115200 on PD5/PD6 |
 | `examples/ch582_blink` | `ch582m` | ch5xx58x | 32 MHz crystal + PLL to 60 MHz, toggles PB4 |
 | `examples/ch582_uart_echo` | `ch582m` | ch5xx58x | UART1 echo at 115200 on PA8/PA9 |
+| `examples/ch582_ble_advertise` | `ch582m` | ch5xx58x | Bluetooth LE peripheral: advertises as "libopenwch", LEDs on connect |
 
 Each example targets one family, because the library archive is per family:
 `blink` uses the CH32V00x `rcc`/`gpio` drivers and therefore only links against
@@ -103,6 +104,7 @@ for d in examples/*/; do make -C "$d" || exit 1; done
 | `MINICHLINK` | `minichlink` | programmer binary |
 | `WRITE_SECTION` | `flash` | minichlink write region |
 | `LIBOPENWCH_NOSTDLIB` | — | set to `1` to link with `-nostdlib` instead of newlib |
+| `LIBOPENWCH_BLE` | `0` | set to `1` to link WCH's Bluetooth stack, for the `ble_*` layer (CH58x only) |
 
 A minimal `Makefile` for a new project is therefore just:
 
@@ -173,5 +175,8 @@ make flash MINICHLINK=~/src/ch32fun/minichlink/minichlink
 * **`gpio_set_mode()` takes one opaque nibble**, not libopencm3's
   `(mode, cnf)` pair.  See
   `include/libopenwch/ch32v0/common/gpio_common_v1.h` for why.
-* The CH58x peripheral drivers are the P3 milestone; only the core layer is
-  available for that family today.
+* **`LIBOPENWCH_BLE=1` links WCH's closed-source Bluetooth stack**, which is
+  not part of `libopenwch_ch5xx58x.a` and is Apache-2.0 rather than LGPL.  It
+  costs roughly 145 KB of flash and needs a heap the application declares
+  with `BLE_HEAP_DEFINE`.  The `ch582_ble_advertise` example sets both
+  switches itself, so it builds with a bare `make`.  See `lib/ble/README`.

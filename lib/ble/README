@@ -1,0 +1,90 @@
+libopenwch — Bluetooth LE
+=========================
+
+What this is
+------------
+
+A thin layer over WCH's closed-source Bluetooth stack, for the CH582/CH583.
+It renames the parts of WCH's API a peripheral needs into this project's
+lowercase_snake_case style, documents them, and gets out of the way.  It is
+not a protocol stack and it contains no Bluetooth logic.
+
+The stack itself is `wch/LIBCH58xBLE.a`, vendored verbatim from WCH's CH583
+EVT package and redistributed under their Apache-2.0 licence.  See
+`wch/LICENSE` and the NOTICE file at the top of the tree.  **That directory is
+not LGPL**; the wrapper around it is.
+
+  wch/LIBCH58xBLE.a                    WCH's stack, unmodified
+  ../include/libopenwch/ble/wch/       WCH's header, unmodified
+
+Layout
+------
+
+  include/libopenwch/ble/common.h      shared types and status codes
+  include/libopenwch/ble/tmos.h        the task/message scheduler
+  include/libopenwch/ble/gap.h         advertising and the peripheral role
+  include/libopenwch/ble/gatt.h        the GATT server
+  include/libopenwch/ble/ble.h         start-up; includes the rest
+  lib/ble/ble.c                        ble_init() and friends
+  lib/ble/ble_tmos.c                   scheduler forwarders
+  lib/ble/ble_gap.c                    GAP and peripheral-role forwarders
+  lib/ble/ble_gatt.c                   GATT server forwarders
+
+The wrapper objects are built into `libopenwch_ch5xx58x.a` because the stack
+is CH58x-only.  They cost nothing to an application that never calls them: an
+archive member is only pulled in to satisfy an undefined symbol, so a program
+that does not use `ble_*` never references the vendor archive either.
+
+Linking
+-------
+
+The stack is *not* part of `libopenwch_ch5xx58x.a`.  An application using this
+layer must link, in this order:
+
+  libopenwch_ch5xx58x.a     our drivers and the wrappers
+  wch/LIBCH58xBLE.a         the stack the wrappers call
+  libopenwch_mini_libc_*.a  the memcpy() the stack needs
+  -lgcc
+
+Applications built from `template/` get this from `LIBOPENWCH_BLE=1`.  Order
+matters: the vendor archive must be scanned after ours (which introduces the
+references) and before the libc (which supplies `memcpy`).
+
+Memory
+------
+
+The stack allocates from a heap the application declares and passes in
+`ble_config_t.heap`; there is no default.  6 KiB is what WCH's examples use
+and 4 KiB is the floor.  Declare it with `BLE_HEAP_DEFINE`.
+
+Some of the stack's own code is placed in `.highcode` and runs from RAM.  The
+library's linker script already handles that: `.highcode` has a RAM VMA and a
+flash LMA, and the start-up code copies it.  Nothing extra is needed.
+
+Scope
+-----
+
+Present: TMOS, GAP parameters, the peripheral role, the GATT server, and
+stack start-up.
+
+Absent, and reachable only through WCH's own names in the vendor header:
+
+  * central, observer and broadcaster roles
+  * the bonding manager (GAPBondMgr_*), and with it persistent bonding, which
+    also needs flash access
+  * OTA update and the mesh stack
+  * the attribute-table macros used to build a service
+
+The MAC address is the application's to supply.  WCH's helper for reading the
+address burned into the part is a macro over `libISP583.a`, another closed
+binary this project does not vendor; see the flash gap described in
+`status.md`.
+
+Not wrapped on purpose
+----------------------
+
+`ble_gap_role_set_param()` takes a `void *` and a length, exactly as WCH's
+does, because one call carries a one-byte flag, a two-byte interval and a
+31-byte advertising payload, and the parameter id is what says which.  Typed
+convenience wrappers would be a nicer API and are exactly the kind of
+opinionated layer this wrapper exists to avoid; put them in the application.

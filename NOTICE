@@ -12,6 +12,7 @@ License summary
   Library code                LGPL-3.0-or-later     LICENSE
   (include/, lib/, ld/, mk/)                        COPYING.LGPL3
   scripts/checkpatch.pl       GPL-2.0               COPYING.GPL2
+  lib/ble/wch/**              Apache-2.0            lib/ble/wch/LICENSE
   Documentation and governance
   (project.md, phase.md,       CC0-1.0 / public domain
    status.md, AGENTS.md,       (original prose, no restriction intended)
@@ -24,8 +25,36 @@ additional permissions, `COPYING.GPL3` is also shipped: it is the text the LGPL
 incorporates by reference.  `COPYING.GPL2` exists solely for
 `scripts/checkpatch.pl`, which is GPL-2.0-only and cannot be relicensed.
 
+Note that `lib/ble/wch/` is **not** LGPL: it is WCH's, under Apache-2.0, and it
+keeps that licence.  See below.
+
 Applications that merely link against libopenwch are unaffected by the LGPL;
 the same is true of libopencm3, from which this split is inherited.
+
+Vendored: WCH's Bluetooth LE stack (Apache-2.0)
+-----------------------------------------------
+
+`lib/ble/wch/` holds two files taken verbatim from WCH's CH583 SDK and one
+licence:
+
+  lib/ble/wch/LIBCH58xBLE.a        the Bluetooth stack, as shipped
+  include/libopenwch/ble/wch/
+      CH58xBLE_LIB.h               the vendor header for it, as shipped
+  lib/ble/wch/LICENSE              WCH's Apache-2.0 licence text
+
+They come from `ch583-main/EVT/EXAM/BLE/LIB/` in WCH's CH583 EVT package
+(copyright (c) Nanjing Qinheng Microelectronics).  They are redistributed
+unmodified under the Apache License, Version 2.0, which that SDK is released
+under, and they are **not** covered by this project's LGPL.
+
+The stack is closed source: there is no source form of `LIBCH58xBLE.a`
+anywhere, and Apache-2.0 section 4(d) aside, nothing here grants a right to
+reverse-engineer it.  Redistributors of this repository must keep the licence
+and this notice with those files.
+
+The wrapper code in `lib/ble/*.c` and `include/libopenwch/ble/*.h` is original
+to this project and stays LGPL-3.0-or-later.  It calls the vendor API and
+therefore links against the vendor archive, which is a separate work.
 
 Derived from libopencm3 (LGPL-3.0-or-later)
 -------------------------------------------
@@ -107,10 +136,17 @@ Everything else is original to this project, in particular:
   include/libopenwch/ch32v0/**       CH32V00x register maps and drivers
   include/libopenwch/ch5xx58x/**     CH58x register maps and drivers
   lib/ch32v0/**, lib/ch5xx58x/**     the driver implementations
+  include/libopenwch/ble/**          the Bluetooth LE layer (not wch/)
+  lib/ble/**                         the Bluetooth LE layer (not wch/)
   lib/mini_libc/**                   the freestanding mini libc
   include/libopenwch/mini_libc.h     its declarations
   template/**                        the application skeleton
   tests/**                           the API smoke tests
+
+The Bluetooth LE layer is a wrapper: it declares the subset of WCH's stack API
+that a peripheral needs, under this project's naming and documentation, and
+forwards each call.  It contains no protocol logic and no code taken from
+WCH.  See `lib/ble/README` for the boundary.
 
 The mini libc is an independent implementation of the standard string and
 memory routines, written for this project from their published semantics.  It

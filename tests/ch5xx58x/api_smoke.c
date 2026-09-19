@@ -29,6 +29,7 @@
  * peripheral, power the crystal, and possibly park flash.
  */
 
+#include <libopenwch/ble/ble.h>
 #include <libopenwch/ch5xx58x/adc.h>
 #include <libopenwch/ch5xx58x/clk.h>
 #include <libopenwch/ch5xx58x/flash.h>
@@ -264,4 +265,66 @@ void api_smoke(void) {
 	adc_disable_touchkey(ADC);
 	(void)adc_read_touchkey(ADC, 1, 1);
 	(void)adc_to_celsius(0);
+
+	/* --- ble (layer over WCH's closed-source stack) --- */
+	{
+		static uint32_t
+		    ble_heap[BLE_HEAP_SIZE_DEFAULT / 4] OPENWCH_ALIGN4;
+		static const uint8_t ble_mac[6] = {1, 2, 3, 4, 5, 6};
+		static gapRolesCBs_t role_cbs;
+		static gapBondCBs_t bond_cbs;
+		static gattAttribute_t attrs[1];
+		static gattServiceCBs_t svc_cbs;
+		static gattCharCfg_t char_cfg[1];
+		ble_config_t cfg;
+
+		ble_config_default(&cfg);
+		cfg.heap = ble_heap;
+		cfg.heap_size = sizeof(ble_heap);
+		cfg.mac = ble_mac;
+
+		(void)ble_init(&cfg);
+		(void)ble_version();
+
+		/* tmos */
+		(void)ble_tmos_task_register(0);
+		(void)ble_tmos_event_set(BLE_TMOS_INVALID_TASK_ID, 0);
+		(void)ble_tmos_task_start(BLE_TMOS_INVALID_TASK_ID, 0, 0);
+		(void)ble_tmos_task_stop(BLE_TMOS_INVALID_TASK_ID, 0);
+		(void)ble_tmos_message_allocate(0);
+		(void)ble_tmos_message_receive(BLE_TMOS_INVALID_TASK_ID);
+		(void)ble_tmos_message_free(0);
+		ble_tmos_memcpy(ble_heap, ble_mac, sizeof(ble_mac));
+		ble_tmos_memset(ble_heap, 0, sizeof(ble_mac));
+		(void)ble_tmos_memcmp(ble_heap, ble_mac, sizeof(ble_mac));
+		ble_tmos_process();
+
+		/* gap */
+		(void)ble_gap_set_param(BLE_GAP_PARAM_DISC_ADV_INT_MIN, 0);
+		(void)ble_gap_role_peripheral_init();
+		(void)ble_gap_role_peripheral_start_device(
+		    BLE_TMOS_INVALID_TASK_ID, &bond_cbs, &role_cbs);
+		(void)ble_gap_role_set_param(BLE_GAP_ROLE_PARAM_ADVERT_ENABLED,
+					     1, &cfg);
+		(void)ble_gap_role_get_param(BLE_GAP_ROLE_PARAM_STATE, &cfg);
+		(void)ble_gap_role_terminate_link(BLE_CONN_HANDLE_INVALID);
+		(void)ble_gap_role_conn_param_update(BLE_CONN_HANDLE_INVALID, 6,
+						     12, 0, 100,
+						     BLE_TMOS_INVALID_TASK_ID);
+		(void)ble_gap_role_update_phy(BLE_CONN_HANDLE_INVALID, 0, 1, 1);
+		(void)ble_gap_role_read_rssi(BLE_CONN_HANDLE_INVALID);
+
+		/* gatt server */
+		(void)ble_gatt_server_add_service(BLE_GATT_ALL_SERVICES);
+		(void)ble_gatt_server_register_service(
+		    attrs, BLE_GATT_ATTR_COUNT(attrs),
+		    BLE_GATT_ENC_KEY_SIZE_NONE, &svc_cbs);
+		ble_gatt_server_char_cfg_init(BLE_CONN_HANDLE_INVALID,
+					      char_cfg);
+		(void)ble_gatt_server_char_cfg_read(BLE_CONN_HANDLE_INVALID,
+						    char_cfg);
+		(void)ble_gatt_server_process_ccc_write(
+		    BLE_CONN_HANDLE_INVALID, attrs, (uint8_t *)ble_mac, 2, 0,
+		    BLE_GATT_CLIENT_CFG_NOTIFY);
+	}
 }

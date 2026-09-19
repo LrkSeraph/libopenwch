@@ -156,5 +156,9 @@ LGPL License Terms @ref lgpl_license
 /* Force a 2-byte-aligned object (the WCH vector table requirement). */
 #define OPENWCH_ALIGN2 __attribute__((aligned(2)))
 
+/* Force a 4-byte-aligned object.  The WCH BLE stack insists its heap starts
+ * on a word boundary. */
+#define OPENWCH_ALIGN4 __attribute__((aligned(4)))
+
 #endif
 /**@}*/

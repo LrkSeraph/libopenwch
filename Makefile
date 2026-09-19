@@ -180,6 +180,14 @@ STYLECHECKFILES := $(wildcard include/*/*.h include/*/*/*.h include/*/*/*/*.h)
 STYLECHECKFILES += $(wildcard lib/*/*.h lib/*/*/*.h lib/*/*/*/*.h)
 STYLECHECKFILES += $(wildcard lib/*/*.c lib/*/*/*.c lib/*/*/*/*.c)
 
+##
+## Vendored third-party code is not ours to style, and reformatting it would
+## also make it no longer "as shipped", which is how it is licensed.  The
+## pre-commit hook skips the same path.
+##
+STYLECHECK_VENDORED := include/libopenwch/ble/wch
+STYLECHECKFILES := $(filter-out $(STYLECHECK_VENDORED)/%,$(STYLECHECKFILES))
+
 STYLECHECKSTAMPS := $(STYLECHECKFILES:=.stylecheck)
 
 stylecheck: $(STYLECHECKSTAMPS)

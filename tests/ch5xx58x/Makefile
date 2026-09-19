@@ -51,6 +51,15 @@ FAMILY_CPPFLAGS	:= $(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) CPPFLAGS)
 ## C library the toolchain may not ship.
 MINILIB		= $(OPENWCH_DIR)/lib/libopenwch_mini_libc_$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) FAMILY).a
 
+## The archive also carries the wrapper objects for WCH's closed-source BLE
+## stack, and the smoke test calls every public function including ble_*().  So
+## the vendor stack has to be on the link line here, which is exactly what we
+## want: it proves the layer really does resolve against the real binary.
+## Order matters -- the vendor stack is scanned after our archive (which
+## introduces the ble_* references) and before the mini-libc (which supplies
+## the memcpy it needs).
+BLELIB		= $(OPENWCH_DIR)/lib/ble/wch/LIBCH58xBLE.a
+
 WARNINGS	= -Wall -Wextra -Wredundant-decls -Wmissing-prototypes \
 		  -Wstrict-prototypes -Wundef -Wshadow -Werror
 
@@ -75,7 +84,7 @@ api_smoke.elf: api_smoke.o generated.$(DEVICE).ld
 	$(Q)$(CC) $(CFLAGS) $(ARCH_FLAGS) -nostdlib \
 		-T generated.$(DEVICE).ld -Wl,--gc-sections \
 		$< -L$(OPENWCH_DIR)/lib -lopenwch_$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) FAMILY) \
-		$(MINILIB) -lgcc -o $@
+		$(BLELIB) $(MINILIB) -lgcc -o $@
 	@$(SIZE) $@
 
 clean:

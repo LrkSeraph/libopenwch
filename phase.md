@@ -511,7 +511,12 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 - [ ] `ch591/592`
 - [ ] `ch32h41x`（双核 V3F/V5F、ITCM/DTCM）—— 长期
 - [ ] `lib/usb/`：USB 设备控制器主机/设备模式（WCH USB2.0 FS）
-- [ ] BLE 的 HCI/寄存器级接口（不含协议栈）
+- [x] **BLE 层（外设角色）**：在 WCH 闭源 `LIBCH58xBLE.a` 之上提供 `ble_*` 命名层
+      （TMOS、GAP 参数、外设角色状态机、GATT server、启动序列），
+      `LIBOPENWCH_BLE=1` 按需链接，示例 `template/examples/ch582_ble_advertise` 全绿。
+      详见 `lib/ble/README`
+- [ ] BLE 的其余角色与配对：central/observer/broadcaster、GAPBondMgr（持久配对还需 flash 支持）、
+      OTA、mesh —— 目前可经 WCH 原始名字直接调用
 - [ ] `libopencmsis/` 完整化，提供 WCH EVT 迁移桥
 
 ---

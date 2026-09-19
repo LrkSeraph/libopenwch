@@ -45,6 +45,9 @@
 # LIBOPENWCH_NOSTDLIB
 #           - set to 1 to link with -nostdlib and the bundled mini-libc
 #             instead of newlib.  Useful with a toolchain that has no newlib.
+# LIBOPENWCH_BLE
+#           - set to 1 to link WCH's closed-source Bluetooth stack, for the
+#             ble_* layer.  CH58x family only.
 
 BUILD_DIR	?= bin
 OPT		?= -Os
@@ -114,6 +117,25 @@ TGT_LDFLAGS	+= $(ARCH_FLAGS)
 TGT_LDFLAGS	+= -mno-relax
 TGT_LDFLAGS	+= -Wl,--gc-sections
 TGT_LDFLAGS	+= -Wl,-Map=$(PROJECT).map
+
+##
+## Bluetooth LE.
+##
+## LIBOPENWCH_BLE=1 links WCH's closed-source Bluetooth stack, which the ble_*
+## layer in libopenwch_ch5xx58x.a calls into.  It must be scanned after that
+## archive (which introduces the references) and before the libc below (which
+## supplies the memcpy the stack needs), so it goes here rather than alongside
+## the other libraries.
+##
+## The archive stays under WCH's Apache-2.0 licence; see NOTICE.  It is only
+## meaningful for the CH58x family, so only link it there.
+##
+ifeq ($(LIBOPENWCH_BLE),1)
+ifneq ($(genlink_family),ch5xx58x)
+$(error LIBOPENWCH_BLE=1 is only supported for the CH58x family; DEVICE=$(DEVICE) is $(genlink_family))
+endif
+LDLIBS		+= $(OPENWCH_DIR)/lib/ble/wch/LIBCH58xBLE.a
+endif
 
 ##
 ## libc.
