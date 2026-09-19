@@ -72,6 +72,29 @@ $(SRCLIBDIR)/$(LIBNAME).a: $(OBJS)
 	$(Q)$(RM) "$@"
 	$(Q)$(AR) $(ARFLAGS) "$@" $(OBJS)
 
+##
+## Optional mini-libc archive.
+##
+## A family opts in by setting MINILIB and MINILIB_OBJS.  It is kept in a
+## separate archive on purpose: linking it alongside the toolchain's own C
+## library would produce two definitions of memcpy() and friends, and which one
+## wins would depend on link order.
+##
+## `-fno-builtin` is mandatory here rather than an optimisation.  GCC
+## recognises a hand-written byte-copy loop as memcpy() and rewrites it into a
+## call to memcpy(), which makes the function recurse until the stack is gone.
+##
+ifneq ($(MINILIB_OBJS),)
+$(MINILIB_OBJS): TGT_CFLAGS += -fno-builtin -ffreestanding
+
+$(SRCLIBDIR)/$(MINILIB).a: $(MINILIB_OBJS)
+	@printf "  AR      $(MINILIB).a\n"
+	$(Q)$(RM) "$@"
+	$(Q)$(AR) $(ARFLAGS) "$@" $(MINILIB_OBJS)
+
+all: $(SRCLIBDIR)/$(MINILIB).a
+endif
+
 %.o: %.c
 	@printf "  CC      $(<F)\n"
 	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) -o $@ -c $<
@@ -83,7 +106,10 @@ $(SRCLIBDIR)/$(LIBNAME).a: $(OBJS)
 clean:
 	$(Q)$(RM) *.o *.d
 	$(Q)$(RM) $(SRCLIBDIR)/$(LIBNAME).a
+ifneq ($(MINILIB_OBJS),)
+	$(Q)$(RM) $(SRCLIBDIR)/$(MINILIB).a
+endif
 
 .PHONY: clean
 
--include $(OBJS:.o=.d)
+-include $(OBJS:.o=.d) $(MINILIB_OBJS:.o=.d)

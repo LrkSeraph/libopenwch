@@ -145,6 +145,44 @@ jobs:
                 echo "::error::$line"
               done
 
+  nostdlib:
+    name: freestanding (toolchain without newlib)
+    runs-on: ubuntu-latest
+    env:
+      BUILD_LOG: /tmp/libopenwch-build.log
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y gcc-riscv64-unknown-elf
+      # Debian's gcc-riscv64-unknown-elf ships no newlib for any multilib, so a
+      # link that pulls in -lc or -lgloss fails outright.  That makes this the
+      # sharpest available test of the claim that libopenwch is freestanding:
+      # if the library, the smoke tests or the template ever start needing a C
+      # library, this job breaks first.
+      - name: Build the library and the mini-libc
+        shell: bash
+        run: make 2>&1 | tee -a "$BUILD_LOG"
+      - name: API smoke tests (link with -nostdlib)
+        shell: bash
+        run: make apitest 2>&1 | tee -a "$BUILD_LOG"
+      - name: Template with LIBOPENWCH_NOSTDLIB=1
+        shell: bash
+        run: |
+          make -C template/examples/blink LIBOPENWCH_NOSTDLIB=1 2>&1 | tee -a "$BUILD_LOG"
+          make -C template/examples/ch582_blink LIBOPENWCH_NOSTDLIB=1 2>&1 | tee -a "$BUILD_LOG"
+      - name: Report the failure
+        if: failure()
+        run: |
+          {
+            echo "### Failure output (tail)"
+            echo '```'
+            tail -n 50 "$BUILD_LOG" 2>/dev/null || echo "no build log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE 'error:|cannot find|undefined reference|Error [0-9]' "$BUILD_LOG" 2>/dev/null \
+            | head -n 5 | while IFS= read -r line; do
+                echo "::error::$line"
+              done
+
   all-targets:
     name: both families in one make
     runs-on: ubuntu-latest

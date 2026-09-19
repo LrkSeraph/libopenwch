@@ -119,12 +119,14 @@ TGT_LDFLAGS	+= -Wl,-Map=$(PROJECT).map
 ## libc.
 ##
 ## By default the toolchain's newlib is used.  A toolchain built without newlib
-## can be used by setting LIBOPENWCH_NOSTDLIB=1, which links the bundled
-## mini-libc that libopenwch ships for exactly this case.
+## -- for instance Debian's gcc-riscv64-unknown-elf, which ships none for the
+## rv32e or rv32imac multilibs -- can be used by setting LIBOPENWCH_NOSTDLIB=1,
+## which links the freestanding mini-libc that libopenwch builds for exactly
+## this case.  The archive is per family, so it carries the right ISA.
 ##
 ifeq ($(LIBOPENWCH_NOSTDLIB),1)
 TGT_LDFLAGS	+= -nostdlib
-LDLIBS		+= $(OPENWCH_DIR)/lib/mini_libc.a -lgcc
+LDLIBS		+= $(OPENWCH_DIR)/lib/libopenwch_mini_libc_$(genlink_family).a -lgcc
 else
 TGT_LDFLAGS	+= -Wl,--start-group
 LDLIBS		+= -lc -lgcc -lnosys

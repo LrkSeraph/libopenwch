@@ -46,6 +46,31 @@ make PREFIX=/opt/xpack-riscv-none-elf-gcc/bin/riscv-none-elf-
 `riscv64-linux-gnu-` is deliberately **not** probed: its startup files and libc
 conventions are different enough to break bare-metal firmware builds.
 
+### No C library required
+
+libopenwch is freestanding: its archives reference only libgcc (for `__mulsi3`,
+`__udivsi3` and friends) and no part of the library calls the C library.  This
+matters in practice, because Debian's and Ubuntu's `gcc-riscv64-unknown-elf`
+ship **no newlib at all** for the `rv32e` or `rv32imac` multilibs, so any link
+that pulls in `-lc` or `-lgloss` fails outright.
+
+Applications built from `template/` have two modes:
+
+| mode | link | use when |
+|---|---|---|
+| default | `-lc -lgcc -lnosys` (newlib) | the toolchain has newlib |
+| `LIBOPENWCH_NOSTDLIB=1` | `-nostdlib` + `libopenwch_mini_libc_<family>.a` + `-lgcc` | it does not |
+
+```sh
+make -C template/examples/blink LIBOPENWCH_NOSTDLIB=1
+```
+
+The mini-libc is a small freestanding set — `memcpy`, `memmove`, `memset`,
+`memcmp`, `memchr`, `strlen`, `strnlen`, `strcmp`, `strncmp`, `strcpy`,
+`strncpy`, `strchr` — built per family into its own archive, so that it carries
+the right ISA and never shadows a real C library unless you ask for it.  It has
+no `printf`, no `malloc` and no floating point.
+
 ## Building the library
 
 ```sh

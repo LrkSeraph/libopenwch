@@ -41,12 +41,21 @@ SRCLIBDIR	?= $(OPENWCH_TOP)/lib
 OPENWCH_TOP	:= $(abspath $(CURDIR)/../..)
 OPENWCH_INC	:= $(OPENWCH_TOP)/include
 OPENWCH_QINGKE	:= $(OPENWCH_TOP)/lib/qingke
+OPENWCH_MINILIB	:= $(OPENWCH_TOP)/lib/mini_libc
 OPENWCH_COMMON	:= $(CURDIR)/common
 
 CC		:= $(PREFIX)-gcc
 AR		:= $(PREFIX)-ar
 
-VPATH += .:$(OPENWCH_QINGKE):$(OPENWCH_COMMON)
+VPATH += .:$(OPENWCH_QINGKE):$(OPENWCH_COMMON):$(OPENWCH_MINILIB)
+
+##
+## The freestanding mini libc for this family, in its own archive.  Built and
+## linked only when an application asks for it with LIBOPENWCH_NOSTDLIB=1.
+##
+MINILIB		= libopenwch_mini_libc_$(notdir $(CURDIR))
+MINILIB_OBJS	= mini_libc.o
+
 
 ##
 ## Objects

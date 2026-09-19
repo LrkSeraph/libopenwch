@@ -65,7 +65,7 @@ generated.$(DEVICE).ld: $(OPENWCH_DIR)/ld/linker.ld.S $(DEVICES_DATA)
 
 api_smoke.elf: api_smoke.o generated.$(DEVICE).ld
 	@printf "  LD      $@\n"
-	$(Q)$(CC) $(CFLAGS) $(ARCH_FLAGS) -nostartfiles \
+	$(Q)$(CC) $(CFLAGS) $(ARCH_FLAGS) -nostdlib \
 		-T generated.$(DEVICE).ld -Wl,--gc-sections \
 		$< -L$(OPENWCH_DIR)/lib -lopenwch_$(shell $(GENLINK_PY) $(DEVICES_DATA) $(DEVICE) FAMILY) \
 		-lgcc -o $@

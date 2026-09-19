@@ -107,5 +107,12 @@ Everything else is original to this project, in particular:
   include/libopenwch/ch32v0/**       CH32V00x register maps and drivers
   include/libopenwch/ch5xx58x/**     CH58x register maps and drivers
   lib/ch32v0/**, lib/ch5xx58x/**     the driver implementations
+  lib/mini_libc/**                   the freestanding mini libc
+  include/libopenwch/mini_libc.h     its declarations
   template/**                        the application skeleton
   tests/**                           the API smoke tests
+
+The mini libc is an independent implementation of the standard string and
+memory routines, written for this project from their published semantics.  It
+is not derived from newlib, from picolibc, or from any other C library, and it
+carries the same LGPL-3.0-or-later terms as the rest of the library.
