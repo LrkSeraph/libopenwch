@@ -1,0 +1,195 @@
+/*
+ * This file is part of the libopenwch project.
+ *
+ * Copyright (C) 2025 libopenwch contributors
+ *
+ * This library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/** @addtogroup gpio_file GPIO
+ *
+ * @ingroup CH32V0
+ *
+ * @brief <b>General Purpose I/O for the CH32V00x</b>
+ *
+ * @version 1.0.0
+ *
+ * @date 1 January 2025
+ *
+ * The CH32V00x GPIO block packs MODE and CNF into one nibble per pin inside
+ * CFGLR.  Pull-up and pull-down are not separate configuration bits: the pin
+ * is configured as an input with CNF = pull-up/pull-down, and the *output*
+ * data register then selects which of the two is active.  That is why
+ * gpio_set_mode() writes OUTDR for GPIO_CNF_INPUT_PULL_UPDOWN.
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
+/**@{*/
+
+#include <libopenwch/ch32v0/gpio.h>
+#include <libopenwch/qingke/assert.h>
+
+/*
+ * Apply `nibble` to the pin-packing register `reg` for every pin set in
+ * `gpios`.  The MODE/CNF fields are 2 bits each, so one pin occupies a nibble
+ * and the register is 32 bits wide -- which is exactly 8 pins, the width of a
+ * CH32V00x port.
+ */
+static void gpio_nibble_apply(volatile uint32_t *reg, uint8_t nibble, uint16_t gpios)
+{
+	uint32_t value = *reg;
+	unsigned pin;
+
+	for (pin = 0; pin < GPIO_PIN_COUNT; pin++) {
+		if (gpios & (1 << pin)) {
+			uint32_t shift = pin * 4;
+
+			value &= ~(0xfu << shift);
+			value |= ((uint32_t)nibble & 0xfu) << shift;
+		}
+	}
+
+	*reg = value;
+}
+
+void gpio_set_mode(uint32_t gpioport, uint8_t mode, uint16_t gpios)
+{
+	openwch_assert((mode & ~GPIO_CFGLR_NIBBLE_MASK) == 0);
+	openwch_assert((gpios & ~GPIO_ALL) == 0);
+
+	/*
+	 * A port is 8 bits wide, so all eight nibbles live in CFGLR.  Requesting
+	 * a pin outside 0..7 is a programming error, not a silent no-op.
+	 */
+	openwch_assert((gpios & 0xff00u) == 0);
+
+	gpio_nibble_apply(&GPIO_CFGLR(gpioport), mode, gpios);
+
+	/*
+	 * Pull direction is selected through the output data register, so a
+	 * pull-down nibble needs the pin driven low and a pull-up nibble needs
+	 * it driven high.
+	 */
+	if (mode == GPIO_MODE_IPD) {
+		GPIO_BCR(gpioport) = gpios;
+	} else if (mode == GPIO_MODE_IPU) {
+		GPIO_BSHR(gpioport) = gpios;
+	}
+}
+
+void gpio_set(uint32_t gpioport, uint16_t gpios)
+{
+	GPIO_BSHR(gpioport) = gpios;
+}
+
+void gpio_clear(uint32_t gpioport, uint16_t gpios)
+{
+	GPIO_BCR(gpioport) = gpios;
+}
+
+uint16_t gpio_get(uint32_t gpioport, uint16_t gpios)
+{
+	return (uint16_t)(GPIO_INDR(gpioport) & gpios);
+}
+
+void gpio_toggle(uint32_t gpioport, uint16_t gpios)
+{
+	/* OUTDR is read/write, and BSHR/BCR are write-only, so a
+	 * read-modify-write of OUTDR is the portable way to toggle. */
+	GPIO_OUTDR(gpioport) ^= gpios;
+}
+
+uint16_t gpio_port_read(uint32_t gpioport)
+{
+	return (uint16_t)GPIO_INDR(gpioport);
+}
+
+void gpio_port_write(uint32_t gpioport, uint16_t data)
+{
+	GPIO_OUTDR(gpioport) = data;
+}
+
+void gpio_port_config_lock(uint32_t gpioport, uint16_t gpios)
+{
+	uint32_t reg;
+
+	openwch_assert((gpios & ~GPIO_ALL) == 0);
+
+	/*
+	 * The LCKR sequence is the standard STM32 one, which WCH copied:
+	 * write with LCKK set, then the same value with LCKK clear, then with
+	 * LCKK set again, and finally read LCKR twice so the read-back drains
+	 * the write buffer.
+	 */
+	reg = (uint32_t)gpios;
+
+	GPIO_LCKR(gpioport) = reg | (1u << 16);
+	GPIO_LCKR(gpioport) = reg;
+	GPIO_LCKR(gpioport) = reg | (1u << 16);
+	(void)GPIO_LCKR(gpioport);
+	(void)GPIO_LCKR(gpioport);
+}
+
+/*
+ * Remap helpers.
+ *
+ * Unlike WCH's EVT, which packs the target, the bit position and a
+ * half-select flag into one 32-bit token, libopenwch exposes two plain
+ * functions: one for the remap bits that are single-bit flags, and one for the
+ * two-bit TIM1/TIM2 fields.  The bit definitions above are the raw register
+ * values, so a caller can compose them directly.
+ */
+void gpio_primary_remap(uint32_t remap)
+{
+	AFIO_PCFR1 |= remap;
+}
+
+void gpio_secondary_remap(uint32_t remap)
+{
+	AFIO_PCFR1 &= ~remap;
+}
+
+/* --- EXTI line source selection ------------------------------------------ */
+
+/*
+ * AFIO_EXTICR maps each EXTI line 0..7 to a port.  Keeping it here (rather
+ * than in the EXTI driver) matches where libopencm3 puts it: the register is
+ * part of the GPIO alternate-function block.
+ */
+void gpio_exti_select_source(uint32_t exti_line, uint32_t gpioport)
+{
+	unsigned pin;
+	uint32_t source;
+
+	for (pin = 0; pin < GPIO_PIN_COUNT; pin++) {
+		if (!(exti_line & (1 << pin))) {
+			continue;
+		}
+
+		if (gpioport == GPIOA_BASE) {
+			source = AFIO_EXTICR_PORTA;
+		} else if (gpioport == GPIOC_BASE) {
+			source = AFIO_EXTICR_PORTC;
+		} else if (gpioport == GPIOD_BASE) {
+			source = AFIO_EXTICR_PORTD;
+		} else {
+			openwch_assert(0);
+			return;
+		}
+
+		AFIO_EXTICR &= ~(0x3u << (pin * 2));
+		AFIO_EXTICR |= source << (pin * 2);
+	}
+}
+/**@}*/

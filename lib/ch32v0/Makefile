@@ -40,6 +40,7 @@ OPENWCH_TOP	:= $(abspath $(CURDIR)/../..)
 OPENWCH_INC	:= $(OPENWCH_TOP)/include
 OPENWCH_QINGKE	:= $(OPENWCH_TOP)/lib/qingke
 OPENWCH_COMMON	:= $(CURDIR)/common
+OPENWCH_FAMILY_COMMON := $(CURDIR)/common
 
 CC		:= $(PREFIX)-gcc
 AR		:= $(PREFIX)-ar
@@ -59,8 +60,8 @@ OBJS += vector_handlers.o vector_names.o
 ## this directory or in ./common/.
 ##
 # P2 plan: uncomment each line as its source file lands.
-#OBJS += gpio.o gpio_common_v1.o
-#OBJS += rcc.o rcc_common_v1.o
+OBJS += gpio.o gpio_common_v1.o
+OBJS += rcc.o rcc_common_v1.o
 #OBJS += usart.o usart_common_v1.o
 #OBJS += tim.o tim_common_v1.o
 #OBJS += spi.o spi_common_v1.o

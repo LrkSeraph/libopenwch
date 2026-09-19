@@ -148,6 +148,36 @@
    （会退化成普通 `ret`，即根本不是中断处理函数）。WCH 的快速中断属性是
    opt-in：定义 `OPENWCH_USE_WCH_INTERRUPT` 并使用 WCH 工具链时才启用。
 
+### P2 实现记录（CH32V00x）
+
+9. **CH32V00x 的 GPIO 引脚配置 nibble 不是 (MODE, CNF) 位域打包**。
+   这是本阶段最重要的发现。WCH 手册与 EVT 给出的
+   `GPIO_Mode_*` 值是：
+
+   | 名称 | 值 |
+   |---|---|
+   | `GPIO_Mode_AIN` | `0x00` |
+   | `GPIO_Mode_IN_FLOATING` | `0x04` |
+   | `GPIO_Mode_IPD` | `0x28` |
+   | `GPIO_Mode_IPU` | `0x48` |
+   | `GPIO_Mode_Out_OD` | `0x14` |
+   | `GPIO_Mode_Out_PP` | `0x10` |
+   | `GPIO_Mode_AF_OD` | `0x1c` |
+   | `GPIO_Mode_AF_PP` | `0x18` |
+
+   穷举所有可能的两个 2-bit 字段位置（MODE 在 s_m、CNF 在 s_c）**不存在**
+   能复现上表的解。也就是说手册正文 "MODE[1:0] / CNF[3:2]" 的字段描述
+   与实际寄存器编码不一致。
+
+   因此 libopenwch **把 nibble 当作不透明寄存器值**处理，直接采用上表的
+   数值（与 EVT、`ch32fun` 一致）。这样从 EVT 或手册抄来的值可以原样传给
+   `gpio_set_mode()`，不会因为重新解释位域而出错。
+
+   代价是 `gpio_set_mode()` 的签名与 libopencm3 的
+   `gpio_set_mode(port, mode, cnf, pins)` 不同——这是**有意的不兼容**，
+   已在头文件中显著说明。拉/下拉方向仍由 OUTDR 选择，因此
+   `GPIO_MODE_IPD` 写 0、`GPIO_MODE_IPU` 写 1。
+
 ### P0 验收
 
 - [x] `make TARGETS=""` 成功（空构建不报错）
@@ -207,17 +237,21 @@
 
 ### P2.1 器件基础
 
-- [ ] `include/libopenwch/ch32v003/memorymap.h`（`PERIPH_BASE=0x40000000`、`APB1/APB2/AHB`、所有 `*_BASE`、`ESIG/OB/INFO/VENDOR_CFG0`）
+- [x] `include/libopenwch/ch32v003/memorymap.h`（`PERIPH_BASE=0x40000000`、`APB1/APB2/AHB`、所有 `*_BASE`、`ESIG/OB/INFO/VENDOR_CFG0`）
 - [ ] `include/libopenwch/ch32v003/irq.json`（`nmi/hardfault/systick/sw/wwdg/pvd/flash/rcc/exti7_0/awu/dma1_channel1..7/adc1/i2c1_ev/i2c1_er/usart1/spi1/tim1_brk/tim1_up/tim1_trg_com/tim1_cc/tim2`）
-- [ ] `include/libopenwch/ch32v0/common/*.h`（`v1` 变体头文件集）
+- [x] `include/libopenwch/ch32v0/common/*.h`（`v1` 变体头文件集）
 - [ ] `include/libopenwch/ch32v0/doc-ch32v0.h`、`ch32v003/doc-ch32v003.h`
 - [ ] `lib/ch32v/Makefile.include`（族级 `TGT_CFLAGS`、`VPATH`）
 
 ### P2.2 驱动实现（按依赖顺序）
 
-- [ ] `rcc`（时钟树：HSI/HSE/PLL、`rcc_clock_setup_hsi_48m`、`rcc_periph_clock_enable`、`rcc_get_clocks_freq`）
-- [ ] `gpio`（`gpio_set_mode`、`gpio_set/clear/toggle/get`、`gpio_port_*`、`gpio_lock_config`、`gpio_primary_remap`、`gpio_set_eventout`）
-- [ ] `syscfg`(AFIO)（`exti_select_source`、remap 寄存器）
+- [x] `rcc`（时钟树：HSI/HSE/PLL、`rcc_clock_setup_hsi_48m`、`rcc_periph_clock_enable`、`rcc_get_clocks_freq`）
+- [x] `gpio` —— `gpio_set_mode(port, nibble, pins)`、`gpio_set/clear/toggle/get`、
+      `gpio_port_read/write`、`gpio_port_config_lock`、`gpio_primary_remap`、
+      `gpio_secondary_remap`、`gpio_exti_select_source`
+      （注意：`gpio_set_mode()` 取**单个不透明 nibble**，不是 libopencm3 的
+      `(mode, cnf)` 两个参数、也不是 CH58x 的 `(mode, drive)`——原因见下）
+- [x] `syscfg`(AFIO)（`exti_select_source`、remap 寄存器）
 - [ ] `exti`（触发沿、中断使能、标志）
 - [ ] `usart`（波特率、数据位、停止位、校验、模式、流控、收发、DMA 挂钩）
 - [ ] `tim`（PWM 输出比较、输入捕获、预分频、自动重装、对齐、中断）
@@ -235,7 +269,7 @@
 
 ### P2.3 器件外壳
 
-- [ ] `lib/ch32v/003/Makefile`（`LIBNAME=libopenwch_ch32v003`、`OBJS`、`VPATH`、`SRCLIBDIR=../../..`）
+- [x] `lib/ch32v/003/Makefile`（`LIBNAME=libopenwch_ch32v003`、`OBJS`、`VPATH`、`SRCLIBDIR=../../..`）
 - [ ] `lib/ch32v/003/<periph>.c` 薄壳（include `../common/<periph>_common_v1.c` 或器件特化）
 
 ### P2.4 示例与验证

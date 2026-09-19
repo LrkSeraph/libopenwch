@@ -11,9 +11,9 @@
 
 | 项 | 值 |
 |---|---|
-| 当前阶段 | **P1 完成，进入 P2（CH32V00x 外设驱动）** |
-| 阶段进度 | P0: 100% ｜ **P1: 100%** ｜ P2: 0% ｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
-| 最近更新 | 完成 P0 构建系统 + P1 `qingke/` 核心层；两个族均可编译出静态库并通过链接冒烟测试 |
+| 当前阶段 | **P2 进行中（CH32V00x 外设驱动）** |
+| 阶段进度 | P0: 100% ｜ P1: 100% ｜ **P2: 15%**（memorymap + gpio + rcc）｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
+| 最近更新 | P2.1–P2.2 完成：`ch32v0/memorymap.h`、`gpio`（含 AFIO/EXTI 源选择）、`rcc`（HSI/HSE→48 MHz、外设时钟、复位、时钟测量） |
 | 构建状态 | ✅ `make` 全绿：`lib/libopenwch_ch32v0.a`、`lib/libopenwch_ch5xx58x.a` |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
 | 仓库状态 | ✅ 已提交基线 `9a8ed34`（56 文件 / 10303 行），构建后工作区依然干净 |
@@ -118,6 +118,25 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 - [x] 两个族都能编译、归档、链接；向量表断言通过
 - [x] `make stylecheck` 可运行（结果仅作参考，见「已知问题」）
 
+### P2 — CH32V00x 外设驱动（进行中，15%）
+
+- [x] `include/libopenwch/ch32v0/memorymap.h`（总线 + 全部 `*_BASE` + `ESIG`/`OB`/`VENDOR_CFG0`）
+- [x] `include/libopenwch/ch32v0/common/gpio_common_v1.h` + `lib/ch32v0/common/gpio_common_v1.c`
+  - `gpio_set_mode()`（不透明 nibble）、`gpio_set/clear/toggle/get`、
+    `gpio_port_read/write`、`gpio_port_config_lock`（LCKR 序列）、
+    `gpio_primary_remap`/`gpio_secondary_remap`、`gpio_exti_select_source`
+- [x] `include/libopenwch/ch32v0/rcc.h` + `lib/ch32v0/common/rcc_common_v1.c`
+  - `rcc_clock_setup_hsi_48mhz()`（含读 `CFG0_PLL_TRIM` 工厂 trim）、
+    `rcc_clock_setup_hse_48mhz()`、`rcc_clock_setup_sysclk()`、
+    `rcc_get_clocks_freq()`、外设时钟/复位（带总线的标识符编码）、
+    分频器、CSS、复位标志
+- [x] 设备薄壳 `lib/ch32v0/{gpio,rcc}.c`
+- [x] 在 `lib/ch32v0/Makefile` 的 `OBJS` 中启用
+- [x] 用真实程序验证：编译 + 链接 + 反汇编确认写入的 nibble 与 WCH EVT 一致
+
+**待办**：`usart`、`tim`、`spi`、`i2c`、`adc`、`dma`、`exti`、`flash`、
+`iwdg`/`wwdg`、`pwr`、`opa`、`dbgmcu`；`examples/`；`tests/`。
+
 ### 相对初版规划的设计修正
 
 实现中发现并修正的问题已详细记录在 `phase.md` 的「P0 实现记录」一节，摘要：
@@ -130,6 +149,10 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 6. `mk/` 全程使用 `$(abspath)` 绝对路径（沙箱/虚拟化文件系统下 `..` 不可靠）
 7. `blocking_handler()` 由生成器定义在 `vector_handlers.c` 内（GCC alias 约束）
 8. `OPENWCH_INTERRUPT` 默认用可移植的 `__attribute__((interrupt()))`
+9. **CH32V00x 的 GPIO nibble 不是 (MODE, CNF) 位域打包**：穷举所有字段位置都
+   无法复现 WCH 手册的 `GPIO_Mode_*` 值，因此是把 nibble 当作**不透明寄存器值**
+   处理。`gpio_set_mode(port, nibble, pins)` 与 libopencm3 的三参数签名
+   **有意不兼容**，已在头文件与 `phase.md` 说明
 
 ---
 
