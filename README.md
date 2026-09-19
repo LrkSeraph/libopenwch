@@ -81,7 +81,6 @@ make TARGETS=ch32v0      # one family
 make list-targets        # show what can be built
 make genlinktests        # validate ld/devices.data (no toolchain needed)
 make stylecheck          # second opinion (scripts/checkpatch.pl)
-make hooks               # install the pre-commit clang-format hook
 make clean
 ```
 
@@ -97,15 +96,9 @@ lib/libopenwch_mini_libc_ch5xx58x.a
 ### Formatting
 
 Formatting is **clang-format**'s job, driven by `.clang-format`.  It runs from
-a pre-commit hook, never in CI:
-
-```sh
-make hooks      # git config core.hooksPath .githooks, once per clone
-```
-
-`git commit` then reformats the C sources you staged and re-stages them.  If
-clang-format is not installed the hook does nothing and the commit proceeds —
-a contributor without LLVM is not blocked.
+`.git/hooks/pre-commit` — never in CI.  `git commit` reformats the C sources
+you staged and re-stages them.  If clang-format is not installed the hook does
+nothing and the commit proceeds, so a contributor without LLVM is not blocked.
 
 ## Using the library
 
@@ -190,8 +183,7 @@ deliberately does not.  See `project.md` §5.1 for a full migration table.
 
 ```
 Makefile            TARGETS-based recursive build
-.clang-format       the formatting authority (see .githooks/pre-commit)
-.githooks/          pre-commit hook installing clang-format (make hooks)
+.clang-format       the formatting authority (see .git/hooks/pre-commit)
 mk/                 reusable build modules (gcc-config, genlink-config, ...)
 scripts/            genlink.py, irq2nvic_h, genlinktest.sh, checkpatch.pl
 ld/                 devices.data + linker.ld.S + tests

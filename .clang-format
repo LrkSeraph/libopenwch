@@ -1,7 +1,7 @@
 # libopenwch formatting
 #
 # clang-format is the authority on formatting.  It runs from the pre-commit
-# hook (.githooks/pre-commit, installed with `make hooks`) and never in CI.
+# hook (.git/hooks/pre-commit) and never in CI.
 # The tree is kept clang-format clean, so `clang-format --dry-run -Werror`
 # over any tracked .c/.h file should report nothing.
 #

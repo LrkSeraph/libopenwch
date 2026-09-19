@@ -42,11 +42,8 @@
 6. **寄存器宏命名贴近 WCH 手册**（`HACKING` 要求），例如 `USART_CTLR1_UE`、`GPIO_CFGLR`。
 7. **格式化由 clang-format 负责，不要手写格式，也不要用脚本改格式**。
 
-   ```sh
-   make hooks          # 每个 clone 执行一次：git config core.hooksPath .githooks
-   ```
-
-   装好钩子后，`git commit` 会用 `.clang-format` 重排本次暂存的 `.c`/`.h` 并重新 `git add`。
+   钩子是 `.git/hooks/pre-commit`（**每个 clone 本地一份、不进版本库**），`git commit` 时
+   会用 `.clang-format` 重排本次暂存的 `.c`/`.h` 并重新 `git add`。
    **CI 里绝不格式化**（格式化是提交时的属性，构建农场事后改写只会让人忽略它）。
    钩子在**未安装 clang-format 时直接放行**（`exit 0`），没有 LLVM 的贡献者不会被挡住。
 
@@ -100,10 +97,6 @@ make PREFIX=riscv64-unknown-elf-
 
 # 链接脚本生成冒烟测试
 make genlinktests
-
-# 安装 git 钩子（提交时自动 clang-format；无 clang-format 时放行）
-make hooks
-make unhooks
 
 # 代码规范（第二意见，非 CI 门禁）
 make stylecheck

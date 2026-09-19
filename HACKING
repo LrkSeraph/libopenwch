@@ -29,12 +29,10 @@ Formatting is clang-format's job, not yours and not the reviewer's
 ------------------------------------------------------------------
 
 `.clang-format` at the top of the tree is the authority on layout.  It runs
-from the pre-commit hook:
+from `.git/hooks/pre-commit`, which is per-clone and not tracked:
 
-	make hooks		# once per clone: git config core.hooksPath .githooks
-
-After that, `git commit` reformats the C sources you staged and re-stages
-them, so nothing arrives unformatted.  The hook is a **no-op when clang-format
+`git commit` reformats the C sources you staged and re-stages them, so
+nothing arrives unformatted.  The hook is a **no-op when clang-format
 is not installed** -- a contributor without LLVM is not blocked, and the style
 is simply applied by whoever does have it.
 
