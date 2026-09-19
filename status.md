@@ -346,6 +346,7 @@ P3 已全部完成，见上一节。P4 待办：
 | 两族函数总数 | `nm --defined-only lib/*.a` | ✅ ch32v0=316，ch5xx58x=202，合计 518 |
 | 两族归档审计 | 重名符号 / 命名违规 | ✅ 均为 0 |
 | CH582 真 blink | `make -C template/examples/ch582_blink` | ✅ 2808 B |
+| CH582 UART echo | `make -C template/examples/ch582_uart_echo` | ✅ 2412 B |
 | `.highcode` 段可链接 | 最小复现 + `make apitest` | ✅ 修复后 `in_ram` 落在 0x20000000 |
 | RWA 解锁序列 | `objdump -d clk.o` | ✅ 8 个内联 `0x57`/`0xA8` 窗口 |
 

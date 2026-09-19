@@ -32,7 +32,9 @@ Two examples are included and both build today:
 | Example | Device | Family | What it does |
 |---|---|---|---|
 | `examples/blink` | `ch32v003f4p6` | ch32v0 | 48 MHz from the internal RC oscillator, toggles PD1 |
-| `examples/ch582_blink` | `ch582m` | ch5xx58x | core-layer bring-up: vector table, PFIC, SysTick 1 ms tick |
+| `examples/uart_echo` | `ch32v003f4p6` | ch32v0 | USART1 echo at 115200 on PD5/PD6 |
+| `examples/ch582_blink` | `ch582m` | ch5xx58x | 32 MHz crystal + PLL to 60 MHz, toggles PB4 |
+| `examples/ch582_uart_echo` | `ch582m` | ch5xx58x | UART1 echo at 115200 on PA8/PA9 |
 
 Each example targets one family, because the library archive is per family:
 `blink` uses the CH32V00x `rcc`/`gpio` drivers and therefore only links against

@@ -24,8 +24,8 @@ staged plan, and `project.md` for the full design.
 
 | Family | Parts | Core | State |
 |---|---|---|---|
-| `ch32v0` | CH32V003, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2, RV32EC | core layer + build system done (P1); drivers in P2 |
-| `ch5xx58x` | CH582, CH583, CH584, CH585 | QingKe V4, RV32IMAC | core layer + build system done (P1); drivers in P3 |
+| `ch32v0` | CH32V003, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2, RV32EC | **done** — 316 public functions across 15 peripherals |
+| `ch5xx58x` | CH582, CH583, CH584, CH585 | QingKe V4, RV32IMAC | **done** — 202 public functions across 12 peripherals |
 
 ## Toolchain
 
@@ -124,6 +124,9 @@ cd ~/src/my-firmware/examples/blink
 make OPENWCH_DIR=~/src/libopenwch
 make OPENWCH_DIR=~/src/libopenwch flash    # needs minichlink
 ```
+
+Four working examples ship with it — `blink` and `uart_echo` for the CH32V003,
+`ch582_blink` and `ch582_uart_echo` for the CH58x.
 
 Each example is a self-contained directory with its own `Makefile`; `DEVICE`
 selects the part and everything else (ISA, linker script, library) is derived
