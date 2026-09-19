@@ -18,73 +18,55 @@
  */
 
 /*
- * CH58x core-layer bring-up.
+ * Blink for a CH58x board.
  *
- * A full blink needs the CH58x clock and GPIO drivers, which are the P3
- * milestone: on this family almost every system, clock, power and GPIO
- * register is write-protected (RWA) and must be written inside the
- * 0x57/0xA8 safe-access window.  Rather than poke those registers without the
- * proper sequence, this example exercises what is already implemented and
- * verified:
+ * Brings the 32 MHz crystal up, runs the system from the 480 MHz PLL divided
+ * to 60 MHz, and toggles a pin.  This is the CH58x counterpart of the
+ * CH32V003 blink and exercises the three things that make this family
+ * different:
  *
- *   - the reset path, .data/.bss initialisation and the vector table,
- *   - the PFIC-backed interrupt controller,
- *   - the SysTick timer as a time base,
- *   - .highcode, which this family's linker script emits.
- *
- * Once lib/ch5xx58x/clk.c and gpio.c land, replace the body of main() with the
- * equivalent of the CH32V003 blink.
+ *   - the crystal is mandatory: there is no internal high-speed oscillator on
+ *     the CH582/CH583, so clk_set_sys_clock() powers XT32M before it touches
+ *     the divider;
+ *   - almost every clock register is RWA and needs the 0x57/0xA8 safe-access
+ *     window, which the RWA_* macros handle;
+ *   - GPIO is bit-parallel, so a whole port is configured with plain masks.
  *
  * Build:   make
- * Size:    make size
+ * Flash:   make flash
  */
 
-#include <libopenwch/qingke/nvic.h>
-#include <libopenwch/qingke/sync.h>
+#include <libopenwch/ch5xx58x/clk.h>
+#include <libopenwch/ch5xx58x/gpio.h>
 #include <libopenwch/qingke/systick.h>
-#include <libopenwch/qingke/vector.h>
-
-/* A counter the SysTick handler bumps; proves interrupts are wired up. */
-static volatile uint32_t ticks;
-
-/* Defined below; the weak fallback lives in the generated vector handlers. */
-void systick_isr(void);
 
 /*
- * The timer interrupt.  The handler is weak-aliased to blocking_handler() by
- * the generated vector_handlers.c, so this non-weak definition wins at link
- * time.
+ * Board wiring.  Change these two lines for your own board.  PB4 is broken
+ * out on most CH582/CH583 modules; the LED is active low on the WCH boards.
  */
-void systick_isr(void)
-{
-	systick_clear_interrupt();
-	ticks++;
-}
+#define LED_PORT		GPIOB
+#define LED_PIN			GPIO4
 
 int main(void)
 {
-	/*
-	 * Counter clock and reload: 1 ms at 48 MHz with the counter running
-	 * from the system clock.  SysTick is a core exception, so it is enabled
-	 * through its own control register rather than through nvic_enable_irq()
-	 * (which drives the PFIC external-interrupt array).
-	 */
-	qingke_systick_set_frequency(48000000u);
-	systick_set_clock_source(1);
-	systick_set_reload(48000u);
+	uint32_t sysclk;
+
+	/* 60 MHz from the PLL.  This powers XT32M first. */
+	clk_set_sys_clock(CLK_SOURCE_PLL_60MHZ);
+	sysclk = clk_get_sys_clock();
+
+	/* Drive the LED pin push-pull. */
+	gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_PP_5MA, LED_PIN);
+
+	/* Use SysTick as the time base: 1 ms ticks. */
+	qingke_systick_set_frequency(sysclk);
+	systick_set_clock_source(1);	/* run from the system clock */
 	systick_clear_interrupt();
-	systick_enable_interrupt();
 	systick_enable_counter();
 
-	qingke_irq_enable();
-
 	for (;;) {
-		/* Wait for the handler to advance the counter. */
-		uint32_t before = ticks;
-
-		while (ticks == before) {
-			;
-		}
+		gpio_toggle(LED_PORT, LED_PIN);
+		qingke_delay_ms(250);
 	}
 
 	return 0;

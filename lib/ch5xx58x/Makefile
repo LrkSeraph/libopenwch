@@ -61,7 +61,8 @@ OBJS += vector_handlers.o vector_names.o
 ## this directory or in ./common/.
 ##
 # P3 plan: uncomment each line as its source file lands.
-#OBJS += rwa.o clk.o sys.o pwr.o flash.o
+OBJS += rwa.o clk.o
+OBJS += gpio.o gpio_common_v1.o
 #OBJS += gpio.o
 #OBJS += uart.o
 #OBJS += spi.o
