@@ -46,6 +46,11 @@ jobs:
           - ch32v0
           - ch5xx58x
 
+    env:
+      # Every build step appends here so the failure step below can surface the
+      # actual compiler/linker error.
+      BUILD_LOG: ${{ runner.temp }}/build.log
+
     steps:
       - uses: actions/checkout@v4
 
@@ -94,15 +99,19 @@ jobs:
           ${{ matrix.toolchain.prefix }}-gcc -dumpversion
 
       - name: Device database tests
-        run: make genlinktests PREFIX=${{ matrix.toolchain.prefix }}
+        shell: bash
+        run: make genlinktests PREFIX=${{ matrix.toolchain.prefix }} 2>&1 | tee -a "$BUILD_LOG"
 
       - name: Build the library
-        run: make TARGETS=${{ matrix.target }} PREFIX=${{ matrix.toolchain.prefix }}
+        shell: bash
+        run: make TARGETS=${{ matrix.target }} PREFIX=${{ matrix.toolchain.prefix }} 2>&1 | tee -a "$BUILD_LOG"
 
       - name: API smoke test
-        run: make apitest PREFIX=${{ matrix.toolchain.prefix }}
+        shell: bash
+        run: make apitest TARGETS=${{ matrix.target }} PREFIX=${{ matrix.toolchain.prefix }} 2>&1 | tee -a "$BUILD_LOG"
 
       - name: Report sizes
+        if: success()
         run: |
           for a in lib/*.a; do
             echo "== $a"
@@ -111,14 +120,58 @@ jobs:
               awk '$2=="T"' | wc -l | xargs echo "  public functions:"
           done
 
+      # Downloading a raw job log through the API requires repository admin
+      # rights, which a contributor debugging a PR does not have.  The step
+      # summary and the error annotations are both readable without them, so
+      # route the decisive lines there as well.
+      - name: Report the failure
+        if: failure()
+        run: |
+          {
+            echo "### Toolchain"
+            echo '```'
+            ${{ matrix.toolchain.prefix }}-gcc --version | head -1
+            ${{ matrix.toolchain.prefix }}-gcc --print-multi-lib | head -20
+            echo '```'
+            echo "### Failure output (tail)"
+            echo '```'
+            tail -n 50 "$BUILD_LOG" 2>/dev/null || echo "no build log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE 'error:|cannot find|undefined reference|Error [0-9]' "$BUILD_LOG" 2>/dev/null \
+            | head -n 5 | while IFS= read -r line; do
+                echo "::error::$line"
+              done
+
   all-targets:
     name: both families in one make
     runs-on: ubuntu-latest
+    env:
+      BUILD_LOG: ${{ runner.temp }}/build.log
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y gcc-riscv64-unknown-elf
       # Building both in one invocation is what would catch a family-specific
       # flag or header leaking into the shared build.
-      - run: make TARGETS="ch32v0 ch5xx58x"
-      - run: make apitest
-      - run: make clean && make
+      - name: Build both families in one make
+        shell: bash
+        run: make TARGETS="ch32v0 ch5xx58x" 2>&1 | tee -a "$BUILD_LOG"
+      - name: API smoke test for both families
+        shell: bash
+        run: make apitest 2>&1 | tee -a "$BUILD_LOG"
+      - name: Clean rebuild
+        shell: bash
+        run: make clean && make 2>&1 | tee -a "$BUILD_LOG"
+      - name: Report the failure
+        if: failure()
+        run: |
+          {
+            echo "### Failure output (tail)"
+            echo '```'
+            tail -n 50 "$BUILD_LOG" 2>/dev/null || echo "no build log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE 'error:|cannot find|undefined reference|Error [0-9]' "$BUILD_LOG" 2>/dev/null \
+            | head -n 5 | while IFS= read -r line; do
+                echo "::error::$line"
+              done

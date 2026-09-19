@@ -164,9 +164,13 @@ styleclean: $(STYLECHECKFILES:=.styleclean)
 ## Compiles and links tests/<family>/api_smoke.c against the whole public API.
 ## It is a build-level test: the ELF is produced but never run.
 ##
-APITEST_DIRS := $(wildcard tests/ch32v0 tests/ch5xx58x)
+## The set of tests is derived from TARGETS rather than hardcoded, and the
+## target depends on `lib`.  Without both, `make TARGETS=ch32v0 apitest` tried
+## to link tests/ch5xx58x against an archive that was never built.
+##
+APITEST_DIRS := $(wildcard $(addprefix tests/,$(TARGETS)))
 
-apitest:
+apitest: lib
 	$(Q)for d in $(APITEST_DIRS); do \
 		printf "  TEST    %s\n" "$$d"; \
 		$(MAKE) -C $$d PREFIX="$(PREFIX)" || exit $$?; \
