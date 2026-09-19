@@ -51,17 +51,46 @@ LGPL License Terms @ref lgpl_license
 /* Event output control register (AFIO_ECR) */
 #define AFIO_ECR			MMIO32(AFIO_BASE + 0x14)
 
-/* AFIO_PCFR1 bits */
-#define AFIO_PCFR1_SPI1_REMAP		(1 << 0)
-#define AFIO_PCFR1_I2C1_REMAP		(1 << 1)
-#define AFIO_PCFR1_USART1_REMAP		(1 << 2)
-#define AFIO_PCFR1_TIM1_REMAP		(3 << 6)
-#define AFIO_PCFR1_TIM2_REMAP		(3 << 8)
-#define AFIO_PCFR1_PA1_PA2_REMAP	(1 << 12)
-#define AFIO_PCFR1_ADC1_ETRGINJ_REMAP	(1 << 13)
-#define AFIO_PCFR1_ADC1_ETRGREG_REMAP	(1 << 14)
-#define AFIO_PCFR1_LSI_CAL_REMAP	(1 << 15)
-#define AFIO_PCFR1_SDI_DISABLE		(1 << 24)
+/*
+ * AFIO_PCFR1 bits.
+ *
+ * Taken from the CH32V003 SVD (misc/CH32V003xx.svd, register AFIO.PCFR1),
+ * which is the machine-readable form of the reference manual and the most
+ * reliable source for this register: WCH's own EVT encodes the remap options
+ * as packed 32-bit tokens whose bit layout is easy to get wrong.
+ *
+ * USART1 and I2C1 each have two remap bits which together form a 2-bit code:
+ *
+ *	code 0b00  no remap
+ *	code 0b01  partial remap 1
+ *	code 0b10  partial remap 2
+ *	code 0b11  full remap
+ *
+ * (For I2C1 only 0b01 and 0b11 are meaningful; 0b10 is not documented.)
+ */
+#define AFIO_PCFR1_SPI1_RM		(1 << 0)
+#define AFIO_PCFR1_I2C1_RM		(1 << 1)
+#define AFIO_PCFR1_USART1_RM		(1 << 2)
+#define AFIO_PCFR1_TIM1_RM_SHIFT	6
+#define AFIO_PCFR1_TIM1_RM_MASK		(0x3u << 6)
+#define AFIO_PCFR1_TIM2_RM_SHIFT	8
+#define AFIO_PCFR1_TIM2_RM_MASK		(0x3u << 8)
+/* Port A1/A2 mapped onto OSCIN/OSCOUT instead of PD0/PD1. */
+#define AFIO_PCFR1_PA12_RM		(1 << 15)
+#define AFIO_PCFR1_ADC1_ETRGINJ_RM	(1 << 17)
+#define AFIO_PCFR1_ADC1_ETRGREG_RM	(1 << 18)
+/* Second remap bit of the USART1 / I2C1 two-bit code. */
+#define AFIO_PCFR1_USART1_REMAP1	(1 << 21)
+#define AFIO_PCFR1_I2C1_REMAP1		(1 << 22)
+/* TIM1_CH1 channel selection. */
+#define AFIO_PCFR1_TIM1_1_RM		(1 << 23)
+#define AFIO_PCFR1_SWCFG_SHIFT		24
+#define AFIO_PCFR1_SWCFG_MASK		(0x7u << 24)
+
+/* Debug-interface (SWD/SDI) disable, per WCH's EVT (not in the SVD). */
+#define AFIO_PCFR1_SDI_DISABLE		(1 << 10)
+/* LSI clock calibration output, per WCH's EVT (not in the SVD). */
+#define AFIO_PCFR1_LSI_CAL		(1 << 7)
 
 /* AFIO_EXTICR: two bits per EXTI line selecting the port. */
 #define AFIO_EXTICR_PORTA		0x0

@@ -141,15 +141,19 @@ void gpio_port_config_lock(uint32_t gpioport, uint16_t gpios)
 	(void)GPIO_LCKR(gpioport);
 }
 
+/* --- Remap helpers ------------------------------------------------------- */
+
 /*
- * Remap helpers.
+ * WCH's EVT encodes each remap option as a packed 32-bit token (value in
+ * [15:0], bit position in [20:16], and class flags up at bits 21/28/31) and
+ * unpacks it at run time, which is hard to read and easy to get wrong.
  *
- * Unlike WCH's EVT, which packs the target, the bit position and a
- * half-select flag into one 32-bit token, libopenwch exposes two plain
- * functions: one for the remap bits that are single-bit flags, and one for the
- * two-bit TIM1/TIM2 fields.  The bit definitions above are the raw register
- * values, so a caller can compose them directly.
+ * libopenwch instead exposes the register fields as they appear in the SVD:
+ * a single-bit flag for the simple cases, and a 2-bit field for the four
+ * peripherals that have more than one remap option.  The helpers below
+ * program the whole field, so switching remap never leaves a stale bit behind.
  */
+
 void gpio_primary_remap(uint32_t remap)
 {
 	AFIO_PCFR1 |= remap;
@@ -158,6 +162,58 @@ void gpio_primary_remap(uint32_t remap)
 void gpio_secondary_remap(uint32_t remap)
 {
 	AFIO_PCFR1 &= ~remap;
+}
+
+/** Program a 2-bit remap field inside AFIO_PCFR1. */
+static void gpio_remap_field(uint32_t mask, uint32_t shift, uint32_t value)
+{
+	uint32_t reg = AFIO_PCFR1;
+
+	reg &= ~mask;
+	reg |= (value << shift) & mask;
+	AFIO_PCFR1 = reg;
+}
+
+void gpio_usart1_remap(uint32_t remap)
+{
+	uint32_t reg = AFIO_PCFR1;
+
+	/* USART1_RM is bit 2, USART1REMAP1 is bit 21; together they form
+	 * the 2-bit code (REMAP1 << 1) | RM. */
+	reg &= ~(AFIO_PCFR1_USART1_RM | AFIO_PCFR1_USART1_REMAP1);
+	if (remap & GPIO_REMAP_USART1_PARTIAL1) {
+		reg |= AFIO_PCFR1_USART1_RM;
+	}
+	if (remap & GPIO_REMAP_USART1_PARTIAL2) {
+		reg |= AFIO_PCFR1_USART1_REMAP1;
+	}
+	AFIO_PCFR1 = reg;
+}
+
+void gpio_i2c1_remap(uint32_t remap)
+{
+	uint32_t reg = AFIO_PCFR1;
+
+	reg &= ~(AFIO_PCFR1_I2C1_RM | AFIO_PCFR1_I2C1_REMAP1);
+	if (remap & GPIO_REMAP_I2C1_PARTIAL) {
+		reg |= AFIO_PCFR1_I2C1_RM;
+	}
+	if (remap & GPIO_REMAP_I2C1_FULL) {
+		reg |= AFIO_PCFR1_I2C1_REMAP1;
+	}
+	AFIO_PCFR1 = reg;
+}
+
+void gpio_tim1_remap(uint32_t remap)
+{
+	openwch_assert(remap <= 3);
+	gpio_remap_field(AFIO_PCFR1_TIM1_RM_MASK, AFIO_PCFR1_TIM1_RM_SHIFT, remap);
+}
+
+void gpio_tim2_remap(uint32_t remap)
+{
+	openwch_assert(remap <= 3);
+	gpio_remap_field(AFIO_PCFR1_TIM2_RM_MASK, AFIO_PCFR1_TIM2_RM_SHIFT, remap);
 }
 
 /* --- EXTI line source selection ------------------------------------------ */

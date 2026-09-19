@@ -62,15 +62,20 @@ OBJS += vector_handlers.o vector_names.o
 # P2 plan: uncomment each line as its source file lands.
 OBJS += gpio.o gpio_common_v1.o
 OBJS += rcc.o rcc_common_v1.o
-#OBJS += usart.o usart_common_v1.o
-#OBJS += tim.o tim_common_v1.o
-#OBJS += spi.o spi_common_v1.o
-#OBJS += i2c.o i2c_common_v1.o
-#OBJS += adc.o adc_common_v1.o
-#OBJS += dma.o dma_common_v1.o
-#OBJS += exti.o exti_common_v1.o
-#OBJS += flash.o flash_common_v1.o
-#OBJS += iwdg.o wwdg.o pwr.o opa.o syscfg.o dbgmcu.o
+OBJS += usart.o usart_common_v1.o
+OBJS += tim.o tim_common_v1.o
+OBJS += spi.o spi_common_v1.o
+OBJS += i2c.o i2c_common_v1.o
+OBJS += adc.o adc_common_v1.o
+OBJS += dma.o dma_common_v1.o
+OBJS += exti.o exti_common_v1.o
+OBJS += flash.o flash_common_v1.o
+OBJS += opa.o opa_common_v1.o
+## NOTE: there is no separate syscfg driver.  AFIO (the remap registers and
+## the EXTI line-source selection) is owned by the GPIO driver, which is
+## where libopencm3 also keeps exti_select_source().
+OBJS += iwdg.o iwdg_common_v1.o wwdg.o wwdg_common_v1.o
+OBJS += pwr.o pwr_common_v1.o dbgmcu.o dbgmcu_common_v1.o
 
 ##
 ## Compile flags.

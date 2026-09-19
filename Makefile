@@ -125,7 +125,7 @@ lib: $(LIB_DIRS)
 html doc:
 	$(Q)$(MAKE) -C doc html TARGETS="$(TARGETS)"
 
-clean: $(IRQ_DEFN_FILES:=.cleanhdr) $(LIB_DIRS:=.clean) doc.clean styleclean genlinktests.clean
+clean: $(IRQ_DEFN_FILES:=.cleanhdr) $(LIB_DIRS:=.clean) doc.clean styleclean genlinktests.clean apitest.clean
 	$(Q)$(RM) .stamp_failure_*
 
 %.clean:
@@ -159,6 +159,23 @@ styleclean: $(STYLECHECKFILES:=.styleclean)
 	$(Q)$(RM) $*.stylecheck;
 
 ##
+## API smoke test
+##
+## Compiles and links tests/<family>/api_smoke.c against the whole public API.
+## It is a build-level test: the ELF is produced but never run.
+##
+APITEST_DIRS := $(wildcard tests/ch32v0 tests/ch5xx58x)
+
+apitest:
+	$(Q)for d in $(APITEST_DIRS); do \
+		printf "  TEST    %s\n" "$$d"; \
+		$(MAKE) -C $$d PREFIX="$(PREFIX)" || exit $$?; \
+	done
+
+apitest.clean:
+	$(Q)for d in $(APITEST_DIRS); do $(MAKE) -C $$d clean; done
+
+##
 ## Linker script generation smoke tests
 ##
 LDTESTS := $(wildcard ld/tests/*.data)
@@ -178,4 +195,5 @@ list-targets:
 	@echo $(TARGETS)
 
 .PHONY: build lib $(LIB_DIRS) doc html clean generatedheaders cleanheaders \
-	stylecheck styleclean genlinktests genlinktests.clean list-targets
+	stylecheck styleclean genlinktests genlinktests.clean apitest apitest.clean \
+	list-targets

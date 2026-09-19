@@ -82,8 +82,13 @@ LGPL License Terms @ref lgpl_license
 #define RCC_BASE			(PERIPH_BASE_AHB + 0x1000)
 #define FLASH_R_BASE			(PERIPH_BASE_AHB + 0x2000)
 #define EXTEN_BASE			(PERIPH_BASE_AHB + 0x3800)
-/* DBGMCU sits in the core private region, not in the peripheral bus space. */
-#define DBGMCU_BASE			(0xe0042000U)
+/*
+ * There is no memory-mapped DBGMCU block on this family: the debug control
+ * register (which WCH's EVT calls CFGR0) lives in CSR 0x7c0 and is reached
+ * with csrr/csrw, and the chip revision/device id live in the factory block
+ * at 0x1ffff7c4.  See include/libopenwch/ch32v0/dbgmcu.h.
+ */
+#define DBGMCU_ID_BASE			(0x1ffff7c4U)
 
 #endif
 /**@}*/

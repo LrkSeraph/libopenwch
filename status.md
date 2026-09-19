@@ -11,12 +11,12 @@
 
 | 项 | 值 |
 |---|---|
-| 当前阶段 | **P2 进行中（CH32V00x 外设驱动）** |
-| 阶段进度 | P0: 100% ｜ P1: 100% ｜ **P2: 40%**（memorymap + gpio + rcc + 应用模板）｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
-| 最近更新 | P2.1–P2.2 完成（memorymap / gpio / rcc）；新增 P2.6 用户应用模板 `template/`，两个示例均可构建，并借此发现并修正 3 个构建系统缺陷 |
+| 当前阶段 | **P2 完成，进入 P3（CH58x 外设驱动）** |
+| 阶段进度 | P0: 100% ｜ P1: 100% ｜ **P2: 100%**（15 个外设 + 应用模板 + API 测试）｜ P3: 0% ｜ P4: 0% ｜ P5: 0% |
+| 最近更新 | P2 全部完成：CH32V00x 15 个外设（316 个公开函数）、`tests/ch32v0/api_smoke.c` 全 API 编译+链接测试、3 个模板示例；并修正 GPIO nibble 与 DBGMCU 寄存器定位两处实质性错误 |
 | 构建状态 | ✅ `make` 全绿：`lib/libopenwch_ch32v0.a`、`lib/libopenwch_ch5xx58x.a` |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
-| 仓库状态 | ✅ 4 个提交，最新 `7b0df2f`；构建后工作区依然干净 |
+| 仓库状态 | ✅ 6 个提交；构建后工作区依然干净 |
 
 ### 可复现的验证命令与结果
 
@@ -156,6 +156,29 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 3. `libopenwch_ch32v0.a` 曾用 `_zmmul` 编译 → 链接出的 CH32V003 映像声明了该型号没有的扩展；
    现已改为纯 `rv32ec`（核心与外设中无任何 mul/div，已用 objdump 验证）
 
+### P2 — CH32V00x 外设驱动（完成，100%）
+
+一期列出的 15 个外设全部实现并归档，`lib/libopenwch_ch32v0.a` 含 **316 个公开函数**：
+
+- [x] `gpio`（含 AFIO remap / EXTI 源选择）、`rcc`、`usart`
+- [x] `tim`、`spi`、`i2c`、`adc`、`dma`、`exti`
+- [x] `flash`（标准 + fast 路径）、`iwdg`、`wwdg`、`pwr`、`opa`、`dbgmcu`
+- [x] `systick`（P1 已含）
+- [x] `lib/ch32v0/Makefile` 的 `OBJS` 全部启用（37 个目标）
+
+**新增测试设施**：
+
+- [x] `tests/ch32v0/api_smoke.c` + `tests/ch32v0/Makefile` —— 调用每个公开函数，
+      以 `-Werror` 与库相同的警告集编译**并链接**；镜像内含 280 个外设函数
+- [x] 根 `Makefile` 的 `make apitest` / `apitest.clean`
+- [x] `api_smoke` 的 `main()` 只取函数地址而不调用（避免真跑破坏芯片）
+
+**一致性核验**（一次性脚本，见 `phase.md`「P2 完成记录」）：
+
+- 37 个目标全部唯一解析，无 VPATH 遮蔽、无空文件
+- 归档无重复全局符号
+- 全部公开函数名符合 `^[a-z][a-z0-9_]*$`
+
 ### 相对初版规划的设计修正
 
 实现中发现并修正的问题已详细记录在 `phase.md` 的「P0 实现记录」一节，摘要：
@@ -172,20 +195,31 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
    无法复现 WCH 手册的 `GPIO_Mode_*` 值，因此是把 nibble 当作**不透明寄存器值**
    处理。`gpio_set_mode(port, nibble, pins)` 与 libopencm3 的三参数签名
    **有意不兼容**，已在头文件与 `phase.md` 说明
+10. **`mk/gcc-config.mk` 的工具变量用了 `?=`，等于从未赋值**。GNU make 预定义
+    `CC=cc`、`LD=ld`、`AS=as` 等内建变量，`?=` 不会覆盖它们，因此
+    `CC`/`LD`/`AS` 一直解析为**宿主工具**。已改为 `:=`（命令行 `make CC=...`
+    仍然优先）。这与第 2 轮在应用模板中发现的是同一类缺陷，当时只修了模板侧，
+    库侧漏掉了
+11. **`DBGMCU` 不是内存映射外设**。WCH EVT 用 `csrr/csrw 0x7c0` 访问调试控制
+    寄存器，芯片版本/型号在 `0x1ffff7c4`；CH32V003 的 SVD 里根本没有 DBGMCU
+    外设节点。原先按 `DBGMCU_BASE=0xe0042000` 的内存映射实现是错的，已重写。
+    位定义存在**未解决的分歧**（见「已知问题」K4）
+12. **AFIO remap 位定义取自 SVD 而非 EVT 的打包 token**。EVT 把"值/位号/半字选择/
+    类别"打包进一个 32 位 token 再运行时解包，极易出错；libopenwch 改为直接暴露
+    SVD 中的字段，并为 USART1/I2C1/TIM1/TIM2 提供 2-bit 字段级 helper。
+    这一改动同时修正了原先写错的 `AFIO_PCFR1_PA1_PA2_REMAP`（应为 bit 15，不是 12）
 
 ---
 
 ## 未开始（P2 待办摘要）
 
-- ⬜ `include/libopenwch/ch32v0/common/*.h`（`v1` 变体头文件集，15 个外设）
-- ⬜ `include/libopenwch/ch32v0/memorymap.h` + 各外设设备头
-- ⬜ `include/libopenwch/ch32v0/doc-ch32v0.h`
-- ⬜ `lib/ch32v0/` 下 15 个外设的 `.c` 与 `common/*.c`
-- ⬜ `lib/ch32v0/Makefile` 中已注释的 `OBJS` 逐条启用
-- ⬜ `examples/ch32v003/{blink,usart_echo}`
-- ⬜ `tests/ch32v003-generic` 冒烟工程
+P2 已全部完成，见上一节。CH58x 侧（P3）尚未开始：
 
-CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等。
+- ⬜ `lib/ch5xx58x/` 的 `rwa.c`（RWA 安全访问，其余全部依赖它）、`clk.c`、`sys.c`
+- ⬜ `gpio.c`、`uart.c`、`spi.c`、`i2c.c`、`tim.c`、`pwm.c`、`adc.c`、`flash.c`、`pwr.c`
+- ⬜ `include/libopenwch/ch5xx58x/common/*.h` 与设备头
+- ⬜ `tests/ch5xx58x/api_smoke.c`
+- ⬜ `template/examples/ch582_blink` 换成真正的 blink（需要 `clk` + `gpio`）
 
 ---
 
@@ -205,7 +239,8 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
 |---|---|---|
 | K1 | `make stylecheck` 对 `volatile` MMIO、`do {} while(1)` 断言、复杂宏报 warning/error | 这些是 `checkpatch.pl` 对内核风格之外的合理用法的固有误报；libopencm3 自身的 `cm3/common.h` 同样报 3 errors / 7 warnings。定位为**参考工具**而非门禁，已在 `HACKING` 说明 |
 | K2 | `.vector` 段设为只读数据（`rodata` PHDR），ISR 目标仍在 `.text` | 与 WCH EVT 一致；两者都在 flash。运行期改表（`OPENWCH_VECTOR_SET`）只在表位于 RAM 时生效，已在 `vector.h` 注明 |
-| K3 | P0 的链接脚本冒烟测试尚未纳入 `make` 目标 | 目前是人工执行的验证步骤。P4 计划加入 `tests/` 作为自动化用例 |
+| K3 | ~~P0 的链接脚本冒烟测试尚未纳入 `make` 目标~~ | ✅ 已解决：`make apitest` + `make genlinktests` |
+| K4 | **`DBGMCU_CR`（CSR 0x7c0）的位定义来源冲突，未经硬件验证** | WCH EVT 用 `IWDG_STOP=0x1 / WWDG=0x2 / TIM1=0x10 / TIM2=0x20`；`ch32fun` 的 `ch32v003hw.h` 用 `IWDG_STOP=0x100 / TIM1_STOP=0x1000`，但那些常量是**死代码**（从内存映射的 V20x/V30x 复制、从未被引用）。已采用 EVT 的值并在头文件注明；同时提供 `dbgmcu_get_control()`/`dbgmcu_set_control()` 裸 CSR 访问，用户可自行决定。**需要在真实硬件上确认** |
 
 ---
 
@@ -253,6 +288,12 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
 | 模板 CH58x 构建 | `make -C template/examples/ch582_blink` | ✅ 376 B text |
 | 模板 `DEVICE=` 切换 | `make DEVICE=ch32v003f4p6 / ch32v002f4p6` | ✅ ISA 分别不含/含 `zmmul` |
 | 同族换型号 | `make -C template/examples/ch582_blink DEVICE=ch584m` | ✅ 构建成功 |
+| 全 API 编译+链接 | `make apitest` | ✅ `-Werror` 通过，镜像含 280 个外设函数 |
+| public 函数总数 | `nm --defined-only lib/libopenwch_ch32v0.a` | 316 个 |
+| OBJS 解析 | 脚本核验 37 个目标 | ✅ 无缺失、无歧义、无 VPATH 遮蔽 |
+| 重复全局符号 | `nm` + `uniq -d` | ✅ 无 |
+| `mk/gcc-config.mk` 工具解析 | `make -f probe.mk` | ✅ `riscv64-unknown-elf-gcc`（修复前是 `cc`） |
+| DBGMCU 指令 | `objdump -d dbgmcu_common_v1.o` | ✅ `csrr/csrw 0x7c0`、`lw 0x1ffff7c4` |
 
 ---
 
@@ -265,3 +306,4 @@ CH58x 侧（P3）同样未开始：`rwa.c` `clk.c` `sys.c` `gpio.c` `uart.c` 等
 | 第 2 轮末 | 按用户要求提交已验证基线：`9a8ed34` "Initial libopenwch: libopencm3-style build system and QingKe core layer"（56 文件）。生成物已由 `.gitignore` 排除，提交后 `make clean && make && make genlinktests` 仍全绿且工作区干净 |
 | 第 3 轮 | P2.1–P2.2：`ch32v0/memorymap.h` + `gpio` + `rcc`，提交 `8026add`。发现 GPIO nibble 不是 `(MODE,CNF)` 位域（穷举无解），改为不透明值，`gpio_set_mode()` 签名有意偏离 libopencm3 |
 | 第 4 轮 | P2.6：新增 `template/` 应用骨架（rules/ + 两个示例 + VSCode 配置），提交 `7b0df2f`。模板暴露并修正 3 个库侧缺陷（`CC ?=` 失效、`ZMMUL_OK` 未在应用侧探测、族归档 ISA 标签过宽） |
+| 第 5 轮 | **P2 完成**：CH32V00x 15 个外设、316 个公开函数；新增 `tests/ch32v0/api_smoke.c` 与 `make apitest`。独立复核 6 个并行实现代理的产出，发现并修正 2 处实质错误：GPIO nibble 位域假设（穷举证明无解→改为不透明值）、DBGMCU 误按内存映射实现（实为 CSR 0x7c0）；另修正 `mk/gcc-config.mk` 的工具变量 `?=` 缺陷与写错的 AFIO remap 位（bit 15 而非 12） |

@@ -51,18 +51,29 @@ ifeq ($(PREFIX),)
   PREFIX := $(PREFIX_DEFAULT)
 endif
 
-CC		?= $(PREFIX)-gcc
-CXX		?= $(PREFIX)-g++
-LD		?= $(PREFIX)-gcc
-AR		?= $(PREFIX)-ar
-AS		?= $(PREFIX)-as
-OBJCOPY		?= $(PREFIX)-objcopy
-OBJDUMP		?= $(PREFIX)-objdump
-GDB		?= $(PREFIX)-gdb
-SIZE		?= $(PREFIX)-size
-NM		?= $(PREFIX)-nm
-CPP		?= $(PREFIX)-gcc -E
-RANLIB		?= $(PREFIX)-ranlib
+## Use := rather than ?= for the tool variables.
+##
+## GNU make predefines CC, CXX, LD, AS, AR and friends as built-in variables
+## (CC defaults to "cc", LD to "ld", AS to "as"), so ?= would never take
+## effect and the build would silently use the HOST tools to compile RISC-V
+## firmware -- producing x86 objects that fail at link time, or worse, appear
+## to succeed when the host binutils happen to cope.
+##
+## A command-line assignment (make CC=...) still wins over these, because make
+## always gives command-line variables priority over makefile assignments.
+##
+CC		:= $(PREFIX)-gcc
+CXX		:= $(PREFIX)-g++
+LD		:= $(PREFIX)-gcc
+AR		:= $(PREFIX)-ar
+AS		:= $(PREFIX)-as
+OBJCOPY		:= $(PREFIX)-objcopy
+OBJDUMP		:= $(PREFIX)-objdump
+GDB		:= $(PREFIX)-gdb
+SIZE		:= $(PREFIX)-size
+NM		:= $(PREFIX)-nm
+CPP		:= $(PREFIX)-gcc -E
+RANLIB		:= $(PREFIX)-ranlib
 
 ##
 ## Toolchain capability probing

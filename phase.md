@@ -275,19 +275,19 @@
       （注意：`gpio_set_mode()` 取**单个不透明 nibble**，不是 libopencm3 的
       `(mode, cnf)` 两个参数、也不是 CH58x 的 `(mode, drive)`——原因见下）
 - [x] `syscfg`(AFIO)（`exti_select_source`、remap 寄存器）
-- [ ] `exti`（触发沿、中断使能、标志）
-- [ ] `usart`（波特率、数据位、停止位、校验、模式、流控、收发、DMA 挂钩）
-- [ ] `tim`（PWM 输出比较、输入捕获、预分频、自动重装、对齐、中断）
-- [ ] `spi`（主/从、时钟极性/相位、NSS、DMA）
-- [ ] `i2c`（主/从、地址、时钟频率、START/STOP、ACK）
-- [ ] `adc`（通道、采样时间、连续/扫描、外部触发、DMA、内部通道）
-- [ ] `dma`（通道配置、优先级、地址/长度、中断、mem2mem）
-- [ ] `flash`（解锁、页擦除、字/半字编程、状态）
-- [ ] `iwdg`/`wwdg`
-- [ ] `pwr`（低压/待机/停止、AWU）
-- [ ] `opa`（运放）
-- [ ] `dbgmcu`（调试挂起位）
-- [ ] `systick`（`systick_set_reload`、`systick_set_frequency`、延时）
+- [x] `exti`（触发沿、中断使能、标志）
+- [x] `usart`（波特率、数据位、停止位、校验、模式、流控、收发、DMA 挂钩）
+- [x] `tim`（PWM 输出比较、输入捕获、预分频、自动重装、对齐、中断）
+- [x] `spi`（主/从、时钟极性/相位、NSS、DMA）
+- [x] `i2c`（主/从、地址、时钟频率、START/STOP、ACK）
+- [x] `adc`（通道、采样时间、连续/扫描、外部触发、DMA、内部通道）
+- [x] `dma`（通道配置、优先级、地址/长度、中断、mem2mem）
+- [x] `flash`（解锁、页擦除、字/半字编程、状态）
+- [x] `iwdg`/`wwdg`
+- [x] `pwr`（低压/待机/停止、AWU）
+- [x] `opa`（运放）
+- [x] `dbgmcu`（调试挂起位）
+- [x] `systick`（`systick_set_reload`、`systick_set_frequency`、延时）
 - [ ] `mini-libc`（可选，`lib/common/mini_libc.c`：`memcpy/memset/strlen` + `_write`/`putchar` 弱符号；仅当用户 `-nostdlib`）
 
 ### P2.3 器件外壳
@@ -297,8 +297,8 @@
 
 ### P2.4 示例与验证
 
-- [ ] `examples/ch32v003/blink/`（`main.c` + `Makefile` + `.clang-format`）
-- [ ] `examples/ch32v003/usart_echo/`
+- [x] `examples/ch32v003/blink/`（`main.c` + `Makefile` + `.clang-format`）
+- [x] `examples/ch32v003/usart_echo/`
 - [ ] `examples/ch32v003/tim_pwm/`（可选）
 - [ ] `examples/ch32v003/adc_poll/`（可选）
 - [ ] `make -C examples/ch32v003/blink OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6` 产出 `.elf/.bin/.hex`
@@ -360,6 +360,42 @@
 - [x] `template/examples/ch582_blink` —— CH58x 核心层 bring-up（SysTick 1 ms）
 - [x] `template/README.md`、`template/.gitignore`、`template/.vscode/*`
 - [x] 验证 `DEVICE=` 切换会正确改变 ISA（V003 无 zmmul，V002/V004 有）
+
+### P2 完成记录（CH32V00x 全部一期外设）
+
+一期列出的 15 个外设全部实现并归档，`lib/libopenwch_ch32v0.a` 共 **316 个公开函数**：
+
+| 外设 | 函数数 | 说明 |
+|---|---|---|
+| adc | 34 | 含 CH32 特有的校准电压（CALVOL）与外部触发延时（DLYR） |
+| timer | 32 | TIM1/TIM2，通道表驱动的 CCxS/CCER 字段推导 |
+| spi | 30 | 含 CRC 与双向模式 |
+| i2c | 30 | 时钟频率由 `rcc_get_clocks_freq()` 推导，标准/快速模式 |
+| dma | 29 | 7 通道，INTFR/INTFCR 的 4 bit/通道全局标志 |
+| usart | 25 | 12.4 定点波特率分频器，含溢出保护 |
+| rcc | 24 | HSI/HSE→48 MHz、工厂 PLL trim、外设时钟/复位、分频器 |
+| flash | 20 | 标准路径 + buffered fast 编程路径 |
+| nvic | 15 | PFIC 后端 |
+| gpio | 15 | 含 AFIO remap 与 EXTI 源选择 |
+| systick | 9 | |
+| pwr | 9 | PVD、AWU、standby |
+| exti | 8 | |
+| wwdg / iwdg | 7 / 7 | |
+| dbgmcu | 6 | |
+| opa | 4 | 走 EXTEN 寄存器 |
+
+**新增测试**：`tests/ch32v0/api_smoke.c` —— 调用**每一个**公开函数，以
+`-Wall -Wextra -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
+-Wundef -Wshadow -Werror` 编译并链接，链接后镜像含 280 个外设函数。
+`main()` 只取 `api_smoke` 的地址（阻止 `--gc-sections` 丢弃）而**不调用**它，
+因为真跑会把所有外设重配并擦除 flash。用 `make apitest` 运行。
+
+**一致性检查**（每次构建都会做的话更好，目前是一次性脚本）：
+
+- 37 个 `OBJS` 目标全部唯一解析到存在的源文件，无 VPATH 遮蔽，无空文件
+- 归档中无重复的全局符号
+- 全部公开函数名符合 `^[a-z][a-z0-9_]*$`（仅 `_start`/`_reset_entry` 例外，
+  它们是运行时符号）
 
 ### P3 验收
 
