@@ -1,0 +1,37 @@
+# Build artifacts
+*.o
+*.d
+*.a
+*.elf
+*.bin
+*.hex
+*.srec
+*.list
+*.map
+*.out
+*.stylecheck
+
+# Generated linker scripts and IRQ headers
+generated.*.ld
+include/libopenwch/*/nvic.h
+lib/*/vector_handlers.c
+lib/*/vector_names.c
+include/libopencmsis/*/irqhandlers.h
+
+# libopencm3-compatible failure stamps
+.stamp_failure_*
+
+# Documentation
+doc/html/
+doc/*/html/
+doc/*/doxy.sourcelist
+doc/*/Doxyfile
+doc/*/DoxygenLayout_*.xml
+
+# Editors / tooling
+compile_commands.json
+.cache/
+*.orig
+*.rej
+*.swp
+*~

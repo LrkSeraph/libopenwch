@@ -1,0 +1,89 @@
+##
+## This file is part of the libopenwch project.
+##
+## Copyright (C) 2025 libopenwch contributors
+##
+## This library is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Lesser General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+###############################################################################
+# The support makefile for building one libopenwch library archive.
+#
+# Derived from libopencm3's lib/Makefile.include (LGPL-3-or-later).
+#
+# Each target directory (lib/<family>/<sub>/) sets LIBNAME, SRCLIBDIR,
+# TGT_CFLAGS and OBJS, then includes this file last.
+#
+# The core-layer objects below are compiled from lib/qingke/ (and, for the
+# architecture-independent helpers, lib/common/) through VPATH, exactly the way
+# libopencm3 compiles lib/cm3/ into every family archive.
+#
+
+ifneq ($(V),1)
+Q := @
+endif
+
+##
+## Hard-fail with an actionable message when the toolchain is missing.
+## This lives here (not in the root Makefile) so that `make genlinktests`,
+## `make list-targets` and `make clean` still work without a compiler.
+##
+## Guarded on OBJS so that `make clean` and `make -n` still work without a
+## toolchain installed.
+ifneq ($(OBJS),)
+ifeq ($(shell command -v $(CC) >/dev/null 2>&1 && echo ok),)
+$(error Cannot find the RISC-V toolchain '$(CC)'. \
+    Install it (Debian/Kali: sudo apt-get install gcc-riscv64-unknown-elf), \
+    or pass PREFIX=... pointing at your toolchain.)
+endif
+endif
+
+##
+## Core-layer objects
+##
+## These are compiled from lib/qingke/ through VPATH.  OPENWCH_CORE_OBJS may be
+## overridden by a family that needs a different set (there is currently only
+## one RISC-V core layer, so the default is used everywhere).
+##
+## The per-device generated vector_handlers.o / vector_names.o are NOT listed
+## here: they are device specific, so each target's Makefile adds them.
+##
+OPENWCH_CORE_OBJS ?= vector.o vector_chipset.o nvic.o assert.o systick.o
+OBJS += $(OPENWCH_CORE_OBJS)
+
+DEBUG_FLAGS ?= -ggdb3
+STANDARD_FLAGS ?= -std=c99
+
+all: $(SRCLIBDIR)/$(LIBNAME).a
+
+$(SRCLIBDIR)/$(LIBNAME).a: $(OBJS)
+	@printf "  AR      $(LIBNAME).a\n"
+	$(Q)$(RM) "$@"
+	$(Q)$(AR) $(ARFLAGS) "$@" $(OBJS)
+
+%.o: %.c
+	@printf "  CC      $(<F)\n"
+	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+%.o: %.S
+	@printf "  AS      $(<F)\n"
+	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) -o $@ -c $<
+
+clean:
+	$(Q)$(RM) *.o *.d
+	$(Q)$(RM) $(SRCLIBDIR)/$(LIBNAME).a
+
+.PHONY: clean
+
+-include $(OBJS:.o=.d)

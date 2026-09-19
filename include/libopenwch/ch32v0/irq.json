@@ -1,0 +1,31 @@
+{
+    "partname_humanreadable": "CH32V00x",
+    "partname_doxygen": "CH32V00x",
+    "includeguard": "LIBOPENWCH_CH32V0_NVIC_H",
+    "comment": "index is the WCH vector table slot; slots 0..15 are RISC-V exceptions, so external interrupts start at 16. The value is also the PFIC interrupt id. This table is the CH32V003 superset; CH32V002/004/005/006/007 implement the same list minus TIM1_BRK.",
+    "irqs": {
+        "16": "wwdg",
+        "17": "pvd",
+        "18": "flash",
+        "19": "rcc",
+        "20": "exti7_0",
+        "21": "awu",
+        "22": "dma1_channel1",
+        "23": "dma1_channel2",
+        "24": "dma1_channel3",
+        "25": "dma1_channel4",
+        "26": "dma1_channel5",
+        "27": "dma1_channel6",
+        "28": "dma1_channel7",
+        "29": "adc1",
+        "30": "i2c1_ev",
+        "31": "i2c1_er",
+        "32": "usart1",
+        "33": "spi1",
+        "34": "tim1_brk",
+        "35": "tim1_up",
+        "36": "tim1_trg_com",
+        "37": "tim1_cc",
+        "38": "tim2"
+    }
+}

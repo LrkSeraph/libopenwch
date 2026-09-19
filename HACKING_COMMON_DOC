@@ -1,0 +1,117 @@
+------------------------------------------------------------------------------
+HACKING_COMMON_DOC — adding a WCH family or subfamily
+------------------------------------------------------------------------------
+
+Reconstructed from libopencm3's HACKING_COMMON_DOC and adapted for
+libopenwch.  Follow the steps in order; the build fails loudly if one of the
+mechanical steps is missed.
+
+A. Root Makefile
+----------------
+
+1. Add the new library directory name to TARGETS.  This one variable drives
+   recursive building, the IRQ header generation, the style check paths and
+   `make list-targets`.
+
+2. Add an IRQ_FILES_<target> variable for it (see the block above the
+   $(IRQ_GENERATED_FILES) rule) and to IRQ_GENERATED_FILES.
+
+B. include/
+-----------
+
+3. Create include/libopenwch/<family>/.
+
+4. Add include/libopenwch/<family>/irq.json.  `index` is the *vector table
+   slot*, which is also the PFIC interrupt id.  Slots 0..15 are reserved for
+   RISC-V exceptions, so external interrupts start at 16.  Slots without an
+   entry are filled with reserved handlers automatically.
+
+5. Add include/libopenwch/<family>/memorymap.h with every peripheral base
+   address and the bus bases.  Include
+   <libopenwch/qingke/memorymap.h> for the core region.
+
+6. Add include/libopenwch/<family>/doc-<family>.h providing the Doxygen
+   @page and the @defgroup <FAMILY>_defines group that every other file in
+   the family adds to.
+
+7. Add the per-peripheral device headers
+   include/libopenwch/<family>/<periph>.h.  Each one:
+
+     * has the family-scoped Doxygen block,
+     * guards with LIBOPENWCH_<PERIPH>_H (the SAME guard as other families,
+       so only one family can be active in a translation unit),
+     * includes <libopenwch/<family>/common/<periph>_common_<v1>.h>,
+     * adds the family-specific defines,
+     * declares the prototypes inside BEGIN_DECLS/END_DECLS.
+
+8. Add the shared implementation headers
+   include/libopenwch/<family>/common/<periph>_common_<variant>.h.  They must
+   not be included directly; use the libopencm3 double-guard pattern:
+
+	/* THIS FILE SHOULD NOT BE INCLUDED DIRECTLY, BUT ONLY VIA GPIO.H */
+	/** @cond */
+	#if defined(LIBOPENWCH_GPIO_H)
+	/** @endcond */
+	#ifndef LIBOPENWCH_GPIO_COMMON_V1_H
+	#define LIBOPENWCH_GPIO_COMMON_V1_H
+	...
+	#endif
+	/** @cond */
+	#else
+	#warning "... should not be included explicitly, only via gpio.h"
+	#endif
+	/** @endcond */
+
+9. Extend include/libopenwch/dispatch/nvic.h with a branch that selects the
+   new family's generated nvic.h from its -D<FAMILY> define.  The define must
+   equal the TARGETS entry (upper-cased) because both genlink-config.mk and
+   the family Makefile set it.
+
+C. lib/
+-------
+
+10. Create lib/<family>/ with a Makefile that sets:
+
+	LIBNAME         libopenwch_<family>
+	SRCLIBDIR       $(OPENWCH_TOP)/lib     (absolute; see the note there)
+	OPENWCH_TOP     $(abspath $(CURDIR)/../..)
+	VPATH           .:$(OPENWCH_QINGKE):$(OPENWCH_COMMON)
+	TGT_CFLAGS      -I$(OPENWCH_INC) -march=... -mabi=... -D<FAMILY>
+	OBJS            vector_handlers.o vector_names.o plus the drivers
+	ARFLAGS         rcs
+
+    and ends with `include $(OPENWCH_TOP)/lib/Makefile.include`.
+    Use $(abspath), not relative '../..': relative paths are unreliable under
+    virtualised filesystems.
+
+11. Add lib/<family>/common/<periph>_common_<variant>.c implementations.  Each
+    must #include the *device* header (e.g. <libopenwch/ch32v0/gpio.h>) so that
+    the family's register names are visible.
+
+12. If the core needs family-specific configuration, provide
+    lib/<family>/common/vector_chipset.c overriding the weak
+    openwch_chipset_core_configure() / openwch_chipset_early_init().
+
+D. Linker and device database
+-----------------------------
+
+13. Add the part-number lines and the group's `+` / `END` lines to
+    ld/devices.data.  Read ld/README first: the two pattern rules there are
+    what make the traversal terminate.
+
+14. Add a ld/tests/<part>.data marker and a matching <part>.result file, then
+    run `make genlinktests`.
+
+E. Documentation
+----------------
+
+15. Add the family to the TARGETS default in doc/Makefile.
+
+F. Housekeeping
+---------------
+
+16. Add the LGPL header to every new file.
+17. Update README.md's supported-part list.
+18. Run `make stylecheck` and, if the family introduced new documented
+    symbols, confirm that the @defgroup names do not collide with another
+    family's.

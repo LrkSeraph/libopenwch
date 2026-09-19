@@ -1,0 +1,21 @@
+# libopenwch formatting
+#
+# The library follows the Linux kernel coding style, which libopencm3 also
+# uses.  Tabs are 8 columns wide; clang-format is configured to match that as
+# closely as it can, so that a stray `clang-format` run does not reformat the
+# whole tree.
+BasedOnStyle: LLVM
+IndentWidth: 8
+TabWidth: 8
+UseTab: Always
+ColumnLimit: 80
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
+IndentCaseLabels: false
+PointerAlignment: Right
+AlignAfterOpenBracket: Align
+SpaceBeforeParens: ControlStatements
+SortIncludes: false
+ReflowComments: false

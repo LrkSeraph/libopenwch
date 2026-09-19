@@ -1,0 +1,28 @@
+{
+    "partname_humanreadable": "CH582/CH583",
+    "partname_doxygen": "CH58x",
+    "includeguard": "LIBOPENWCH_CH5XX58X_NVIC_H",
+    "comment": "index is the WCH vector table slot; slots 0..15 are RISC-V exceptions, so external interrupts start at 16. The value is also the PFIC interrupt id.",
+    "irqs": {
+        "16": "tmr0",
+        "17": "gpioa",
+        "18": "gpiob",
+        "19": "spi0",
+        "20": "bleb",
+        "21": "blel",
+        "22": "usb",
+        "23": "usb2",
+        "24": "tmr1",
+        "25": "tmr2",
+        "26": "uart0",
+        "27": "uart1",
+        "28": "rtc",
+        "29": "adc",
+        "30": "i2c",
+        "31": "pwm",
+        "32": "tmr3",
+        "33": "uart2",
+        "34": "uart3",
+        "35": "wdog_bat"
+    }
+}

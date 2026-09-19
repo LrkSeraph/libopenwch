@@ -1,0 +1,176 @@
+################################################################################
+#
+# Device chip tree definition file for libopenwch.
+#
+# Derived from libopencm3's ld/devices.data (LGPL-3-or-later), extended with
+# the RISC-V fields described below.
+#
+# Line description:
+#   <pattern> <parent> (<data> ...)
+#
+#   <pattern>: is the pattern for the chip description to be searched for.
+#       The case of the pattern string is ignored.
+#       Pattern match symbols:
+#            ?  - matches exactly one character
+#            *  - matches none or more characters
+#            +  - matches single or more characters
+#
+#   <parent>: is the parent group name, where the search will continue.
+#       There are special parents names that controls traversing:
+#             "END" - Exit traversal.
+#             "+"   - Don't change the parent. Use for split long line to two.
+#
+#   <data>: space-separated list of symbols.
+#       KEY=VALUE entries whose key matches ^[A-Z0-9_]+$ are passed to the
+#       linker script preprocessor as -D_KEY=VALUE.  The keys MARCH, MABI,
+#       ZMMUL, ARCH, ENTRY, CPU and FPU answer queries and are NOT passed to
+#       the linker script.
+#
+# Traversal: the query starts at the part-number pattern, continues to the
+# value in the <parent> column, and so on until a line whose parent is "END".
+# The matched pattern names are collected and reversed, so
+#
+#   GENLINK_FAMILY    = the outermost group, e.g. "ch32v0"
+#   GENLINK_SUBFAMILY = the immediate group,  e.g. "ch32v003"
+#
+# The archive is lib/libopenwch_$(GENLINK_FAMILY).a, built by the recursive
+# make target whose path is lib/$(GENLINK_FAMILY).  Every group name below is
+# therefore both a directory name under lib/ and a line that matches itself,
+# which is what makes the traversal terminate.
+#
+# Two rules keep this file consistent:
+#   1. a part-number pattern must need at least one character after the family
+#      prefix ("ch32v003?*", not "ch32v003*"), so that it cannot swallow its
+#      own group name;
+#   2. a group line must be exact ("ch32v0"), so that it does not swallow the
+#      part numbers that point at it.
+#
+# ---------------------------------------------------------------------------
+# RISC-V specific keys
+# ---------------------------------------------------------------------------
+#
+#   MARCH=<isa>     passed to -march (e.g. rv32ec)
+#   MABI=<abi>      passed to -mabi  (e.g. ilp32e)
+#   ZMMUL=1         the part has the integer multiply extension; when the
+#                   toolchain accepts it (GCC >= 13) mk/genlink-config.mk
+#                   appends "_zmmul" to MARCH, else soft multiply is used
+#   ENTRY=<symbol>  entry point recorded in the generated linker script
+#   GP=1            emit __global_pointer$ in the generated linker script
+#   HICODE=1        emit .highcode (RAM-resident code, required wherever the
+#                   flash controller or the low-power entry path cannot run
+#                   from flash: CH5xx, CH32V103/20x/30x)
+#
+# ---------------------------------------------------------------------------
+# Memory map notes
+# ---------------------------------------------------------------------------
+#
+#   ch32v0    (QingKe V2 core, RV32EC)
+#       CH32V003              16K flash / 2K RAM
+#       CH32V002              16K / 4K
+#       CH32V004, CH32V005    32K / 6K
+#       CH32V006, CH32V007    62K / 8K
+#
+#   ch32v0v4  (QingKe V4 core, RV32IMAC)
+#       CH32V103              64K / 20K
+#       CH32V203              64K / 20K
+#       CH32V303              288K / 32K
+#
+#   ch32x0    CH32X035        62K / 20K    (RV32IMAC, no PLL)
+#   ch32l1    CH32L103        64K / 20K
+#
+#   ch5xx57x  (QingKe V4 core, RV32IMAC)
+#       CH570, CH572          240K / 12K
+#       CH571                 192K / 18K at 0x20003800
+#       CH573                 448K / 18K at 0x20003800
+#
+#   ch5xx58x
+#       CH582, CH583          448K / 32K    (no HSI: 32 MHz HSE mandatory)
+#       CH584                 448K / 96K
+#       CH585                 448K / 128K
+#
+#   ch5xx59x
+#       CH591                 192K / 26K
+#       CH592                 448K / 26K
+#
+################################################################################
+
+
+################################################################################
+# Part numbers.  Each points at the group whose archive it belongs to.
+################################################################################
+#
+ch32v003?*      ch32v0          ROM=16K RAM=2K ZMMUL=0
+ch32v002?*      ch32v0          ROM=16K RAM=4K ZMMUL=1
+ch32v00[45]?*   ch32v0          ROM=32K RAM=6K ZMMUL=1
+ch32v00[67]?*   ch32v0          ROM=62K RAM=8K ZMMUL=1
+ch32v103?*      ch32v0v4        ROM=64K RAM=20K
+ch32v20[38]?*   ch32v0v4        ROM=64K RAM=20K
+ch32v30[357]?*  ch32v0v4        ROM=288K RAM=32K
+ch32x03[35]?*   ch32x0          ROM=62K RAM=20K
+ch32l103?*      ch32l1          ROM=64K RAM=20K
+ch570?*         ch5xx57x        ROM=240K RAM=12K
+ch572?*         ch5xx57x        ROM=240K RAM=12K
+ch571?*         ch5xx57x        ROM=192K RAM=18K RAM_OFF=0x20003800
+ch573?*         ch5xx57x        ROM=448K RAM=18K RAM_OFF=0x20003800
+ch582?*         ch5xx58x        ROM=448K RAM=32K
+ch583?*         ch5xx58x        ROM=448K RAM=32K
+ch584?*         ch5xx58x        ROM=448K RAM=96K
+ch585?*         ch5xx58x        ROM=448K RAM=128K
+ch591?*         ch5xx59x        ROM=192K RAM=26K
+ch592?*         ch5xx59x        ROM=448K RAM=26K
+
+################################################################################
+# RV32EC, QingKe V2 core; no .highcode section
+################################################################################
+#
+ch32v0          +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+ch32v0          +               ENTRY=_start GP=1 HICODE=0
+ch32v0          END             ARCH=riscv MARCH=rv32ec ZEXT=_zicsr_zifencei MABI=ilp32e
+
+################################################################################
+# QingKe V4 core; .highcode required
+################################################################################
+#
+ch32v0v4        +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+ch32v0v4        +               ENTRY=_start GP=1 HICODE=1
+ch32v0v4        END             ARCH=riscv MARCH=rv32imac ZEXT=_zicsr_zifencei MABI=ilp32
+
+################################################################################
+# QingKe V4 core; .highcode required
+################################################################################
+#
+ch32x0          +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+ch32x0          +               ENTRY=_start GP=1 HICODE=1
+ch32x0          END             ARCH=riscv MARCH=rv32imac ZEXT=_zicsr_zifencei MABI=ilp32
+
+################################################################################
+# QingKe V4 core; .highcode required
+################################################################################
+#
+ch32l1          +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+ch32l1          +               ENTRY=_start GP=1 HICODE=1
+ch32l1          END             ARCH=riscv MARCH=rv32imac ZEXT=_zicsr_zifencei MABI=ilp32
+
+################################################################################
+# QingKe V4 core; RAM_OFF is per part (CH571/CH573 use 0x20003800)
+################################################################################
+#
+ch5xx57x        +               ROM_OFF=0x00000000
+ch5xx57x        +               ENTRY=_start GP=1 HICODE=1
+ch5xx57x        END             ARCH=riscv MARCH=rv32imac ZEXT=_zicsr_zifencei MABI=ilp32
+
+################################################################################
+# QingKe V4 core
+################################################################################
+#
+ch5xx58x        +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+ch5xx58x        +               ENTRY=_start GP=1 HICODE=1
+ch5xx58x        END             ARCH=riscv MARCH=rv32imac ZEXT=_zicsr_zifencei MABI=ilp32
+
+################################################################################
+# QingKe V4 core
+################################################################################
+#
+ch5xx59x        +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+ch5xx59x        +               ENTRY=_start GP=1 HICODE=1
+ch5xx59x        END             ARCH=riscv MARCH=rv32imac ZEXT=_zicsr_zifencei MABI=ilp32

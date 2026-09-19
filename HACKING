@@ -1,0 +1,98 @@
+------------------------------------------------------------------------------
+HACKING — libopenwch
+------------------------------------------------------------------------------
+
+This file is inherited from libopencm3 and extended for RISC-V/WCH specifics.
+
+Coding style
+------------
+
+The whole library is programmed using the Linux kernel coding style:
+	https://www.kernel.org/doc/html/latest/process/coding-style.html
+Please use the same style for any code contributions.
+
+Amendments to the Linux kernel coding style (as in libopencm3)
+--------------------------------------------------------------
+
+1) Use the stdint types.  Do not introduce abbreviated types such as u8/s8.
+
+2) Do not use __packed/__aligned definitions; compiler extensions are not our
+   job to invent.  If one is needed, introduce a normal macro that is not in
+   the compiler-reserved keyword space (see OPENWCH_HIGH_CODE in
+   include/libopenwch/qingke/common.h for the pattern).
+
+3) An empty busy-wait loop may be written on one line: `while (1);`.
+
+4) Always put braces around the bodies of if/while/for, even single
+   statements.
+
+RISC-V / WCH specific rules
+---------------------------
+
+5) Naming.  This library replaces WCH's EVT StdPeriphDriver API, which is
+   CamelCase (GPIO_Init, GPIOA_ModeCfg, RCC_GetClocksFreq).  libopenwch uses
+   lowercase_snake_case throughout:
+
+	periph_verb_object()   gpio_set_mode(), usart_set_baudrate()
+
+   Do NOT add CamelCase public names.
+
+6) Register and bit macro naming follows the vendor manual as closely as
+   possible (also a libopencm3 rule):
+
+	SUBSYSTEM_REGISTER            GPIO_CFGLR, USART_CTLR1
+	SUBSYSTEM_REGISTER_BIT        USART_CTLR1_UE, RCC_CFGR0_PLLON
+
+   WCH's own CH583SFR.h uses R32_/R16_/R8_/RB_ prefixes; those are acceptable
+   for register names that have no natural SUBSYSTEM_REGISTER form, but prefer
+   the structured form where the peripheral has a register block.
+
+7) ISA extensions must be named explicitly.  Since the RISC-V 20191213 spec,
+   Zicsr and Zifencei are separate extensions; the CSR instructions and
+   fence.i used by the core layer require
+
+	-march=..._zicsr_zifencei
+
+   for GCC >= 12.  Never rely on them being implied.
+
+8) Interrupt service routines.  Use OPENWCH_INTERRUPT (see
+   include/libopenwch/qingke/common.h).  Do NOT use WCH's
+   __attribute__((interrupt("WCH-Interrupt-fast"))) unconditionally: mainline
+   riscv64-unknown-elf-gcc does not implement that machine string, and with it
+   the compiler emits a plain `ret` instead of an interrupt return.
+
+9) RWA registers (CH5xx only).  Every read-modify-write of a write-protected
+   (RWA) register must go through the safe-access helpers in
+   lib/ch5xx58x/rwa.c.  The unlock window is only about 16 system clock cycles,
+   so one unlock/lock pair per register operation is required; it is not valid
+   to unlock once and then write several registers.
+
+10) .highcode.  Code that runs while the flash controller is being
+    reconfigured, or that must execute during low-power entry, has to live in
+    RAM.  Tag it OPENWCH_HIGH_CODE.  The linker script places the section only
+    for families whose ld/devices.data entry sets HICODE=1.
+
+Development guidelines
+----------------------
+
+ - Every new file must carry the usual license header (see existing files).
+   Library code is LGPL-3.0-or-later; scripts/checkpatch.pl is GPL-2.0.
+
+ - Doxygen is used to generate the API documentation.  Follow the libopencm3
+   convention: `@defgroup <periph>_defines` in headers, `@file` groups named
+   `<periph>_file` in sources.
+
+ - Common peripheral implementations are named
+   `<periph>_common_<variant>.{c,h}` and are shared between the parts of a
+   family.  A variant is either an IP version (`v1`) or a group of parts.  The
+   common header must only be reachable through the device header; see
+   HACKING_COMMON_DOC.
+
+ - Run `make stylecheck` before submitting.
+
+Tips and tricks
+---------------
+
+ - `make V=1` shows the full compiler command lines.
+ - `make list-targets` prints the currently buildable families.
+ - `make genlinktests` validates ld/devices.data without a toolchain.

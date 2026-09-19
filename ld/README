@@ -1,0 +1,97 @@
+libopenwch linker script generator
+==================================
+
+This directory holds the device database and the generic linker script
+template.  Together with scripts/genlink.py they implement the same
+"device name in, linker script out" feature that libopencm3 provides.
+
+Files
+-----
+
+  devices.data   the device tree (part number -> family group -> ISA)
+  linker.ld.S    the generic linker script, preprocessed per device
+  tests/         one <part>.data marker and <part>.result expectation per test
+
+How it works
+------------
+
+1. The application sets DEVICE, e.g.
+
+	OPENWCH_DIR ?= /path/to/libopenwch
+	DEVICE      ?= ch32v003f4p6
+
+	include $(OPENWCH_DIR)/mk/genlink-config.mk
+
+2. genlink-config.mk asks scripts/genlink.py for a series of answers about
+   that part number:
+
+	FAMILY     the group that names the archive (libopenwch_ch32v0.a)
+	SUBFAMILY  the immediate group (ch32v003)
+	MARCH      the -march base ISA (rv32ec)
+	ZEXT       the always-on extensions (_zicsr_zifencei)
+	MABI       the -mabi (ilp32e)
+	ZMMUL      1 if the part needs _zmmul appended to MARCH
+	CPPFLAGS   -D<FAMILY> -D<SUBFAMILY> ... -D<PART>
+	DEFS       the above plus -D_ROM=... -D_RAM=... -D_ROM_OFF=... etc.
+
+3. mk/genlink-rules.mk preprocesses linker.ld.S with DEFS, producing
+   generated.$(DEVICE).ld in the application directory.
+
+The devices.data grammar
+------------------------
+
+	<pattern> <parent> (<data> ...)
+
+The query starts by matching <pattern> against the part number (lower-cased,
+shell wildcards `? * +`).  Whatever is in the <parent> column becomes the next
+query, and traversal continues until a line whose parent is `END`.  A parent of
+`+` contributes data without changing the query.
+
+Two rules keep the file consistent:
+
+  1. A part-number pattern must require at least one character after the
+     family prefix (`ch32v003?*`, not `ch32v003*`), otherwise it also matches
+     its own group name and the traversal stops one level too early.
+
+  2. A group line must be exact (`ch32v0`), so that it does not swallow the
+     part numbers that point at it.
+
+Continuation lines use `+` in the parent column and must appear BEFORE the
+`END` line, because traversal stops as soon as the `END` line is processed:
+
+	ch32v0          +               ROM_OFF=0x00000000 RAM_OFF=0x20000000
+	ch32v0          +               ENTRY=_start GP=1 HICODE=0
+	ch32v0          END             ARCH=riscv MARCH=rv32ec MABI=ilp32e
+
+RISC-V specific keys
+--------------------
+
+  MARCH=<isa>     base ISA passed to -march
+  ZEXT=<exts>     extensions always appended to MARCH
+  ZMMUL=1         append _zmmul when the toolchain supports it
+  MABI=<abi>      passed to -mabi
+  ENTRY=<symbol>  entry point in the generated script
+  GP=1            emit __global_pointer$
+  HICODE=1        emit the .highcode section
+
+Everything else that matches ^[A-Z0-9_]+$ is passed to the linker script
+preprocessor as -D_<KEY>=<VALUE> (note the leading underscore).
+
+Testing
+-------
+
+	make genlinktests
+
+runs every ld/tests/*.data marker through scripts/genlinktest.sh, which
+compares the full set of query answers against ld/tests/<part>.result.  The
+test queries the real devices.data rather than a private copy, so it cannot
+silently drift from the device tree.
+
+Adding a family
+---------------
+
+  1. Add the lib/<family>/ directory with its Makefile.
+  2. Add the part-number line(s) and the group's `+`/`END` lines to
+     devices.data.
+  3. Add the family to TARGETS in the root Makefile.
+  4. Add a ld/tests/<part>.data + .result pair.

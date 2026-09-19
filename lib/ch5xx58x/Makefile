@@ -1,0 +1,90 @@
+##
+## This file is part of the libopenwch project.
+##
+## Copyright (C) 2025 libopenwch contributors
+##
+## This library is free software: you can redistribute it and/or modify
+## it under the terms of the GNU Lesser General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public License
+## along with this library.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+##
+## CH58x family: CH582, CH583, CH584, CH585.
+##
+## QingKe V4 core, RV32IMAC.  These parts have no HSI: the 32 MHz HSE crystal
+## is mandatory and the PLL runs at a fixed 480 MHz, so bring-up must power
+## the crystal before selecting a PLL clock source.
+##
+## Most system, clock, power and GPIO registers are RWA (write-protected) and
+## need the 0x57/0xA8 safe-access unlock sequence; see lib/ch5xx58x/rwa.c.
+##
+## .highcode is required: flash-controller and low-power code cannot run from
+## flash.
+##
+## NOTE ON PATHS: every include path is absolute and derived from $(CURDIR)
+## through $(abspath).  Relative '../..' paths are deliberately avoided
+## because they are fragile under virtualised / sandboxed filesystems.
+##
+
+LIBNAME		= libopenwch_ch5xx58x
+SRCLIBDIR	?= $(OPENWCH_TOP)/lib
+
+OPENWCH_TOP	:= $(abspath $(CURDIR)/../..)
+OPENWCH_INC	:= $(OPENWCH_TOP)/include
+OPENWCH_QINGKE	:= $(OPENWCH_TOP)/lib/qingke
+OPENWCH_COMMON	:= $(CURDIR)/common
+
+CC		:= $(PREFIX)-gcc
+AR		:= $(PREFIX)-ar
+
+VPATH += .:$(OPENWCH_QINGKE):$(OPENWCH_COMMON)
+
+##
+## Objects
+##
+## The core layer (vector.o, vector_chipset.o, nvic.o, assert.o, systick.o) is
+## added by lib/Makefile.include.
+##
+OBJS += vector_handlers.o vector_names.o
+
+##
+## Peripheral drivers.  Every object listed here must have a source file in
+## this directory or in ./common/.
+##
+# P3 plan: uncomment each line as its source file lands.
+#OBJS += rwa.o clk.o sys.o pwr.o flash.o
+#OBJS += gpio.o
+#OBJS += uart.o
+#OBJS += spi.o
+#OBJS += i2c.o
+#OBJS += tim.o
+#OBJS += pwm.o
+#OBJS += adc.o
+
+##
+## Compile flags: RV32IMAC, no float ABI.
+##
+TGT_CFLAGS	= -Os -g3 \
+		  -Wall -Wextra -Wimplicit-function-declaration \
+		  -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes \
+		  -Wundef -Wshadow \
+		  -I$(OPENWCH_INC) -fno-common \
+		  -ffunction-sections -fdata-sections -MD \
+		  -mno-relax \
+		  -march=rv32imac_zicsr_zifencei -mabi=ilp32 \
+		  -DCH5XX58X
+TGT_CFLAGS	+= $(DEBUG_FLAGS)
+TGT_CFLAGS	+= $(STANDARD_FLAGS)
+
+ARFLAGS		= rcs
+
+include $(OPENWCH_TOP)/lib/Makefile.include

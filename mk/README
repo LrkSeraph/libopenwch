@@ -1,0 +1,112 @@
+# libopenwch — 构建系统可复用组件（mk/）
+
+本目录的模块与 libopencm3 的 `mk/` 保持同构，只是把 ARM 相关部分换成了 RISC-V。
+
+每个模块由两个文件组成：
+
+- `<module>-config.mk` —— 定义新变量，或向已有变量追加值；
+  **在 Makefile 靠前的位置**（定义变量的区域）`include`。
+- `<module>-rules.mk` —— 定义构建规则；
+  **在 Makefile 靠后的位置**（规则区域）`include`。
+
+---
+
+## 模块一览
+
+| 文件 | 作用 |
+|---|---|
+| `gcc-config.mk` | 探测 RISC-V 工具链前缀（`riscv64-unknown-elf` 等），定义 `CC/CXX/LD/AR/AS/OBJCOPY/OBJDUMP/GDB/SIZE/NM/CPP/RANLIB`；探测 GCC 版本与 `zmmul` 能力 |
+| `gcc-rules.mk` | 通用规则：`%.o`（`.c`/`.S`/`.s`/`.cpp`）、`%.elf`、`%.bin`、`%.hex`、`%.srec`、`%.list` |
+| `genlink-config.mk` | 用 `scripts/genlink.py` 查询 `ld/devices.data`，得到 `FAMILY/SUBFAMILY/MARCH/MABI/ZMMUL/CPPFLAGS`，据此设置 `ARCH_FLAGS`、自动选择 `libopenwch_<family>.a`、追加 `-I/-L` |
+| `genlink-rules.mk` | 由 `ld/linker.ld.S` 预处理生成 `generated.$(DEVICE).ld` |
+
+---
+
+## 用法
+
+```make
+# 1) 必须设置：库根目录 与 目标器件名
+OPENWCH_DIR ?= /path/to/libopenwch
+DEVICE      ?= ch32v003f4p6
+
+# 2) 目标文件与编译选项
+CFLAGS   += -Os -g -Wall -Wextra -std=c99
+CPPFLAGS += -MD
+OBJS     += main.o
+
+# 3) 配置模块（靠前）
+include $(OPENWCH_DIR)/mk/genlink-config.mk
+include $(OPENWCH_DIR)/mk/gcc-config.mk
+
+.PHONY: all clean
+all: main.elf main.hex
+
+clean:
+	$(Q)$(RM) -rf main.* *.o *.d generated.*.ld
+
+# 4) 规则模块（靠后）
+include $(OPENWCH_DIR)/mk/genlink-rules.mk
+include $(OPENWCH_DIR)/mk/gcc-rules.mk
+```
+
+---
+
+## 变量契约
+
+`genlink-config.mk` 对各变量的影响，与 libopencm3 一致：
+
+| 变量 | 动作 | 内容 |
+|---|---|---|
+| `CPPFLAGS` | **追加** | `-D<FAMILY> -D<SUBFAMILY> …` 与 `-I$(OPENWCH_DIR)/include` |
+| `ARCH_FLAGS` | **替换** | `-march=<MARCH> -mabi=<MABI>`（必要时 `-march=<MARCH>_zmmul`） |
+| `LDSCRIPT` | **替换** | `generated.$(DEVICE).ld` |
+| `LDLIBS` | **追加** | `-lopenwch_<family>` |
+| `LDFLAGS` | **追加** | `-L$(OPENWCH_DIR)/lib` |
+| `LIBDEPS` | **追加** | `$(OPENWCH_DIR)/lib/libopenwch_<family>.a`（供 `%.elf` 依赖用） |
+
+内部变量（`genlink_family`、`genlink_subfamily`、`genlink_march`、`genlink_mabi`、
+`genlink_zmmul`、`genlink_cppflags`、`genlink_march_full`）**不应对用户可见**，
+请勿在工程中直接使用。
+
+`gcc-config.mk` 定义：
+
+| 变量 | 说明 |
+|---|---|
+| `PREFIX` | 工具链前缀（不含末尾 `-`）。未设置时按 `riscv64-unknown-elf` → `riscv64-none-elf` → `riscv32-unknown-elf` → `riscv-none-elf` → `riscv64-elf` → `riscv32-elf` 顺序探测 |
+| `CC` … `RANLIB` | 各工具，默认 `$(PREFIX)-<tool>`，可用 `?=` 覆盖 |
+| `GCCVERSION` / `GCCMAJOR` | 编译器版本（`-dumpversion`） |
+| `ZMMUL_OK` | 非空表示编译器接受 `-march=rv32ec_zmmul` |
+
+---
+
+## 与 libopencm3 的差异
+
+| libopencm3 | libopenwch | 原因 |
+|---|---|---|
+| `PREFIX ?= arm-none-eabi` | RISC-V 前缀探测链 | 目标工具链为 `riscv64-unknown-elf` |
+| `ARCH_FLAGS := -mcpu=$(genlink_cpu)` + `-mthumb` + `-mfpu=` | `ARCH_FLAGS := -march=$(genlink_march) -mabi=$(genlink_mabi)` | RISC-V 无 `-mcpu`/`-mthumb`/`-mfpu` |
+| `libopencm3_<family>.a` | `libopenwch_<family>.a` | 库名 |
+| `OPENCM3_DIR` | `OPENWCH_DIR` | 项目名 |
+| 无 | `ZMMUL` 键与 `ZMMUL_OK` 探测 | CH32V002/004/005/006/007 需要 zmmul，旧 GCC 不支持 |
+| `$(IRQ_DEFN_FILES:./include/...=./lib/...)`（**有 `./` 前缀导致替换失效**） | 根 `Makefile` 中去掉 `./` | 修正 libopencm3 的潜在 bug，使 `vector_nvic.c` 的依赖强制真正生效 |
+
+---
+
+## 无 newlib 的工具链
+
+本库自身只使用 freestanding 头（`stdint.h`/`stdbool.h`/`stddef.h`），
+**不依赖 newlib**。应用若使用 `printf`/`memcpy` 等，可：
+
+1. 使用工具链自带的 newlib（`-lc`/`-lnosys`），或
+2. 用 `-nostdlib` 并链接 `lib/common/mini_libc.c`（本库附带的极简实现），或
+3. 自行提供 `_write`/`_sbrk` 等 syscall stub。
+
+对 `-march=rv32ec -mabi=ilp32e`，需确认工具链带有该 multilib 的 `libgcc.a`。
+可用如下命令检查：
+
+```sh
+$(PREFIX)-gcc -march=rv32ec -mabi=ilp32e -print-libgcc-file-name
+```
+
+Debian/Kali 的 `gcc-riscv64-unknown-elf` 15.3.0 提供 `rv32e/ilp32e/libgcc.a`，可正常链接。
+若你的工具链缺失，可参考 ch32fun 的做法，为其捆绑一份预编译的 `libgcc.a`。
