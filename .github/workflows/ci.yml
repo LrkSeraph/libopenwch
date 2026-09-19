@@ -48,8 +48,10 @@ jobs:
 
     env:
       # Every build step appends here so the failure step below can surface the
-      # actual compiler/linker error.
-      BUILD_LOG: ${{ runner.temp }}/build.log
+      # actual compiler/linker error.  A literal path, deliberately: the runner
+      # context does not exist at job level, and referencing it there makes the
+      # whole workflow fail to validate.
+      BUILD_LOG: /tmp/libopenwch-build.log
 
     steps:
       - uses: actions/checkout@v4
@@ -147,7 +149,7 @@ jobs:
     name: both families in one make
     runs-on: ubuntu-latest
     env:
-      BUILD_LOG: ${{ runner.temp }}/build.log
+      BUILD_LOG: /tmp/libopenwch-build.log
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y gcc-riscv64-unknown-elf
