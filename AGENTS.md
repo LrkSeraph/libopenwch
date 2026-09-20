@@ -9,7 +9,7 @@
 | 文档 | 作用 | 何时读 |
 |---|---|---|
 | **`project.md`** | **总体设计**：项目定位、需求、参考工程角色、目录结构、核心层设计（`qingke/` ↔ libopencm3 的 `cm3/`）、API 命名规范与 WCH EVT 迁移对照表、构建系统改造点（ch32fun 式工具链适配）、ADR、扩展路线、验证策略 | **开工前必读全文** |
-| **`phase.md`** | **阶段性目标**：P0–P5 六阶段的交付物、任务复选框、每阶段验收标准、里程碑 Reviewer Checklist | 每次认领任务前读对应阶段 |
+| **`phase.md`** | **阶段性目标**：P0–P6 七阶段的交付物、任务复选框、每阶段验收标准、里程碑 Reviewer Checklist | 每次认领任务前读对应阶段 |
 | **`status.md`** | **当前完成情况**：阶段进度快照、已完成/未开始清单、**阻塞项与待决问题**、下一步动作、验证记录、变更日志 | **每次会话开始时读**，**每次会话结束前更新** |
 | `README.md` | 面向用户的快速上手（工具链安装、构建、示例） | 用户文档变更时 |
 
@@ -63,6 +63,18 @@
    `include/libopenwch/*/nvic.h`、`include/libopencmsis/*/irqhandlers.h` 由
    `scripts/irq2nvic_h` 生成（`make stylecheck` 会跳过它们），要改风格请改生成器。
 
+10. **本仓库不含 host 侧 USB 代码，也不实现编程器协议**。库的构建只需要一条 RISC-V
+    工具链，不得引入 `libusb`/`pkg-config`/`udev` 之类 host 依赖。
+    `template/rules/toolchain.mk` 的 `flash`/`monitor`/`unbrick` 只做**委派**：
+    优先使用 `tools/wchlink/` 下已构建的工具，否则回退到 `minichlink`。
+
+    面向 WCH-LinkE 的烧录/调试工具位于**独立仓库**，以 **git submodule** 挂在
+    `tools/wchlink/`。submodule 默认未初始化，**CI 与普通 `git clone` 都不受影响**
+    （`actions/checkout` 默认不拉 submodule），所以不要为它新增 CI 依赖。
+    该定位**只记录在内部文档**（`project.md` §1.3、本文件、`phase.md`、`status.md`），
+    **不要写进 `README.md`**——README 只讲「驱动库」这一层身份。
+    理由与评估见 `project.md` §1.3，工具规划见 `phase.md` 的 P6。
+
 ---
 
 ## 4. 参考工程位置与用途
@@ -111,8 +123,8 @@ make clean
 # 文档
 make html        # 或 make -C doc html
 
-# 示例
-cd examples/ch32v003/blink && make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
+# 示例（在 template/examples/ 下）
+cd template/examples/blink && make
 ```
 
 ---
@@ -150,7 +162,8 @@ libopenwch/
 │   ├── qingke/     ← vector.c / nvic.c / assert.c / systick.c ...
 │   ├── ch32v/      Makefile.include + common/ + 003/
 │   └── ch5xx/      Makefile.include + common/ + 58x/
-├── doc/  tests/  examples/
+├── tools/wchlink/  ← WCH-LinkE 工具（git submodule，默认未初始化，见 §3.10）
+├── doc/  tests/
 ```
 
 ---

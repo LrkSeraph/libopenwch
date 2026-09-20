@@ -17,6 +17,7 @@
 | **P3** | CH582/CH58x 外设驱动 | `include/libopenwch/ch582/*`、`lib/ch5xx/58x/*` | `make TARGETS=ch5xx/58x` 全绿；示例链接成功 | P1 |
 | **P4** | 示例、文档、CI、硬件验证 | `examples/`、`doc/`、`.github/workflows/ci.yml`、`NOTICE` | Doxygen 生成成功；CI 绿；硬件上跑通 blink + uart | P2, P3 |
 | **P5** | 扩展族与 USB/BLE 接口 | `ch32x035`、`ch32v103`、`ch57x/59x`、`usb/` | 新增族构建全绿；`devices.data` 覆盖全部规划器件 | P4 |
+| **P6** | 伴随工具：WCH-LinkE 烧录器 | **独立仓库**，以 submodule 挂在 `tools/wchlink/` | 无设备时诊断清晰；有硬件时能烧录并校验 CH32V003/CH582 | P4 |
 
 ---
 
@@ -518,6 +519,36 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 - [ ] BLE 的其余角色与配对：central/observer/broadcaster、GAPBondMgr（持久配对还需 flash 支持）、
       OTA、mesh —— 目前可经 WCH 原始名字直接调用
 - [ ] `libopencmsis/` 完整化，提供 WCH EVT 迁移桥
+
+---
+
+## P6 — 伴随工具：WCH-LinkE 烧录器（独立仓库）
+
+定位与边界见 `project.md` §1.3。工具在**独立仓库**里开发、以 **git submodule**
+挂在 `tools/wchlink/`；本仓库**不实现协议、不引入 host 依赖**。
+首版只做**烧录**，调试器（GDB stub）不在范围内。
+
+**交付物**：一个 host 可执行文件 `wchlink`，命令 `info` / `flash` / `read` /
+`reset` / `unbrick` / `terminal`；Linux udev 规则；工具仓库自己的 README/NOTICE/LICENSE。
+
+- [ ] **M1 骨架与设备发现**：host 构建（libusb，支持 `LIBUSB_CFLAGS`/`LIBUSB_LIBS`
+      覆盖以便在无 `-dev` 包的环境构建）、USB 设备发现与接口声明、`info` 子命令、
+      芯片表、CLI 与诊断输出。**可在本机验证构建**
+- [ ] **M2 目标访问**：停机/复位、按 7 位寄存器号读写 32 位调试寄存器、命令 flush、
+      内存读回（`read`）。需硬件
+- [ ] **M3 烧录**：Flash 擦除/写入/校验（`flash`）、`reset`、`unbrick`、
+      NRST-as-GPIO、读保护。需硬件
+- [ ] **M4 终端**：单线调试通道（`terminal`）。需硬件
+- [ ] **集成**：submodule 就位；`template/rules/toolchain.mk` 优先使用已构建的工具，
+      否则回退 `minichlink`，两者都没有时给出可操作的报错
+
+**验收标准**：工具在**无设备**时给出清晰诊断并以非零退出（不崩溃）；
+在有 WCH-LinkE + CH32V003/CH582 的机器上，`flash` 能写入并校验通过，
+`reset` 后目标运行 —— 这一步同时清除 `status.md` 的 B1/B4。
+
+> **注意**：M2–M4 **无法在本工作区验证**（无 WCH-LinkE、无开发板），
+> 只能做到构建通过。这与 `status.md` 的 B1/B4 是同一个阻塞，
+> 而该工具正是用来清除它的手段 —— 互为前提，需用户提供硬件。
 
 ---
 

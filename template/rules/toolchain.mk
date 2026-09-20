@@ -53,20 +53,67 @@ SIZE		:= $(PREFIX)-size
 ##
 ## Flashing.
 ##
-## minichlink (https://github.com/cnlohr/ch32fun) drives the WCH-Link and the
-## built-in USB ISP bootloader, and needs no vendor software.  Point
-## MINICHLINK at the built binary if it is not on PATH.
+## Two programmer tools can drive a WCH-LinkE:
 ##
+##   minichlink  https://github.com/cnlohr/ch32fun -- external, found on PATH,
+##               and what this template has always used.
+##   wchlink     the libopenwch-tools companion, reached through the
+##               tools/wchlink/ submodule.  A plain `git clone` does not
+##               initialise that submodule, and building it needs libusb.
+##
+## PROGRAMMER selects one:
+##
+##   minichlink    (default) use minichlink
+##   wchlink       use the built submodule binary, or one on PATH
+##
+## The default is still minichlink *on purpose*.  wchlink is at milestone 1 and
+## cannot flash yet -- its flash subcommand reports "not implemented".  Making
+## it the default now would turn a working `make flash` into a failing one, so
+## the default flips when its milestone 3 lands.
+##
+PROGRAMMER	?= minichlink
+
+WCHLINK		?= $(OPENWCH_DIR)/tools/wchlink/build/wchlink
 MINICHLINK	?= minichlink
 MINICHLINK_FLAGS ?= -b
 
+ifeq ($(PROGRAMMER),wchlink)
+
+## Prefer the submodule's own build; fall back to one on PATH.
+WCHLINK_TOOL	?= $(if $(wildcard $(WCHLINK)),$(WCHLINK),wchlink)
+
+ifeq ($(wildcard $(WCHLINK)),)
+ifeq ($(shell command -v wchlink >/dev/null 2>&1 && echo found),)
+$(error PROGRAMMER=wchlink, but no wchlink found. Either build the companion \
+    tool (make -C $(OPENWCH_DIR)/tools/wchlink), or fetch the submodule \
+    (git submodule update --init tools/wchlink), or leave PROGRAMMER at its \
+    default and use minichlink.)
+endif
+endif
+
+## These are recursive (=) on purpose: WRITE_SECTION is defined in rules.mk,
+## which includes this file before defining it.
+FLASH_PREFIX	= $(WCHLINK_TOOL) flash
+FLASH_SUFFIX	= $(WCHLINK_FLAGS)
+MONITOR_CMD	= $(WCHLINK_TOOL) terminal
+UNBRICK_CMD	= $(WCHLINK_TOOL) unbrick
+
+else
+
+FLASH_PREFIX	= $(MINICHLINK) -w
+FLASH_SUFFIX	= $(WRITE_SECTION) $(MINICHLINK_FLAGS)
+MONITOR_CMD	= $(MINICHLINK) -T
+UNBRICK_CMD	= $(MINICHLINK) -u
+
+endif
+
 ## Interactive terminal over the single-wire debug channel.
 monitor:
-	$(MINICHLINK) -T
+	$(Q)$(MONITOR_CMD)
 
 ## Unbrick / reset a part that no longer answers.
 unbrick:
-	$(MINICHLINK) -u
+	$(Q)$(UNBRICK_CMD)
 
 ## Fail early with an actionable message instead of a wall of compiler noise.
 ifeq ($(shell command -v $(CC) >/dev/null 2>&1 && echo ok),)

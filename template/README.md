@@ -101,8 +101,10 @@ for d in examples/*/; do make -C "$d" || exit 1; done
 | `CFLAGS` | — | extra compiler flags |
 | `LDFLAGS` | — | extra linker flags |
 | `LDLIBS` | — | extra libraries |
-| `MINICHLINK` | `minichlink` | programmer binary |
+| `PROGRAMMER` | `minichlink` | which flasher to drive: `minichlink` or `wchlink` |
+| `MINICHLINK` | `minichlink` | minichlink binary |
 | `WRITE_SECTION` | `flash` | minichlink write region |
+| `WCHLINK` | `tools/wchlink/build/wchlink` | the `wchlink` binary, used with `PROGRAMMER=wchlink` |
 | `LIBOPENWCH_NOSTDLIB` | — | set to `1` to link with `-nostdlib` instead of newlib |
 | `LIBOPENWCH_BLE` | `0` | set to `1` to link WCH's Bluetooth stack, for the `ble_*` layer (CH58x only) |
 
@@ -151,6 +153,27 @@ Point `MINICHLINK` at the binary if it is not on `PATH`:
 ```sh
 make flash MINICHLINK=~/src/ch32fun/minichlink/minichlink
 ```
+
+### Choosing the programmer
+
+`PROGRAMMER` picks which tool drives the WCH-LinkE:
+
+| Value | Tool |
+|---|---|
+| `minichlink` | **(default)** minichlink, found on `PATH` or named by `MINICHLINK` |
+| `wchlink` | the libopenwch-tools companion, from the `tools/wchlink/` submodule or on `PATH` |
+
+```sh
+make flash PROGRAMMER=wchlink
+```
+
+With `PROGRAMMER=wchlink`, the built submodule binary
+(`tools/wchlink/build/wchlink`) is used if it exists, otherwise one on `PATH`;
+if there is neither, the build stops with an explanation rather than a
+confusing "command not found".
+
+The default stays `minichlink` for now because `wchlink` is still at milestone
+1 and cannot flash yet.  It becomes the default once it can.
 
 ## Output files
 

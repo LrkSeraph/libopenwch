@@ -7,15 +7,34 @@ register-level API with **lowercase_snake_case** names, a family/subfamily
 directory layout, and a `Makefile`-based build that generates the right linker
 script from the part number.
 
-## Status
+## Status: incubating — not ready for production
 
-Early incubation.  See `status.md` for the current progress, `phase.md` for the
-staged plan, and `project.md` for the full design.
+libopenwch is **pre-1.0 and in active incubation**.  The public API is not frozen and
+breaking changes land between commits.  Please read this section before depending on
+anything here.
+
+What that means concretely:
+
+- **Only two families exist so far** — `ch32v0` and `ch5xx58x`.  The rest of the WCH
+  line-up is planned, not written.
+- **Nothing has been verified on silicon.**  No development board and no WCH-Link are
+  available to this project, so hardware-in-the-loop testing is outstanding for every
+  driver.  What *is* verified is that the entire public API compiles and links, that the
+  archives carry the right ISA, and that generated code matches the reference manual's
+  register descriptions.  That is not the same thing as having run it.
+- **A known hardware-dependent question is open**: the `DBGMCU_CR` bit layout
+  (CSR `0x7c0`), where WCH's EVT and ch32fun disagree.  A value was chosen, raw accessors
+  are provided, and it needs a real part to settle.  See known issue K4 in `status.md`.
+- **The Bluetooth LE layer links WCH's closed-source stack** and has never executed on
+  a chip.
+
+**Do not use this in production.**  `status.md` has the current progress and the open
+blockers, `phase.md` the staged plan, and `project.md` the full design.
 
 | Family | Parts | Core | State |
 |---|---|---|---|
-| `ch32v0` | CH32V003, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2, RV32EC | **done** — 316 public functions across 15 peripherals |
-| `ch5xx58x` | CH582, CH583, CH584, CH585 | QingKe V4, RV32IMAC | **done** — 202 public functions across 12 peripherals |
+| `ch32v0` | CH32V003, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2, RV32EC | driver API complete, **not run on hardware** — 316 public functions, 15 peripherals |
+| `ch5xx58x` | CH582, CH583, CH584, CH585 | QingKe V4, RV32IMAC | driver API complete, **not run on hardware** — 230 public functions, 12 peripherals plus the Bluetooth LE layer |
 
 ## Toolchain
 
@@ -208,7 +227,7 @@ a heap the application declares (`BLE_HEAP_DEFINE`) and about 145 KB of flash.
 cp -r libopenwch/template ~/src/my-firmware
 cd ~/src/my-firmware/examples/blink
 make OPENWCH_DIR=~/src/libopenwch
-make OPENWCH_DIR=~/src/libopenwch flash    # needs minichlink
+make OPENWCH_DIR=~/src/libopenwch flash    # needs a WCH-Link programmer
 ```
 
 Four working examples ship with it — `blink` and `uart_echo` for the CH32V003,
@@ -254,7 +273,7 @@ lib/
     mini_libc/          freestanding string/memory routines
     ble/                Bluetooth LE layer; ble/wch/ is WCH's binary
 template/           application skeleton (rules/, examples/)
-doc/  tests/  examples/
+doc/  tests/
 ```
 
 ## License

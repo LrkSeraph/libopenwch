@@ -208,14 +208,20 @@ size: $(PROJECT).elf
 	@$(SIZE) $(PROJECT).elf
 
 ##
-## Flashing.  WRITE_SECTION defaults to the internal flash; a family with an
-## external image (CH32V20x) can set it to the external region instead.
+## Flashing.
+##
+## WRITE_SECTION defaults to the internal flash; a family with an external
+## image (CH32V20x) can set it to the external region instead.  It only applies
+## to minichlink -- wchlink takes the region from the part it was told about.
+##
+## FLASH_PREFIX/FLASH_SUFFIX come from toolchain.mk, which picks the programmer
+## and knows how each one wants its arguments.
 ##
 WRITE_SECTION	?= flash
 
 flash: $(PROJECT).bin
-	@printf "  FLASH   $<\n"
-	$(Q)$(MINICHLINK) -w $< $(WRITE_SECTION) $(MINICHLINK_FLAGS)
+	@printf "  FLASH   $< ($(PROGRAMMER))\n"
+	$(Q)$(FLASH_PREFIX) $< $(FLASH_SUFFIX)
 
 clean:
 	$(Q)rm -rf $(BUILD_DIR) $(GENERATED_BINS)

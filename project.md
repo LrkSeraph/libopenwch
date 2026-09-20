@@ -50,8 +50,41 @@ WCH RISC-V 芯片提供一套「小、直、无 HAL 中间层」的驱动库。
 - 不绑定 RTOS，不引入动态内存。
 - 不复刻 WCH EVT 的 `StdPeriphDriver` API（只作为寄存器事实来源）。
 - 不实现 BLE 协议栈 / USB 协议栈（USB *设备控制器*寄存器级驱动在后期阶段可选）。
+  BLE 侧改为**链接 WCH 的闭源二进制**并在其上提供薄封装层，见 `lib/ble/README`。
+- **本仓库不含任何 host 侧 USB 代码**，也不提供编程器实现，见 §1.3。
 - `ch32v003` 的 `ch32fun` 式极简 runtime **不**直接采用；本库走 libopencm3 的
   "静态库 + 链接脚本生成 + 可选 newlib"路线。ch32fun 仅作为**工具链兼容方案的参考**。
+
+### 1.3 伴随工具定位（WCH-LinkE 编程器）
+
+本项目的定位分两层。**第一层是对外身份，第二层只在内部文档记录**：
+
+1. **主定位（对外）**：与 libopencm3 对齐的 WCH RISC-V 外设驱动库。
+   `README.md` 只讲这一层，其中不出现编程器工具的宣传。
+2. **伴随定位（内部）**：为 **WCH-LinkE 编程器**提供烧录与调试能力的配套工具。
+
+**边界（硬性约束）**：本仓库**不含任何 host 侧 USB 代码**。库的构建只需要一条 RISC-V
+工具链，不引入 `libusb`/`pkg-config`/`udev`。`template/rules/toolchain.mk` 里的
+`flash`/`monitor`/`unbrick` 只做**委派**——把工作交给外部编程器工具，自身不实现协议。
+
+**载体**：配套工具位于**独立仓库**，以 **git submodule** 形式挂在 `tools/wchlink/`。
+submodule 默认未初始化，因此 `git clone` 与 CI 都不受影响，也不需要 libusb。
+
+**为什么不直接集成**（评估结论）：
+
+| 维度 | 库（本仓库） | WCH-LinkE 工具 |
+|---|---|---|
+| ISA / 工具链 | 仅 `riscv64-unknown-elf` | host `x86_64` gcc |
+| 构建驱动 | `TARGETS` 按族递归 | 单个 host 可执行文件 |
+| 产物 | `lib/libopenwch_<family>.a` | 可执行文件 |
+| 依赖 | 仅一条 RISC-V 工具链 | `libusb-1.0`、`libudev`、`pthread` |
+| 受众 | 固件作者 | 任何持有 WCH-LinkE 的人，不限本库用户 |
+
+集成在技术上**可行**，但会把第二套工具链、一组 host 依赖和一类新产物塞进一个以
+「`TARGETS` 递归 + 一条 RISC-V 工具链」为身份的构建里，并与「对齐 libopencm3」的定位冲突
+——libopencm3 自身也不提供编程器。生态同样如此：`wlink`、`minichlink`、
+`riscv-openocd-wch` 都是独立工程。因此选择**分离仓库 + submodule**，并保留现有的
+「委派」边界。工具自身的规划见 `phase.md` 的 P6。
 
 ---
 
@@ -697,15 +730,25 @@ make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
 
 ## 8. 许可与合规
 
-- **库代码**（`lib/`、`include/`）：`LGPL-3.0-or-later`（`COPYING.LGPL3`），
-  与 libopencm3 一致——允许商业闭源链接。
-- **工具/脚本**（`scripts/`、`mk/`）：`GPL-3.0-or-later`（`COPYING.GPL3`），
-  与 libopencm3 的 `HACKING`/`irq2nvic_h` 头部一致。
+- **库代码**（`include/`、`lib/`、`ld/`、`mk/`）：`LGPL-3.0-or-later`
+  （`LICENSE` / `COPYING.LGPL3`），与 libopencm3 一致——允许商业闭源链接。
+- **`scripts/checkpatch.pl`**：`GPL-2.0`（`COPYING.GPL2`），取自 Linux 内核，
+  文件头即声明 GPL-2.0，无法改许可。它是开发工具，不属于库。
+- **`lib/ble/wch/`**：**Apache-2.0**（`lib/ble/wch/LICENSE`），是 WCH 的闭源
+  BLE 栈与其头文件原样 vendor 进来的，**不属于 LGPL**；再分发者必须随附其许可与
+  `NOTICE` 中的说明。
+- **文档与治理文件**（`project.md`、`phase.md`、`status.md`、`AGENTS.md`、
+  `README.md`、`NOTICE`）：CC0-1.0 / 公有领域。
 - WCH EVT 代码（`ch32v003-main`、`ch583-main`）**只作为寄存器定义与操作时序的事实参考**，
   **不复制其代码**，避免引入 WCH 的许可不确定性。寄存器地址/位定义属于接口事实，
   按 HACKING 的要求"尽量贴近厂商手册命名"重新表述为 libopencm3 风格宏。
 - ch32fun 采用 MIT/自定义宽松许可，其 `misc/libgcc.a` 等可再分发内容若被引入，
-  需在 `NOTICE`/`README` 中标注来源与许可（一期不使用该 `libgcc.a`）。
+  需在 `NOTICE`/`README` 中标注来源与许可（本库**不使用**该 `libgcc.a`，
+  改用自建 mini-libc 并探测工具链自带的 `rv32e/ilp32e` libgcc）。
+- **伴随工具（WCH-LinkE 编程器，§1.3）**：独立仓库，自带 `LICENSE` 与 `NOTICE`。
+  它通过 submodule 被引用，其许可不改变本仓库的许可；本仓库不分发其代码。
+  工具实现走 **clean-room**：minichlink/wlink/openocd-wch 只作为**协议事实**参考，
+  不复制其源码——与对待 WCH EVT 的做法一致。
 
 ---
 
@@ -734,10 +777,20 @@ make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
 3. **CH5xx 全族**：`ch571/573`（RAM 偏移 `0x20003800`）、`ch591/592`（`TARGET_MCU_LD==9`）。
 4. **USB 设备控制器**：移植 libopencm3 的 `lib/usb/`，把 `usb_dwc_common`/`st_usbfs_*`
    抽象出 RISC-V 可用的 part（WCH 的 USB2.0 设备控制器与 `st_usbfs_v2` 相似度较高）。
-5. **BLE**：仅提供 HCI 传输层/寄存器级接口，不含协议栈。
+5. **BLE**：✅ 已完成外设角色的薄封装层（TMOS / GAP / GAPRole / GATT server），
+   链接 WCH 的闭源 `LIBCH58xBLE.a`；central、observer、broadcaster、配对、OTA、mesh
+   仍待做。详见 `lib/ble/README` 与 §1.2。
 6. **`libopencmsis/`**：让 WCH EVT 的 `StdPeriphDriver` 可编译在 libopenwch 之上
    （`NVIC_EnableIRQ` 等 CMSIS 名 → libopenwch 实现），作为迁移桥梁。
 7. **文档站**：Doxygen + GitHub Pages，按族生成。
+8. **伴随工具 `libopenwch-tools`（WCH-LinkE 编程器，§1.3）**：独立仓库、以 submodule
+   引入。定位为**烧录工具**，分四个里程碑：
+   1. 仓库骨架、host 构建（libusb）、USB 设备发现、`info` 子命令、芯片表、CLI；
+   2. 停机/复位、调试寄存器读写、内存读回（`read`）；
+   3. Flash 擦/写/校验、`reset`/`unbrick`（`flash`）；
+   4. 单线调试终端。
+   调试器（GDB stub）**不在**首版范围。该工具是清除 §11 中「硬件在环」阻塞的前提，
+   但它自身也需要 WCH-LinkE 才能验证。
 
 ---
 
@@ -750,5 +803,6 @@ make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
 | 归档内容 | `riscv64-unknown-elf-nm` 检查符号存在且无未定义 | ✅ |
 | 代码规范 | `make stylecheck`（`scripts/checkpatch.pl`） | ✅ |
 | 目标码检查 | `riscv64-unknown-elf-objdump -d` 确认 `-march` 生效（压缩指令/无浮点） | ✅ |
-| 硬件在环 | WCH-Link + `minichlink`（参考 ch32fun）闪写 CH32V003/CH582 并跑 blink/uart | ⚠️ 需硬件 |
+| 硬件在环 | WCH-Link + 编程器工具（`minichlink` 或 §1.3 的 `libopenwch-tools`）闪写 CH32V003/CH582 并跑 blink/uart | ⚠️ 需硬件 |
+| 编程器工具（§1.3） | 在**独立仓库**中自测：host 构建 + 无设备时的诊断路径 | ⚠️ 构建可验，运行需 WCH-LinkE |
 | QEMU | `qemu-riscv32` 可跑纯计算部分（无外设）；对寄存器级驱动意义有限 | ⚠️ 有限 |
