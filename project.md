@@ -63,24 +63,27 @@ WCH RISC-V 芯片提供一套「小、直、无 HAL 中间层」的驱动库。
    `README.md` 只讲这一层，其中不出现编程器工具的宣传。
 2. **伴随定位（内部）**：为 **WCH-LinkE 编程器**提供烧录与调试能力的配套工具。
 
-**边界（硬性约束）**：本仓库**不含任何 host 侧 USB 代码**，也**不再包含应用模板**。
+**边界（硬性约束）**：本仓库**不含任何 host 侧 USB 代码**，也**不再包含应用模板与示例**。
 库的构建只需要一条 RISC-V 工具链，不引入 `libusb`/`pkg-config`/`udev`。
-模板已拆到独立仓库 `libopenwch-template`，其 `rules/toolchain.mk` 里的
-`flash`/`monitor`/`unbrick` 只做**委派**——把工作交给外部编程器工具，自身不实现协议。
+模板与示例已拆到两个独立仓库，其中的 `flash`/`monitor`/`unbrick` 只做**委派**——
+把工作交给外部编程器工具，自身不实现协议。
 
-**三个仓库的分工**：
+**四个仓库的分工**：
 
 | 仓库 | 角色 | 关系 |
 |---|---|---|
 | `libopenwch`（本仓库） | 驱动库 | — |
-| `libopenwch-template` | 应用骨架与示例 | 独立仓库；用户从它开始建项目，用 `OPENWCH_DIR` 指向本库 |
-| `libopenwch-tools` | WCH-LinkE 烧录器（`wchlink`） | 独立仓库；以 **submodule** 挂在 `tools/wchlink/` |
+| `libopenwch-template` | 应用骨架 | 独立仓库；用户从它开始建项目。它以 **submodule** 挂载本库（`libopenwch/`）与工具（`tools/wchlink/`） |
+| `libopenwch-examples` | 逐个外设的完整示例 | 独立仓库；同样以 **submodule** 挂载本库。它同时是本库 CI 的集成测试对象（CI 克隆它并用当前 checkout 构建全部示例） |
+| `libopenwch-tools` | WCH-LinkE 烧录器（`wchlink`） | 独立仓库；不作为本库的 submodule，只由 template 以 **submodule** 挂在 `tools/wchlink/` |
 
-模板**不是** submodule：它是用户项目的起点，按 libopencm3 / libopencm3-template 的成例
-应当独立可用。工具**是** submodule：模板的 `make flash` 需要它的源码在树内。
+模板与示例**不是**本库的 submodule：它们是用户可见的独立工程，按 libopencm3 /
+libopencm3-template 的成例应当独立可用。工具被 template 以 submodule 引用：
+模板的 `make flash PROGRAMMER=wchlink` 需要它的源码在树内。
 
-**载体**：配套工具位于**独立仓库**，以 **git submodule** 形式挂在 `tools/wchlink/`。
-submodule 默认未初始化，因此 `git clone` 与 CI 都不受影响，也不需要 libusb。
+**载体**：本仓库不挂任何 submodule，因此 `git clone` 与 CI 都不受影响，也不需要 libusb。
+`PROGRAMMER=wchlink` 在 template 中默认指向 `tools/wchlink/build/wchlink`，
+在 examples 中则只查 `PATH`（它不挂该 submodule）。
 
 **为什么不直接集成**（评估结论）：
 
@@ -276,15 +279,17 @@ libopenwch/
 │   ├── ch32v003-generic/         # 板级/最小系统冒烟工程（blink/uart echo）
 │   └── ch582-generic/
 │
-├── examples/                     # 面向用户的示例（每个一个目录 + Makefile）
-│   ├── ch32v003/blink/
-│   ├── ch32v003/usart_echo/
-│   ├── ch582/blink/
-│   └── ch582/uart_echo/
+├── examples/                     # 已迁出：见下方说明
 │
 ├── project.md  phase.md  status.md  AGENTS.md
-└── .github/workflows/ci.yml      # 可选：多工具链矩阵构建
+└── .github/workflows/ci.yml      # 多工具链矩阵 + 示例集成测试
 ```
+
+上图中的 `examples/` 只保留位置说明：面向用户的示例已迁到独立仓库
+**`libopenwch-examples`**（`examples/<名字>/`，每个含 `main.c` + `Makefile`），
+应用骨架在 **`libopenwch-template`**（`Makefile` + `src/`）。两者都以 submodule
+引用本库，本仓库不再持有它们。CI 的 `examples` job 会克隆 examples 仓库并用
+**当前 checkout** 构建全部示例，见 `.github/workflows/ci.yml`。
 
 ### 3.1 分类映射表（WCH 体系 ↔ 本库目标名 ↔ 库文件名）
 
@@ -757,10 +762,14 @@ make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
 - ch32fun 采用 MIT/自定义宽松许可，其 `misc/libgcc.a` 等可再分发内容若被引入，
   需在 `NOTICE`/`README` 中标注来源与许可（本库**不使用**该 `libgcc.a`，
   改用自建 mini-libc 并探测工具链自带的 `rv32e/ilp32e` libgcc）。
-- **伴随工具（WCH-LinkE 编程器，§1.3）**：独立仓库，自带 `LICENSE` 与 `NOTICE`。
-  它通过 submodule 被引用，其许可不改变本仓库的许可；本仓库不分发其代码。
+- **伴随工具（WCH-LinkE 编程器，§1.3）**：独立仓库 `libopenwch-tools`，自带
+  `LICENSE` 与 `NOTICE`。它只由 `libopenwch-template` 通过 submodule 引用，
+  本仓库不分发其代码，它的许可也不改变本仓库的许可。
   工具实现走 **clean-room**：minichlink/wlink/openocd-wch 只作为**协议事实**参考，
   不复制其源码——与对待 WCH EVT 的做法一致。
+- **示例（`libopenwch-examples`）与模板（`libopenwch-template`）**：同样独立仓库、
+  LGPL-3.0-or-later、各自带 `LICENSE`/`NOTICE`。两者都以 submodule 引用本库，
+  因此本库的许可与它们的许可互不影响。
 
 ---
 
@@ -795,8 +804,11 @@ make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
 6. **`libopencmsis/`**：让 WCH EVT 的 `StdPeriphDriver` 可编译在 libopenwch 之上
    （`NVIC_EnableIRQ` 等 CMSIS 名 → libopenwch 实现），作为迁移桥梁。
 7. **文档站**：Doxygen + GitHub Pages，按族生成。
-8. **伴随工具 `libopenwch-tools`（WCH-LinkE 编程器，§1.3）**：独立仓库、以 submodule
-   引入。定位为**烧录工具**，分四个里程碑：
+8. **示例与模板**：✅ 已拆为独立仓库——`libopenwch-examples`（逐个外设的完整示例，
+   同时是本库 CI 的集成测试对象）与 `libopenwch-template`（应用骨架，本库与工具均以
+   submodule 引入）。后续随新族/新外设扩充示例即可。
+9. **伴随工具 `libopenwch-tools`（WCH-LinkE 编程器，§1.3）**：独立仓库，由 template
+   以 submodule 引入。定位为**烧录工具**，分四个里程碑：
    1. 仓库骨架、host 构建（libusb）、USB 设备发现、`info` 子命令、芯片表、CLI；
    2. 停机/复位、调试寄存器读写、内存读回（`read`）；
    3. Flash 擦/写/校验、`reset`/`unbrick`（`flash`）；
@@ -815,6 +827,7 @@ make OPENWCH_DIR=../../.. DEVICE=ch32v003f4p6
 | 归档内容 | `riscv64-unknown-elf-nm` 检查符号存在且无未定义 | ✅ |
 | 代码规范 | `make stylecheck`（`scripts/checkpatch.pl`） | ✅ |
 | 目标码检查 | `riscv64-unknown-elf-objdump -d` 确认 `-march` 生效（压缩指令/无浮点） | ✅ |
+| 应用侧集成 | `examples` CI job：克隆 `libopenwch-examples`，用当前 checkout 构建全部示例 | ✅ 需 RISC-V 工具链 |
 | 硬件在环 | WCH-Link + 编程器工具（`minichlink` 或 §1.3 的 `libopenwch-tools`）闪写 CH32V003/CH582 并跑 blink/uart | ⚠️ 需硬件 |
 | 编程器工具（§1.3） | 在**独立仓库**中自测：host 构建 + 无设备时的诊断路径 | ⚠️ 构建可验，运行需 WCH-LinkE |
 | QEMU | `qemu-riscv32` 可跑纯计算部分（无外设）；对寄存器级驱动意义有限 | ⚠️ 有限 |

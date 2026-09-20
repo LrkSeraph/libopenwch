@@ -557,33 +557,53 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 
 ---
 
-## P7 — 应用模板拆分为独立仓库
+## P7 — 应用侧拆分为独立仓库（模板 + 示例）
 
 模板原先住在 `template/`，使「库」这个仓库同时承载了「用户项目的起点」。按
 libopencm3 / libopencm3-template 的成例拆开：**库是你 build against 的东西，
 模板是你 build from 的东西**。
 
-**交付物**：独立仓库 **`libopenwch-template`**，自带 LICENSE / NOTICE /
-`.clang-format` / CI；本仓库**不再包含 `template/`**。
+拆的过程中发现最初的拆分把两件事混在了一个仓库里：**骨架**（用户复制走、填自己的
+代码）与**示例**（做完的程序，用来读、也是集成测试对象）。一个既是骨架又是示例集的
+仓库，用户必须删掉一堆东西才能开始，所以最终分成两个仓库。
 
-- [x] 把 `template/` 的 `rules/`、5 个示例、`.vscode/`、README 移入新仓库
-- [x] **`OPENWCH_DIR` 查找改造**：旧默认是「我的父目录就是 libopenwch」，
-      只在模板位于库内时成立。现在按序尝试
-      (1) 调用方显式设置的值 → (2) 旁边的 `../libopenwch` → (3) 父目录，
-      每个候选都用 `mk/genlink-config.mk` 确认存在；都不匹配时直接报错并列出
-      尝试过的路径，而不是稍后抛一个莫名其妙的缺文件错误
+**交付物**：
+
+| 仓库 | 内容 |
+|---|---|
+| `libopenwch-template` | `Makefile` + `src/main.c` + 两个 submodule（`libopenwch/`、`tools/wchlink/`）+ `.clang-format` / `.vscode/` / CI，仅此而已 |
+| `libopenwch-examples` | `rules/`（toolchain + 应用规则）、5 个示例、`libopenwch/` submodule、CI |
+
+- [x] 拆出 `libopenwch-examples`：`rules/`、5 个示例、`.vscode/`、README、CI
+- [x] 再拆出 `libopenwch-template`：只留 `Makefile` + `src/main.c` + 编辑器配置
+- [x] **`libopenwch/` 改为 submodule**（两个仓库都是），默认查找顺序为
+      (1) 调用方显式设置的值 → (2) submodule `./libopenwch` → (3) 旁边的
+      `../libopenwch` → (4) 父目录；每个候选都用 `mk/genlink-config.mk` 确认存在；
+      都不匹配时直接报错并列出尝试过的路径
+- [x] **缺归档时就地构建库**：`$(LIBDEPS)` 规则触发一次 `make -C $(OPENWCH_DIR)`，
+      使 `git clone --recurse-submodules` 后直接 `make` 即可，不必先手动构建库
 - [x] 5 个示例的 Makefile 不再自行设置 `OPENWCH_DIR`（否则会抢在查找之前生效）
-- [x] `.vscode/c_cpp_properties.json` 指向 `../../libopenwch/include`
-- [x] 新仓库自带 CI：克隆 libopenwch，用默认查找、显式 `OPENWCH_DIR`、
-      freestanding 三种方式构建全部示例，并每周定时跑一次
+- [x] 模板以 submodule 引入 `libopenwch-tools`（`tools/wchlink/`），
+      `PROGRAMMER=minichlink`（默认）/ `wchlink` 的委派逻辑移入模板 Makefile；
+      examples 不挂该 submodule，`PROGRAMMER=wchlink` 只查 `PATH`
+- [x] 模板 CI：pinned submodule 与 libopenwch master 两条路径、两族器件、
+      `LIBOPENWCH_NOSTDLIB=1`
+- [x] examples CI：pinned submodule 与 libopenwch master 两条路径，构建全部示例
+      （含 freestanding 与 BLE 示例），并每周定时跑一次
+- [x] 本仓库新增 `examples` CI job：克隆 `libopenwch-examples` 并用**当前 checkout**
+      构建全部示例（仓库为空时只告警跳过）
 - [x] 本仓库移除 `template/`；README、CI、NOTICE、`AGENTS.md`、`project.md` 同步
 
-**验收标准**：`libopenwch-template` 的 5 个示例全部构建成功且体积与拆分前一致；
-放在孤立目录时给出可操作的报错、显式 `OPENWCH_DIR` 可救回；
-本仓库 `make` / `make apitest` / `make genlinktests` / `make stylecheck` 全绿。
+**验收标准**：两个仓库的示例/骨架全部构建成功且体积与拆分前一致
+（blink 1124 B、uart_echo 2044 B、ch582_blink 2808 B、ch582_uart_echo 2412 B、
+ch582_ble_advertise 146628 B text）；放在孤立目录时给出可操作的报错、显式
+`OPENWCH_DIR` 可救回；本仓库 `make` / `make apitest` / `make genlinktests` /
+`make stylecheck` 全绿。
 
-> 应用示例的构建覆盖随之**转到模板仓库的 CI**。BLE 闭源栈的链接覆盖**没有丢**：
-> ch5xx58x 的 `make apitest` 会调用全部 `ble_*()` 并链接 vendor 归档。
+> 应用示例的构建覆盖随之**转到 examples 仓库的 CI**，并在本仓库 CI 中以
+> `examples` job 反向覆盖（用当前 checkout 构建示例）。BLE 闭源栈的链接覆盖
+> **没有丢**：ch5xx58x 的 `make apitest` 会调用全部 `ble_*()` 并链接 vendor 归档。
+
 
 ---
 

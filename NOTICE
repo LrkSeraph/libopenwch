@@ -110,7 +110,8 @@ Influenced the toolchain strategy
 
 ch32fun is MIT licensed.  Its approach to the generic `riscv64-unknown-elf`
 toolchain shaped the toolchain probe chain in mk/gcc-config.mk and the
-`-nostdlib` / `-ffunction-sections` recipe used by the application template.
+`-nostdlib` / `-ffunction-sections` recipe used by the application template
+and the examples.
 No ch32fun source was copied.  The bundled `misc/libgcc.a` from ch32fun is
 NOT used: the Debian riscv64-unknown-elf toolchain ships a working
 `rv32e/ilp32e` libgcc, which the build probes for.
@@ -145,10 +146,21 @@ Everything else is original to this project, in particular:
 Not in this repository any more
 -------------------------------
 
-The application template was moved out into its own repository,
-`libopenwch-template`, which has its own LICENSE and NOTICE covering the build
-rules and examples.  This repository is now only the library.  Companion tools
-live in `libopenwch-tools`, likewise separate.
+Everything that is not the library now lives in its own repository:
+
+  libopenwch-template    https://github.com/LrkSeraph/libopenwch-template
+                         the application skeleton: a Makefile, a src/main.c,
+                         and this library plus the companion flasher as
+                         submodules.  LGPL-3.0-or-later.
+  libopenwch-examples    https://github.com/LrkSeraph/libopenwch-examples
+                         the worked examples, and what this library's CI
+                         builds to test itself.  LGPL-3.0-or-later.
+  libopenwch-tools       https://github.com/LrkSeraph/libopenwch-tools
+                         wchlink, the WCH-LinkE flasher.  LGPL-3.0-or-later.
+
+Each has its own LICENSE and NOTICE.  This repository is now only the library,
+and its build needs nothing but a RISC-V toolchain: no libusb, no pkg-config,
+no host tooling.
 
 The Bluetooth LE layer is a wrapper: it declares the subset of WCH's stack API
 that a peripheral needs, under this project's naming and documentation, and

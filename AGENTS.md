@@ -65,15 +65,23 @@
 
 10. **本仓库不含 host 侧 USB 代码，也不实现编程器协议**。库的构建只需要一条 RISC-V
     工具链，不得引入 `libusb`/`pkg-config`/`udev` 之类 host 依赖。
-    **应用模板也不在本仓库**：它在独立仓库 `libopenwch-template` 里，其
-    `rules/toolchain.mk` 的 `flash`/`monitor`/`unbrick` 只做**委派**：
-    优先使用 `tools/wchlink/` 下已构建的工具，否则回退到 `minichlink`。
+    **应用模板与示例都不在本仓库**，它们是两个独立仓库：
 
-    面向 WCH-LinkE 的烧录/调试工具位于**独立仓库**，以 **git submodule** 挂在
-    `tools/wchlink/`。submodule 默认未初始化，**CI 与普通 `git clone` 都不受影响**
-    （`actions/checkout` 默认不拉 submodule），所以不要为它新增 CI 依赖。
+    - `libopenwch-template` —— 用户工程起点：`Makefile` + `src/`，并把本库
+      与烧录工具都以 **submodule** 挂在 `libopenwch/`、`tools/wchlink/`。
+    - `libopenwch-examples` —— 逐个外设的完整示例（5 个），同时是本库 CI 的
+      集成测试对象：本库的 `examples` job 会克隆它并用**当前 checkout** 构建全部示例。
+
+    两者共用同一套应用规则：`flash`/`monitor`/`unbrick` 只做**委派**，
+    `PROGRAMMER=minichlink`（默认）走 minichlink，`PROGRAMMER=wchlink` 走
+    `tools/wchlink/` 下已构建的工具或 `PATH` 上的同名程序。
+
+    面向 WCH-LinkE 的烧录器位于**独立仓库** `libopenwch-tools`，由
+    `libopenwch-template` 以 submodule 挂在 `tools/wchlink/`。
+    **本仓库不挂任何 submodule**，所以 `git clone` 与 CI 都不受影响。
     该定位**只记录在内部文档**（`project.md` §1.3、本文件、`phase.md`、`status.md`），
-    **不要写进 `README.md`**——README 只讲「驱动库」这一层身份。
+    **不要写进 `README.md`**——README 只讲「驱动库」这一层身份（示例与模板的
+    下载入口除外，那是用户上手路径，不是工具的定位说明）。
     理由与评估见 `project.md` §1.3，工具规划见 `phase.md` 的 P6。
 
 ---
@@ -124,8 +132,13 @@ make clean
 # 文档
 make html        # 或 make -C doc html
 
-# 示例在独立仓库 libopenwch-template 中（不在本仓库）
-cd ../libopenwch-template/examples/blink && make
+# 集成测试：用本仓库构建全部示例（也是 CI 的 examples job 做的事）
+git clone https://github.com/LrkSeraph/libopenwch-examples /tmp/openwch-examples
+for d in /tmp/openwch-examples/examples/*/; do make -C "$d" OPENWCH_DIR=$PWD; done
+
+# 示例与模板都在独立仓库（不在本仓库）
+cd ../libopenwch-examples/examples/blink && make   # 逐个外设的完整示例
+cd ../libopenwch-template && make                  # 用户工程起点（不需要 /tmp 的克隆）
 ```
 
 ---
@@ -163,15 +176,15 @@ libopenwch/
 │   ├── qingke/     ← vector.c / nvic.c / assert.c / systick.c ...
 │   ├── ch32v/      Makefile.include + common/ + 003/
 │   └── ch5xx/      Makefile.include + common/ + 58x/
-├── tools/wchlink/  ← WCH-LinkE 工具（git submodule，默认未初始化，见 §3.10）
 ├── doc/  tests/
 ```
 
 **不在本仓库**（各自独立、各有 LICENSE/NOTICE/CI）：
 
 ```
-../libopenwch-template/   应用骨架与示例（用户项目的起点）
-../libopenwch-tools/      wchlink：WCH-LinkE 烧录器
+../libopenwch-template/   应用骨架：Makefile + src/，本库与工具都挂 submodule
+../libopenwch-examples/   逐个外设的完整示例，同时是本库 CI 的集成测试对象
+../libopenwch-tools/      wchlink：WCH-LinkE 烧录器（由 template 挂 submodule）
 ```
 
 ---

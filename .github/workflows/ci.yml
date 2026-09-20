@@ -15,6 +15,11 @@
 # function with the library's own strict warning set plus -Werror and link the
 # result, so a broken prototype or a missing object fails CI rather than a
 # user's board.
+#
+# A fourth job builds libopenwch-examples, a separate repository, against this
+# checkout.  The examples are the only consumer of the library that is not part
+# of it, so they are what notices when a public interface changes underneath
+# somebody.
 
 name: build
 
@@ -23,6 +28,13 @@ on:
     branches: ['**']
   pull_request:
   workflow_dispatch:
+
+defaults:
+  run:
+    # `bash -e` treats a pipeline as successful when its *last* command
+    # succeeds, so without pipefail a failing `make ... | tee` would report
+    # success -- and every build step here records its output that way.
+    shell: bash --noprofile --norc -eo pipefail {0}
 
 jobs:
   build:
@@ -101,15 +113,12 @@ jobs:
           ${{ matrix.toolchain.prefix }}-gcc -dumpversion
 
       - name: Device database tests
-        shell: bash
         run: make genlinktests PREFIX=${{ matrix.toolchain.prefix }} 2>&1 | tee -a "$BUILD_LOG"
 
       - name: Build the library
-        shell: bash
         run: make TARGETS=${{ matrix.target }} PREFIX=${{ matrix.toolchain.prefix }} 2>&1 | tee -a "$BUILD_LOG"
 
       - name: API smoke test
-        shell: bash
         run: make apitest TARGETS=${{ matrix.target }} PREFIX=${{ matrix.toolchain.prefix }} 2>&1 | tee -a "$BUILD_LOG"
 
       - name: Report sizes
@@ -159,15 +168,14 @@ jobs:
       # if the library or the smoke tests ever start needing a C library, this
       # job breaks first.
       - name: Build the library and the mini-libc
-        shell: bash
         run: make 2>&1 | tee -a "$BUILD_LOG"
       # The ch5xx58x smoke test calls every ble_*() function, so this link also
       # proves the vendored WCH Bluetooth stack resolves -- on a toolchain with
       # no newlib at all, where the stack's memcpy() has to come from our
-      # mini-libc.  The application examples are not here: they live in the
-      # template repository, whose own CI checks this one out and builds them.
+      # mini-libc.  The application examples are not here: they live in
+      # libopenwch-examples, and the `examples` job below builds them against
+      # this checkout.
       - name: API smoke tests (link with -nostdlib)
-        shell: bash
         run: make apitest 2>&1 | tee -a "$BUILD_LOG"
       - name: Report the failure
         if: failure()
@@ -194,14 +202,81 @@ jobs:
       # Building both in one invocation is what would catch a family-specific
       # flag or header leaking into the shared build.
       - name: Build both families in one make
-        shell: bash
         run: make TARGETS="ch32v0 ch5xx58x" 2>&1 | tee -a "$BUILD_LOG"
       - name: API smoke test for both families
-        shell: bash
         run: make apitest 2>&1 | tee -a "$BUILD_LOG"
       - name: Clean rebuild
-        shell: bash
         run: make clean && make 2>&1 | tee -a "$BUILD_LOG"
+      - name: Report the failure
+        if: failure()
+        run: |
+          {
+            echo "### Failure output (tail)"
+            echo '```'
+            tail -n 50 "$BUILD_LOG" 2>/dev/null || echo "no build log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE 'error:|cannot find|undefined reference|Error [0-9]' "$BUILD_LOG" 2>/dev/null \
+            | head -n 5 | while IFS= read -r line; do
+                echo "::error::$line"
+              done
+
+  # The examples are a separate project with its own CI, but they are also the
+  # only code that consumes the library's public interface from outside, so
+  # breakage that the smoke tests cannot see -- a macro that stopped being
+  # exported, a driver whose setup sequence no longer builds -- shows up here
+  # first.  This job deliberately builds the examples against *this* checkout,
+  # not against a released revision.
+  examples:
+    name: integration test (libopenwch-examples)
+    runs-on: ubuntu-latest
+    env:
+      BUILD_LOG: /tmp/libopenwch-examples.log
+      # A literal URL so that a fork's CI tests the examples upstream, and not
+      # a repository the fork's owner does not have.
+      EXAMPLES_REPO: https://github.com/LrkSeraph/libopenwch-examples.git
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y gcc-riscv64-unknown-elf
+
+      # A clone failure is a real failure -- a renamed repository or a broken
+      # network should be loud, not silently skipped.  A repository that is
+      # reachable but still empty is the one case worth tolerating, so that
+      # this job does not go red on unrelated commits while the examples are
+      # being prepared.
+      - name: Check out libopenwch-examples
+        id: examples
+        run: |
+          git clone --depth 1 "$EXAMPLES_REPO" "$RUNNER_TEMP/examples"
+          if [ -d "$RUNNER_TEMP/examples/examples" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=examples skipped::$EXAMPLES_REPO has no content yet; the integration test did not run."
+            {
+              echo "### Integration test skipped"
+              echo "$EXAMPLES_REPO was cloned but contains no examples."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Build the library
+        if: steps.examples.outputs.found == 'true'
+        run: make 2>&1 | tee -a "$BUILD_LOG"
+
+      # OPENWCH_DIR is passed explicitly: the examples' own default is a
+      # sibling checkout, which does not exist here.  It has to be passed to
+      # `clean` as well, because every example's Makefile includes the rules
+      # that need it even for that target.  Building one example at a time
+      # keeps a failure attributable to the example that caused it.
+      - name: Build every example against this checkout
+        if: steps.examples.outputs.found == 'true'
+        run: |
+          for d in "$RUNNER_TEMP"/examples/examples/*/; do
+            echo "== $(basename "$d")"
+            make -C "$d" OPENWCH_DIR="$GITHUB_WORKSPACE" 2>&1 | tee -a "$BUILD_LOG"
+            make -C "$d" OPENWCH_DIR="$GITHUB_WORKSPACE" clean
+          done
+
       - name: Report the failure
         if: failure()
         run: |

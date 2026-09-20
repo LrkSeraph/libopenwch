@@ -68,8 +68,7 @@ therefore has to supply `memcpy` and `memset` alongside libgcc.
 This matters, because Debian's and Ubuntu's `gcc-riscv64-unknown-elf` ship
 **no newlib at all** for the `rv32e` or `rv32imac` multilibs, so any link that
 pulls in `-lc` or `-lgloss` fails outright.  The bundled mini-libc supplies
-what is missing, and applications built from **libopenwch-template** have two
-modes:
+what is missing, and applications built on libopenwch have two modes:
 
 | mode | link | use when |
 |---|---|---|
@@ -77,7 +76,8 @@ modes:
 | `LIBOPENWCH_NOSTDLIB=1` | `-nostdlib` + `libopenwch_mini_libc_<family>.a` + `-lgcc` | it does not |
 
 ```sh
-make -C examples/blink LIBOPENWCH_NOSTDLIB=1   # in a libopenwch-template checkout
+# in a libopenwch-examples or libopenwch-template checkout
+make -C examples/blink LIBOPENWCH_NOSTDLIB=1
 ```
 
 The mini-libc is a small freestanding set — `memcpy`, `memmove`, `memset`,
@@ -196,7 +196,7 @@ for (;;) {
 ```
 
 `examples/ch582_ble_advertise/` in
-[libopenwch-template](https://github.com/LrkSeraph/libopenwch-template) is that
+[libopenwch-examples](https://github.com/LrkSeraph/libopenwch-examples) is that
 program complete: it advertises as "libopenwch" and lights an LED when a
 central connects.
 
@@ -228,18 +228,28 @@ The application skeleton lives in its own repository,
 the counterpart of
 [libopencm3-template](https://github.com/bonedaddy/libopencm3-template), and
 for the same reason: the library is what you build *against*, the template is
-what you build *from*.
+what you build *from*.  It holds a `Makefile`, a `main.c` and libopenwch as a
+submodule, and nothing else.
 
 ```sh
-git clone https://github.com/LrkSeraph/libopenwch.git ~/src/libopenwch
-git clone https://github.com/LrkSeraph/libopenwch-template.git ~/src/my-firmware
-cd ~/src/my-firmware/examples/blink
-make                                        # finds the sibling libopenwch
-make OPENWCH_DIR=~/src/libopenwch flash     # needs a WCH-Link programmer
+git clone --recurse-submodules \
+    https://github.com/LrkSeraph/libopenwch-template.git ~/src/my-firmware
+cd ~/src/my-firmware
+make                                        # builds the library first, then the app
+make flash                                  # needs a WCH-Link programmer
 ```
 
-Five working examples ship with it — `blink` and `uart_echo` for the CH32V003,
-`ch582_blink`, `ch582_uart_echo` and `ch582_ble_advertise` for the CH58x.
+Worked programs for each peripheral live separately, in
+[**libopenwch-examples**](https://github.com/LrkSeraph/libopenwch-examples):
+five self-contained directories — `blink` and `uart_echo` for the CH32V003,
+`ch582_blink`, `ch582_uart_echo` and `ch582_ble_advertise` for the CH58x — that
+are also what this library's CI builds to test itself.
+
+```sh
+git clone https://github.com/LrkSeraph/libopenwch-examples.git ~/src/libopenwch-examples
+cd ~/src/libopenwch-examples/examples/blink
+make OPENWCH_DIR=~/src/libopenwch
+```
 
 Each example is a self-contained directory with its own `Makefile`; `DEVICE`
 selects the part and everything else (ISA, linker script, library) is derived

@@ -13,14 +13,15 @@
 |---|---|
 | 当前阶段 | **P3 完成；P4 软件部分完成，硬件在环受阻** |
 | 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ **P5: BLE 层已完成**，其余扩展族/USB 未开始 ｜ **P6: M1 完成**（`libopenwch-tools` 已建，M2–M4 需硬件）｜ **P7: 完成**（模板已拆为 `libopenwch-template`） |
-| 最近更新 | README 明确标注**孵化阶段**（pre-1.0、未上硬件、勿用于生产）；项目双层定位（对外=libopencm3 风格驱动库 / 内部=WCH-LinkE 烧录工具）写入 `project.md` §1.3，**不写进 README**；新增 **P6** 阶段与独立工具仓库规划。此前：BLE 层（28 个函数）、风格统一、CI 收敛、许可与发布 |
+| 最近更新 | **应用侧拆成两个仓库**：`libopenwch-examples`（示例 + `rules/`）与 `libopenwch-template`（`Makefile` + `src/main.c` + 两个 submodule）；两者都以 **submodule** 引用本库，缺归档时**就地构建库**（`$(LIBDEPS)` 规则），`git clone --recurse-submodules` 后直接 `make` 即可；模板再以 submodule 引入 `libopenwch-tools`（`tools/wchlink/`）；本库 CI 新增 `examples` job（克隆 examples 并用当前 checkout 构建全部示例），并修正 CI 的 `| tee` 未启用 `pipefail` 导致构建失败被吞掉的缺陷。此前：README 孵化阶段标注、双层定位、P6/P7 规划 |
 | 构建状态 | ✅ `make` 全绿：两族库归档 + 两族 mini-libc 归档，共 **4 个归档** |
 | BLE | ✅ 外设角色可用（TMOS / GAP / GAPRole peripheral / GATT server）；central+observer+broadcaster、配对、OTA、mesh 未做。栈为 WCH 闭源二进制，**Apache-2.0** |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
 | 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0**；CI **8/8 全绿**（不含风格 job） |
-| 伴随工具状态 | ✅ `libopenwch-tools` 已建（本地 3 个提交），M1 构建+测试通过；**尚未创建 GitHub 远端**，submodule 待挂载 |
-| 模板仓库状态 | ✅ `libopenwch-template` 已建（本地 1 个提交），5 个示例全部构建通过；**尚未创建 GitHub 远端** |
-| 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest` / 四个示例 × 两种链接模式） |
+| 伴随工具状态 | ✅ `libopenwch-tools` 已推送到 `git@github.com:LrkSeraph/libopenwch-tools.git`（`master`，4 个提交），M1 构建+无硬件测试通过；已由 template 以 submodule 挂在 `tools/wchlink/` |
+| 示例仓库状态 | ✅ `libopenwch-examples` 已建（`master`），`rules/` + 5 个示例 + `libopenwch` submodule；5/5 构建成功且体积与拆分前一致；CI 分 pinned submodule 与 libopenwch master 两条路径 |
+| 模板仓库状态 | ✅ `libopenwch-template` 已建（`master`），只有 `Makefile` + `src/main.c` + `libopenwch`/`tools/wchlink` 两个 submodule + 编辑器配置；CI 两族 × 两种链接模式全绿 |
+| 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest`）；examples 与 template 以 `--recurse-submodules` 克隆后 `make` 即可构建（首次会就地构建库） |
 | freestanding 状态 | ✅ 冒烟测试与模板 freestanding 模式均以 `-nostdlib` + 按族 mini-libc 链接，可在**无 newlib** 的 Debian/Ubuntu 包上工作。注意起动代码是否调用 `memcpy`/`memset` 取决于编译器版本，故 mini-libc 是**必需**而非可选 |
 
 ### 可复现的验证命令与结果
@@ -143,7 +144,7 @@ CH582（RV32IMAC + `.highcode`）同样链接成功并生成 `.highcode` 输出�
 **待办**：`usart`、`tim`、`spi`、`i2c`、`adc`、`dma`、`exti`、`flash`、
 `iwdg`/`wwdg`、`pwr`、`opa`、`dbgmcu`；库内 `examples/`；`tests/` 自动化。
 
-### P2.6 — 用户应用模板（`template/`）
+### P2.6 — 用户应用模板（`template/`，已迁出，见 P7）
 
 - [x] `template/rules/toolchain.mk` —— RISC-V 前缀探测链、`PREFIX` 覆盖、
       工具链缺失硬报错、minichlink 的 `monitor`/`unbrick`
@@ -314,10 +315,10 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 
 ## 下一步（Next Actions，按序）
 
-1. **推送两个新仓库并挂 submodule**（需用户先在 GitHub 建好空仓库）：
-   - `LrkSeraph/libopenwch-tools` → 推送后 `git submodule add` 到 `tools/wchlink/`
-   - `LrkSeraph/libopenwch-template` → 直接推送；**它不是 submodule**
-   两个仓库的 CI 都已写好，推送后即可验证。
+1. **推送 `libopenwch-examples` 与 `libopenwch-template`**：三个卫星仓库的 GitHub
+   远端均已由用户建好，`libopenwch-tools` 已推送；examples/template 的 `origin`
+   已配置为 SSH，推送后把两个仓库的 `libopenwch` submodule 指针升到本轮结束时的
+   `master`（当前指向 `3eb5641`，本轮 README/CI/NOTICE 提交后需 `git submodule update --remote`）。
 2. **P6 M2–M4（WCH-LinkE 烧录器）**：停机/复位、调试寄存器、内存读回 → Flash 擦写校验
    → 单线终端。**需用户提供 WCH-LinkE**；本机只能验证构建。
 3. **清除 P4 的两项外部阻塞**：硬件在环（需 WCH-Link + 板子）、Doxygen 实测（本机未装
@@ -326,7 +327,8 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
    `ch571/573`、`ch591/592`、`lib/usb/`、`libopencmsis/`。
 5. **BLE 其余角色与配对**：central/observer/broadcaster、GAPBondMgr、OTA、mesh。
 
-新增外设时，示例补在 **`libopenwch-template`** 仓库的 `examples/` 下，**不在本仓库**。
+新增示例补在 **`libopenwch-examples`** 的 `examples/` 下（每个一个目录 + `Makefile`），
+应用骨架的改动在 **`libopenwch-template`**，**都不在本仓库**。
 
 ---
 
@@ -412,6 +414,19 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 | 堆位置 | `nm` 示例镜像 | ✅ `ble_heap` 落在 `.bss` |
 | 公开函数总数 | `nm --defined-only lib/*.a` | ✅ 546（ch32v0 316 + ch5xx58x 230），较前 +28 |
 | 钩子：无 clang-format 时放行 | `PATH= clang-format` 不可见时不拦截 | ✅ `exit 0`，提交照常 |
+| examples submodule 查找 | `examples/blink` 以默认查找（`./libopenwch`）构建 | ✅ 1124 B，与拆分前一致 |
+| examples 就地建库 | 删掉 `libopenwch/lib/*.a` 后 `make -C examples/blink` | ✅ 触发一次 `make -C ./libopenwch`，随后链接成功 |
+| examples 全示例 | 5 个示例 × {submodule 默认, 显式 `OPENWCH_DIR`} | ✅ 10/10，体积与拆分前逐字节一致（1124 / 2044 / 2808 / 2412 / 146628 B text） |
+| examples freestanding | `blink`、`ch582_blink` 加 `LIBOPENWCH_NOSTDLIB=1` | ✅ 均构建成功 |
+| examples 外部 OPENWCH_DIR | `make -C examples/* OPENWCH_DIR=<其它 checkout>` | ✅ 全部成功，并在该 checkout 内就地构建库 |
+| template 新结构 | `make`（`src/main.c`） | ✅ 216 B text / 156 B data；`DEVICE=ch582m` 也构建成功 |
+| template 就地建库 | 空 submodule 目录（未 init） | ✅ `make` 直接报可操作错误（提示 `git submodule update --init`） |
+| template 两种模式 | 两族 × {newlib, `LIBOPENWCH_NOSTDLIB=1`} | ✅ 4/4 构建成功 |
+| template 干净库克隆 | 从空归档的 pristine clone 就地构建（两种 DEVICE 各一次） | ✅ 归档 ISA 正确（ch32v0=`rv32e`、ch5xx58x=`rv32i`），**未**出现父工程 arch 泄漏 |
+| template wchlink 委派 | `make wchlink` + `make flash PROGRAMMER=wchlink` | ✅ 构建出 `tools/wchlink/build/wchlink`（需 `LIBUSB_CFLAGS`/`LIBUSB_LIBS` 覆盖）；未构建时报可操作错误 |
+| template 缺 submodule 报错 | 空 `libopenwch/` | ✅ `$(error ...)` 并给出 `git submodule update --init` 与 `OPENWCH_DIR=` 两条出路 |
+| libopenwch CI `examples` job | 本地按 job 步骤复现（克隆 examples + `OPENWCH_DIR=$PWD`） | ✅ 5/5 示例通过；仓库为空时走告警跳过分支 |
+| CI `pipefail` 修正 | `bash -e` 下 `make ... \| tee` | ✅ 修正前失败会被 `tee` 的退出码吞掉；现统一 `defaults.run.shell` 带 `-eo pipefail` |
 
 ---
 
@@ -437,3 +452,4 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 | 第 15 轮（孵化定位 + 工具分离） | 按用户要求三件事：**(1)** `README.md` 的 Status 改为醒目的「孵化中、勿用于生产」，逐条列出未上硬件、K4 未决、BLE 层未在芯片上跑过等事实，并修掉 Layout 里早已不存在的 `examples/` 与「needs minichlink」的写法；**(2)** 在 `project.md` 新增 **§1.3 伴随工具定位**，记录双层定位（对外驱动库 / 内部 WCH-LinkE 烧录调试工具）、**硬性边界**（本仓库不含 host 侧 USB 代码、只做委派）与**为何不直接集成**的评估表；同步写入 `AGENTS.md` 约束 10、`phase.md` P6、`status.md`，**README 中不出现该定位**。顺带修正 `project.md` §8 许可（`scripts/`+`mk/` 标为 GPL-3 是错的：`mk/` 属 LGPL，只有 `checkpatch.pl` 是 GPL-2.0，`lib/ble/wch/` 是 Apache-2.0）、§10 里过时的 BLE 条目、§11 的验证表，以及 `AGENTS.md` 里指向不存在路径的示例命令。**(3)** 评估结论：集成**可行但不合适**（第二套工具链 + libusb/udev 依赖 + 新产物类型，且与「对齐 libopencm3」冲突；libopencm3 自身也不带编程器），故**分离独立仓库并以 submodule 引入**，保留现有委派边界。新增 P6 阶段（M1–M4），首版只做烧录，调试器不在范围 |
 | 第 16 轮（伴随工具落地） | 建立独立仓库 **`libopenwch-tools`** 并完成 **M1**：host 构建（libusb，支持 `LIBUSB_CFLAGS`/`LIBUSB_LIBS` 覆盖以便在只有运行库的机器上构建）、USB 枚举、`info` / `chips` / `--help`、25 个型号的芯片表（内存数据取自本仓库 `ld/devices.data`，避免两边漂移）、udev 规则、无硬件测试（144 + 14 项）、仓库自带 CI。**clean-room**：minichlink / wlink / riscv-openocd-wch 只作为**协议事实**参考，未复制源码，`NOTICE` 已记录来源与许可选择。本仓库侧新增 `PROGRAMMER` 选择器（`minichlink` 默认 / `wchlink`），三种失效路径都有可操作报错。**有意偏离已批准计划一处**：计划写「已构建则优先 wchlink」，但 wchlink 尚处于 M1、**不能烧录**，优先会让原本可用的 `make flash` 变成失败，故默认仍为 `minichlink`，待 M3 落地后再翻转（已在 `toolchain.mk`、模板 README、`AGENTS.md` 三处注明）。另修正本轮自身两处失误：工具二进制原落在仓库根，被 `git add -A` 误提交，已从索引与磁盘移除并加固 `.gitignore` |
 | 第 17 轮（模板拆分） | 按用户要求把应用模板拆成**独立仓库 `libopenwch-template`**，本仓库**不再包含 `template/`**（`git rm`），与 libopencm3 / libopencm3-template 的成例一致：库是 build against 的东西，模板是 build from 的东西。关键改造是 **`OPENWCH_DIR` 查找**——旧默认「我的父目录就是 libopenwch」只在模板位于库内时成立；现在按 显式值 → 旁边 `../libopenwch` → 父目录 依次尝试，每个候选用 `mk/genlink-config.mk` 确认，全不匹配时直接报错并列出尝试过的路径。5 个示例的 Makefile 不再自行设置 `OPENWCH_DIR`（否则会抢在查找之前生效）；`.vscode` 指向 `../../libopenwch/include`。新仓库自带 LICENSE/NOTICE/`.clang-format`/CI（克隆 libopenwch 后以默认查找、显式 `OPENWCH_DIR`、freestanding 三种方式构建全部 5 个示例，并每周定时跑）。本仓库 README/CI/NOTICE/`lib/ble/README`/`AGENTS.md`/`project.md`/`phase.md` 同步更新，新增 P7 阶段。**覆盖没有丢**：示例构建转到模板仓库 CI，而 BLE 闭源栈的链接仍由 ch5xx58x 的 `make apitest` 覆盖（它调用全部 `ble_*()` 并链接 vendor 归档） |
+| 第 18 轮（示例 / 模板分离 + 三仓推送） | 用户指出上一轮的 `libopenwch-template`「完全不像 template」，于是**再拆一次**：骨架与示例是两件事。**`libopenwch-examples`**（由 template 改名而来）持有 `rules/` 与 5 个示例，并把 libopenwch 改为 **submodule**（`./libopenwch`，查找顺序：显式值 → submodule → 旁邻 → 父目录；`OPENWCH_DIR` 仍可救回）；**`libopenwch-template`** 重写为最小骨架：`Makefile` + `src/main.c` + `libopenwch` 与 `tools/wchlink` 两个 submodule + `.clang-format`/`.vscode`/CI，没有 `rules/`、没有示例。两个仓库的规则都新增 **`$(LIBDEPS)` 就地建库**规则，使 `git clone --recurse-submodules && make` 一步可用。模板的 `PROGRAMMER`（`minichlink` 默认 / `wchlink`）委派逻辑落在模板 Makefile，`make wchlink` 构建子模块；examples 不挂该 submodule，`PROGRAMMER=wchlink` 只查 `PATH`。本库 CI 新增 **`examples` job**（克隆 examples、用当前 checkout 构建全部示例；仓库为空时告警跳过），并修正一处真实缺陷：所有 `make ... \| tee` 步骤在 `bash -e` 下**永远成功**（`tee` 的退出码），现以 `defaults.run.shell: bash -eo pipefail` 统一。三个卫星仓库已推送到 GitHub（`libopenwch-tools` 4 提交；examples/template 待推）。README/NOTICE/`AGENTS.md`/`project.md`/`phase.md`（P7 重写）同步。**验证**：examples 5/5、template 两族 × 两种链接模式、外部 `OPENWCH_DIR`、pristine clone 就地建库、空 submodule 报错路径，全部通过，体积与拆分前逐字节一致。**另记一处本机假故障**：`rm -f lib/*.a` 后重新归档会把**旧 flags 编译的 `.o`** 一起打进归档（make 认为 .o 比 .c 新，不重编），表现为 `mis-matched ISA string to merge 'i' and 'e'`；pristine clone 复现证明与本轮规则无关，`make clean` 即消除 |
