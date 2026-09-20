@@ -374,7 +374,9 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 | `.gitignore` 语义 | `git check-ignore -v` 手写 vs 生成 `nvic.h` | ✅ 手写 `qingke/`+`dispatch/` 不被忽略；生成的族头文件仍被忽略 |
 | `make clean` 安全性 | `make clean` 后检查手写 `nvic.h` | ✅ `qingke/nvic.h`、`dispatch/nvic.h` 保留；生成的族头文件被删除；随后 `make` 仍全绿 |
 | GitHub 许可识别 | `api.github.com/repos/LrkSeraph/libopenwch` | ✅ `spdx_id: LGPL-3.0` |
-| 远程一致性 | `git rev-parse HEAD` vs `git rev-parse origin/master` | ✅ 一致（`f0b94f7`） |
+| 远程一致性 | `git rev-parse HEAD` vs `git ls-remote origin master` | ✅ 四个仓库均一致：libopenwch `5be4c87`、libopenwch-tools `9275afe`、libopenwch-examples `f62ddf3`、libopenwch-template `340462b`（远端 `HEAD` 均指向 `master`） |
+| **发布仓库干净克隆（端到端）** | 从 GitHub 全新 clone 两个卫星仓库（`--recurse-submodules`）后直接 `make` | ✅ template：submodule 检出 `5be4c87`/`9275afe`，默认 216 B、`ch582m`、`LIBOPENWCH_NOSTDLIB=1` 全部成功，`make wchlink` 产出 64792 B 二进制；examples：submodule 检出 `5be4c87`，5/5 构建且体积与拆分前逐字节一致 |
+| 本库 CI `examples` job（对已发布仓库） | clone libopenwch master → `make` → 逐个 `make -C examples/* OPENWCH_DIR=<checkout>` | ✅ 库构建成功，5/5 示例构建成功 |
 | 远程文件树 | `contents/include/libopenwch/dispatch` | ✅ `nvic.h` 已在远端（修复前该目录 0 文件） |
 | **freestanding 链接** | 冒烟测试以 `-nostdlib` + mini-libc 链接 | ✅ 两族均成功，链接行不再出现 `-lc`/`-lgloss` |
 | 库的 libc 依赖 | `nm --undefined-only lib/*.a`（**不截断**） | ⚠️ 本机 GCC 15 下未出现 `memcpy`/`memset`（循环被内联），但 **GCC 13.2 会为 `openwch_reset_init` 的 `.data`/`.bss` 循环生成这两个调用**——即该依赖**随编译器版本变化**，因此不能假定归档无 libc 依赖 |
