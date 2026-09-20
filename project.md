@@ -63,9 +63,21 @@ WCH RISC-V 芯片提供一套「小、直、无 HAL 中间层」的驱动库。
    `README.md` 只讲这一层，其中不出现编程器工具的宣传。
 2. **伴随定位（内部）**：为 **WCH-LinkE 编程器**提供烧录与调试能力的配套工具。
 
-**边界（硬性约束）**：本仓库**不含任何 host 侧 USB 代码**。库的构建只需要一条 RISC-V
-工具链，不引入 `libusb`/`pkg-config`/`udev`。`template/rules/toolchain.mk` 里的
+**边界（硬性约束）**：本仓库**不含任何 host 侧 USB 代码**，也**不再包含应用模板**。
+库的构建只需要一条 RISC-V 工具链，不引入 `libusb`/`pkg-config`/`udev`。
+模板已拆到独立仓库 `libopenwch-template`，其 `rules/toolchain.mk` 里的
 `flash`/`monitor`/`unbrick` 只做**委派**——把工作交给外部编程器工具，自身不实现协议。
+
+**三个仓库的分工**：
+
+| 仓库 | 角色 | 关系 |
+|---|---|---|
+| `libopenwch`（本仓库） | 驱动库 | — |
+| `libopenwch-template` | 应用骨架与示例 | 独立仓库；用户从它开始建项目，用 `OPENWCH_DIR` 指向本库 |
+| `libopenwch-tools` | WCH-LinkE 烧录器（`wchlink`） | 独立仓库；以 **submodule** 挂在 `tools/wchlink/` |
+
+模板**不是** submodule：它是用户项目的起点，按 libopencm3 / libopencm3-template 的成例
+应当独立可用。工具**是** submodule：模板的 `make flash` 需要它的源码在树内。
 
 **载体**：配套工具位于**独立仓库**，以 **git submodule** 形式挂在 `tools/wchlink/`。
 submodule 默认未初始化，因此 `git clone` 与 CI 都不受影响，也不需要 libusb。

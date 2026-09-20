@@ -18,6 +18,7 @@
 | **P4** | 示例、文档、CI、硬件验证 | `examples/`、`doc/`、`.github/workflows/ci.yml`、`NOTICE` | Doxygen 生成成功；CI 绿；硬件上跑通 blink + uart | P2, P3 |
 | **P5** | 扩展族与 USB/BLE 接口 | `ch32x035`、`ch32v103`、`ch57x/59x`、`usb/` | 新增族构建全绿；`devices.data` 覆盖全部规划器件 | P4 |
 | **P6** | 伴随工具：WCH-LinkE 烧录器 | **独立仓库**，以 submodule 挂在 `tools/wchlink/` | 无设备时诊断清晰；有硬件时能烧录并校验 CH32V003/CH582 | P4 |
+| **P7** | 应用模板拆分为独立仓库 | **独立仓库** `libopenwch-template`；本仓库移除 `template/` | 5 个示例在新仓库全绿；`OPENWCH_DIR` 查找在两种布局下都正确 | P4 |
 
 ---
 
@@ -350,16 +351,19 @@
 - [x] `examples/ch582/blink/`、`examples/ch582/uart_echo/`
 - [ ] 确认 `-march=rv32imac -mabi=ilp32`、`.highcode` 段、`0x20003800` RAM 偏移（`ch571/573` 才用，58x 不用）等差异
 
-### P2.6 用户应用模板（`template/`）
+### P2.6 用户应用模板
 
-- [x] `template/rules/toolchain.mk` —— RISC-V 前缀探测、`PREFIX` 覆盖、
+> **已迁出**：模板在后续轮次中拆分为**独立仓库 `libopenwch-template`**（见 P7），
+> 本仓库不再包含 `template/`。下面保留当初的交付记录，其中的路径是历史路径。
+
+- [x] `rules/toolchain.mk` —— RISC-V 前缀探测、`PREFIX` 覆盖、
       工具链缺失硬报错、`monitor`/`unbrick` 目标
-- [x] `template/rules/rules.mk` —— `PROJECT`/`DEVICE` 驱动；`-nostartfiles`
+- [x] `rules/rules.mk` —— `PROJECT`/`DEVICE` 驱动；`-nostartfiles`
       （必须，否则与工具链 crt0 冲突）；`${PROJECT}.{elf,bin,hex,map,list}`；
       `flash`/`size`/`monitor`/`unbrick`；`LIBOPENWCH_NOSTDLIB` 选项
-- [x] `template/examples/blink` —— CH32V003 可编译可链接（1124 B）
-- [x] `template/examples/ch582_blink` —— CH58x 核心层 bring-up（SysTick 1 ms）
-- [x] `template/README.md`、`template/.gitignore`、`template/.vscode/*`
+- [x] `examples/blink` —— CH32V003 可编译可链接（1124 B）
+- [x] `examples/ch582_blink` —— CH58x 核心层 bring-up（SysTick 1 ms）
+- [x] `README.md`、`.gitignore`、`.vscode/*`
 - [x] 验证 `DEVICE=` 切换会正确改变 ISA（V003 无 zmmul，V002/V004 有）
 
 ### P2 完成记录（CH32V00x 全部一期外设）
@@ -514,7 +518,8 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 - [ ] `lib/usb/`：USB 设备控制器主机/设备模式（WCH USB2.0 FS）
 - [x] **BLE 层（外设角色）**：在 WCH 闭源 `LIBCH58xBLE.a` 之上提供 `ble_*` 命名层
       （TMOS、GAP 参数、外设角色状态机、GATT server、启动序列），
-      `LIBOPENWCH_BLE=1` 按需链接，示例 `template/examples/ch582_ble_advertise` 全绿。
+      `LIBOPENWCH_BLE=1` 按需链接，示例 `examples/ch582_ble_advertise`（在
+      `libopenwch-template` 中）全绿。
       详见 `lib/ble/README`
 - [ ] BLE 的其余角色与配对：central/observer/broadcaster、GAPBondMgr（持久配对还需 flash 支持）、
       OTA、mesh —— 目前可经 WCH 原始名字直接调用
@@ -539,7 +544,7 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 - [ ] **M3 烧录**：Flash 擦除/写入/校验（`flash`）、`reset`、`unbrick`、
       NRST-as-GPIO、读保护。需硬件
 - [ ] **M4 终端**：单线调试通道（`terminal`）。需硬件
-- [ ] **集成**：submodule 就位；`template/rules/toolchain.mk` 优先使用已构建的工具，
+- [ ] **集成**：submodule 就位；`libopenwch-template` 的 `rules/toolchain.mk` 优先使用已构建的工具，
       否则回退 `minichlink`，两者都没有时给出可操作的报错
 
 **验收标准**：工具在**无设备**时给出清晰诊断并以非零退出（不崩溃）；
@@ -549,6 +554,36 @@ libopenwch 不链接该库，所以 `flash_erase_page()` / `flash_program()` 是
 > **注意**：M2–M4 **无法在本工作区验证**（无 WCH-LinkE、无开发板），
 > 只能做到构建通过。这与 `status.md` 的 B1/B4 是同一个阻塞，
 > 而该工具正是用来清除它的手段 —— 互为前提，需用户提供硬件。
+
+---
+
+## P7 — 应用模板拆分为独立仓库
+
+模板原先住在 `template/`，使「库」这个仓库同时承载了「用户项目的起点」。按
+libopencm3 / libopencm3-template 的成例拆开：**库是你 build against 的东西，
+模板是你 build from 的东西**。
+
+**交付物**：独立仓库 **`libopenwch-template`**，自带 LICENSE / NOTICE /
+`.clang-format` / CI；本仓库**不再包含 `template/`**。
+
+- [x] 把 `template/` 的 `rules/`、5 个示例、`.vscode/`、README 移入新仓库
+- [x] **`OPENWCH_DIR` 查找改造**：旧默认是「我的父目录就是 libopenwch」，
+      只在模板位于库内时成立。现在按序尝试
+      (1) 调用方显式设置的值 → (2) 旁边的 `../libopenwch` → (3) 父目录，
+      每个候选都用 `mk/genlink-config.mk` 确认存在；都不匹配时直接报错并列出
+      尝试过的路径，而不是稍后抛一个莫名其妙的缺文件错误
+- [x] 5 个示例的 Makefile 不再自行设置 `OPENWCH_DIR`（否则会抢在查找之前生效）
+- [x] `.vscode/c_cpp_properties.json` 指向 `../../libopenwch/include`
+- [x] 新仓库自带 CI：克隆 libopenwch，用默认查找、显式 `OPENWCH_DIR`、
+      freestanding 三种方式构建全部示例，并每周定时跑一次
+- [x] 本仓库移除 `template/`；README、CI、NOTICE、`AGENTS.md`、`project.md` 同步
+
+**验收标准**：`libopenwch-template` 的 5 个示例全部构建成功且体积与拆分前一致；
+放在孤立目录时给出可操作的报错、显式 `OPENWCH_DIR` 可救回；
+本仓库 `make` / `make apitest` / `make genlinktests` / `make stylecheck` 全绿。
+
+> 应用示例的构建覆盖随之**转到模板仓库的 CI**。BLE 闭源栈的链接覆盖**没有丢**：
+> ch5xx58x 的 `make apitest` 会调用全部 `ble_*()` 并链接 vendor 归档。
 
 ---
 

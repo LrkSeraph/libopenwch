@@ -84,9 +84,9 @@
  * Linking.  The stack is closed-source and is *not* part of
  * `libopenwch_ch5xx58x.a`: an application that uses this layer must also link
  * `lib/ble/wch/LIBCH58xBLE.a` and `libopenwch_mini_libc_ch5xx58x.a` (the
- * stack needs `memcpy`).  Application projects built from `template/` get
- * this by setting `LIBOPENWCH_BLE=1`.  The binary stays under WCH's Apache-2.0
- * licence; see NOTICE.
+ * stack needs `memcpy`).  Application projects built from
+ * libopenwch-template get this by setting `LIBOPENWCH_BLE=1`.  The binary
+ * stays under WCH's Apache-2.0 licence; see NOTICE.
  *
  * What is not here.  Central, observer and broadcaster roles, the bonding
  * manager, OTA and the mesh stack are all absent.  They are reachable through

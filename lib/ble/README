@@ -46,9 +46,10 @@ layer must link, in this order:
   libopenwch_mini_libc_*.a  the memcpy() the stack needs
   -lgcc
 
-Applications built from `template/` get this from `LIBOPENWCH_BLE=1`.  Order
-matters: the vendor archive must be scanned after ours (which introduces the
-references) and before the libc (which supplies `memcpy`).
+Applications built from libopenwch-template get this from
+`LIBOPENWCH_BLE=1`.  Order matters: the vendor archive must be scanned after
+ours (which introduces the references) and before the libc (which supplies
+`memcpy`).
 
 Memory
 ------

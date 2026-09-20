@@ -12,13 +12,14 @@
 | 项 | 值 |
 |---|---|
 | 当前阶段 | **P3 完成；P4 软件部分完成，硬件在环受阻** |
-| 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ **P5: BLE 层已完成**，其余扩展族/USB 未开始 ｜ **P6: M1 完成**（`libopenwch-tools` 已建，M2–M4 需硬件） |
+| 阶段进度 | P0: 100% ｜ P1: 100% ｜ P2: 100% ｜ P3: 100% ｜ **P4: 75%**（缺硬件在环 + Doxygen 实测）｜ **P5: BLE 层已完成**，其余扩展族/USB 未开始 ｜ **P6: M1 完成**（`libopenwch-tools` 已建，M2–M4 需硬件）｜ **P7: 完成**（模板已拆为 `libopenwch-template`） |
 | 最近更新 | README 明确标注**孵化阶段**（pre-1.0、未上硬件、勿用于生产）；项目双层定位（对外=libopencm3 风格驱动库 / 内部=WCH-LinkE 烧录工具）写入 `project.md` §1.3，**不写进 README**；新增 **P6** 阶段与独立工具仓库规划。此前：BLE 层（28 个函数）、风格统一、CI 收敛、许可与发布 |
 | 构建状态 | ✅ `make` 全绿：两族库归档 + 两族 mini-libc 归档，共 **4 个归档** |
 | BLE | ✅ 外设角色可用（TMOS / GAP / GAPRole peripheral / GATT server）；central+observer+broadcaster、配对、OTA、mesh 未做。栈为 WCH 闭源二进制，**Apache-2.0** |
 | 工具链状态 | ✅ `riscv64-unknown-elf-gcc` 15.3.0-24 |
 | 仓库状态 | ✅ 已推送到 `git@github.com:LrkSeraph/libopenwch.git`（`master`）；GitHub 识别许可为 **LGPL-3.0**；CI **8/8 全绿**（不含风格 job） |
 | 伴随工具状态 | ✅ `libopenwch-tools` 已建（本地 3 个提交），M1 构建+测试通过；**尚未创建 GitHub 远端**，submodule 待挂载 |
+| 模板仓库状态 | ✅ `libopenwch-template` 已建（本地 1 个提交），5 个示例全部构建通过；**尚未创建 GitHub 远端** |
 | 干净克隆状态 | ✅ 全新 `git clone` 后可完整构建（`make` / `make genlinktests` 6/6 / `make apitest` / 四个示例 × 两种链接模式） |
 | freestanding 状态 | ✅ 冒烟测试与模板 freestanding 模式均以 `-nostdlib` + 按族 mini-libc 链接，可在**无 newlib** 的 Debian/Ubuntu 包上工作。注意起动代码是否调用 `memcpy`/`memset` 取决于编译器版本，故 mini-libc 是**必需**而非可选 |
 
@@ -313,22 +314,19 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 
 ## 下一步（Next Actions，按序）
 
-1. **P2.1** `include/libopenwch/ch32v0/memorymap.h`：`PERIPH_BASE`、`APB1/APB2/AHB`、
-   全部 `*_BASE`、`ESIG`/`OB`/`INFO`/`VENDOR_CFG0`。
-2. **P2.2** `include/libopenwch/ch32v0/common/gpio_common_v1.h` + `lib/ch32v0/gpio_common_v1.c`：
-   `gpio_set_mode()`（CNF/MODE nibble，`GPIOA/C/D` 8 位端口，无 CFGHR）、
-   `gpio_set/clear/toggle/get`（`BSHR`/`BCR`/`INDR`）、`gpio_port_*`、
-   `gpio_lock_config`、`gpio_primary_remap`、`gpio_set_eventout`。
-3. **P2.3** `rcc`（HSI 24 MHz + PLL×2 = 48 MHz，读 `CFG0_PLL_TRIM`）、
-   然后 `usart`、`tim`、`spi`、`i2c`、`adc`、`dma`、`exti`、`flash`、`iwdg`/`wwdg`、
-   `pwr`、`opa`、`syscfg`、`dbgmcu`。
-4. **P2.4** 每加一个外设就在 `lib/ch32v0/Makefile` 的 `OBJS` 中启用对应行，并跑一次 `make`。
-5. **P2.5** `examples/ch32v003/blink` 与 `usart_echo`，用 `OPENWCH_DIR` + `DEVICE` 构建。
-6. **P2.6** 模板骨架已完成（`template/`，两个示例可构建）。新增外设时在
-   `template/examples/` 下补对应示例即可。
-7. **P3** 同法推进 CH58x（先 `rwa.c`，再 `clk.c`，其余依赖它）；届时
-   `template/examples/ch582_blink` 可换成真正的 blink。
-8. **P4** 把链接冒烟测试固化为 `tests/` 用例；补 Doxygen、CI、`NOTICE`。
+1. **推送两个新仓库并挂 submodule**（需用户先在 GitHub 建好空仓库）：
+   - `LrkSeraph/libopenwch-tools` → 推送后 `git submodule add` 到 `tools/wchlink/`
+   - `LrkSeraph/libopenwch-template` → 直接推送；**它不是 submodule**
+   两个仓库的 CI 都已写好，推送后即可验证。
+2. **P6 M2–M4（WCH-LinkE 烧录器）**：停机/复位、调试寄存器、内存读回 → Flash 擦写校验
+   → 单线终端。**需用户提供 WCH-LinkE**；本机只能验证构建。
+3. **清除 P4 的两项外部阻塞**：硬件在环（需 WCH-Link + 板子）、Doxygen 实测（本机未装
+   `doxygen`）。烧录器 M3 落地后，硬件在环才有自研工具可用——两者互为前提。
+4. **P5 其余扩展族**：`ch32x035`、`ch32v103`、`ch32v203/208`、`ch32v303/305/307`、
+   `ch571/573`、`ch591/592`、`lib/usb/`、`libopencmsis/`。
+5. **BLE 其余角色与配对**：central/observer/broadcaster、GAPBondMgr、OTA、mesh。
+
+新增外设时，示例补在 **`libopenwch-template`** 仓库的 `examples/` 下，**不在本仓库**。
 
 ---
 
@@ -438,3 +436,4 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 | 第 14 轮（BLE 层） | 按用户要求「使用闭源二进制并在其上构建 BLE 层」：把 WCH 的 `LIBCH58xBLE.a`（1.1 MB，Apache-2.0）与其 `CH58xBLE_LIB.h` 原样 vendor 到 `lib/ble/wch/`、`include/libopenwch/ble/wch/`，并新增 `lib/ble/README` 与 NOTICE 章节说明**该目录是 Apache-2.0、不是 LGPL**。在其上实现 **外设角色** 的 `ble_*` 薄层（28 个公开函数）：TMOS 任务/消息、GAP 参数、GAPRole 外设状态机、GATT server、启动序列；`.gitignore` 对 `*.a` 的忽略用负向规则放行该二进制（与此前 nvic.h 同类陷阱）。构建上新增 `LIBOPENWCH_BLE=1`（模板）按需链接，非 BLE 应用不会被拉入协议栈；ch5xx58x 冒烟测试改为链接该二进制，从而真正验证层与栈的解析。新增示例 `template/examples/ch582_ble_advertise`（广播为 "libopenwch"，连接后点亮 PB4）。**实测**：二进制为 ELF32/RVC/soft-float，可用 `elf32lriscv` 与我们 rv32imac 目标合并链接，其外部依赖只有 libgcc 与 `memcpy`（均由本库提供）；栈的 `.highcode` 段由现有链接脚本以「RAM VMA + flash LMA」正确搬运。公开函数 518 → **546** |
 | 第 15 轮（孵化定位 + 工具分离） | 按用户要求三件事：**(1)** `README.md` 的 Status 改为醒目的「孵化中、勿用于生产」，逐条列出未上硬件、K4 未决、BLE 层未在芯片上跑过等事实，并修掉 Layout 里早已不存在的 `examples/` 与「needs minichlink」的写法；**(2)** 在 `project.md` 新增 **§1.3 伴随工具定位**，记录双层定位（对外驱动库 / 内部 WCH-LinkE 烧录调试工具）、**硬性边界**（本仓库不含 host 侧 USB 代码、只做委派）与**为何不直接集成**的评估表；同步写入 `AGENTS.md` 约束 10、`phase.md` P6、`status.md`，**README 中不出现该定位**。顺带修正 `project.md` §8 许可（`scripts/`+`mk/` 标为 GPL-3 是错的：`mk/` 属 LGPL，只有 `checkpatch.pl` 是 GPL-2.0，`lib/ble/wch/` 是 Apache-2.0）、§10 里过时的 BLE 条目、§11 的验证表，以及 `AGENTS.md` 里指向不存在路径的示例命令。**(3)** 评估结论：集成**可行但不合适**（第二套工具链 + libusb/udev 依赖 + 新产物类型，且与「对齐 libopencm3」冲突；libopencm3 自身也不带编程器），故**分离独立仓库并以 submodule 引入**，保留现有委派边界。新增 P6 阶段（M1–M4），首版只做烧录，调试器不在范围 |
 | 第 16 轮（伴随工具落地） | 建立独立仓库 **`libopenwch-tools`** 并完成 **M1**：host 构建（libusb，支持 `LIBUSB_CFLAGS`/`LIBUSB_LIBS` 覆盖以便在只有运行库的机器上构建）、USB 枚举、`info` / `chips` / `--help`、25 个型号的芯片表（内存数据取自本仓库 `ld/devices.data`，避免两边漂移）、udev 规则、无硬件测试（144 + 14 项）、仓库自带 CI。**clean-room**：minichlink / wlink / riscv-openocd-wch 只作为**协议事实**参考，未复制源码，`NOTICE` 已记录来源与许可选择。本仓库侧新增 `PROGRAMMER` 选择器（`minichlink` 默认 / `wchlink`），三种失效路径都有可操作报错。**有意偏离已批准计划一处**：计划写「已构建则优先 wchlink」，但 wchlink 尚处于 M1、**不能烧录**，优先会让原本可用的 `make flash` 变成失败，故默认仍为 `minichlink`，待 M3 落地后再翻转（已在 `toolchain.mk`、模板 README、`AGENTS.md` 三处注明）。另修正本轮自身两处失误：工具二进制原落在仓库根，被 `git add -A` 误提交，已从索引与磁盘移除并加固 `.gitignore` |
+| 第 17 轮（模板拆分） | 按用户要求把应用模板拆成**独立仓库 `libopenwch-template`**，本仓库**不再包含 `template/`**（`git rm`），与 libopencm3 / libopencm3-template 的成例一致：库是 build against 的东西，模板是 build from 的东西。关键改造是 **`OPENWCH_DIR` 查找**——旧默认「我的父目录就是 libopenwch」只在模板位于库内时成立；现在按 显式值 → 旁边 `../libopenwch` → 父目录 依次尝试，每个候选用 `mk/genlink-config.mk` 确认，全不匹配时直接报错并列出尝试过的路径。5 个示例的 Makefile 不再自行设置 `OPENWCH_DIR`（否则会抢在查找之前生效）；`.vscode` 指向 `../../libopenwch/include`。新仓库自带 LICENSE/NOTICE/`.clang-format`/CI（克隆 libopenwch 后以默认查找、显式 `OPENWCH_DIR`、freestanding 三种方式构建全部 5 个示例，并每周定时跑）。本仓库 README/CI/NOTICE/`lib/ble/README`/`AGENTS.md`/`project.md`/`phase.md` 同步更新，新增 P7 阶段。**覆盖没有丢**：示例构建转到模板仓库 CI，而 BLE 闭源栈的链接仍由 ch5xx58x 的 `make apitest` 覆盖（它调用全部 `ble_*()` 并链接 vendor 归档） |

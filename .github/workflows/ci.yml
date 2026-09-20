@@ -156,27 +156,19 @@ jobs:
       # Debian's gcc-riscv64-unknown-elf ships no newlib for any multilib, so a
       # link that pulls in -lc or -lgloss fails outright.  That makes this the
       # sharpest available test of the claim that libopenwch is freestanding:
-      # if the library, the smoke tests or the template ever start needing a C
-      # library, this job breaks first.
+      # if the library or the smoke tests ever start needing a C library, this
+      # job breaks first.
       - name: Build the library and the mini-libc
         shell: bash
         run: make 2>&1 | tee -a "$BUILD_LOG"
+      # The ch5xx58x smoke test calls every ble_*() function, so this link also
+      # proves the vendored WCH Bluetooth stack resolves -- on a toolchain with
+      # no newlib at all, where the stack's memcpy() has to come from our
+      # mini-libc.  The application examples are not here: they live in the
+      # template repository, whose own CI checks this one out and builds them.
       - name: API smoke tests (link with -nostdlib)
         shell: bash
         run: make apitest 2>&1 | tee -a "$BUILD_LOG"
-      - name: Template with LIBOPENWCH_NOSTDLIB=1
-        shell: bash
-        run: |
-          make -C template/examples/blink LIBOPENWCH_NOSTDLIB=1 2>&1 | tee -a "$BUILD_LOG"
-          make -C template/examples/ch582_blink LIBOPENWCH_NOSTDLIB=1 2>&1 | tee -a "$BUILD_LOG"
-      # The BLE example links WCH's closed-source stack, which is the only
-      # place in this repository where a prebuilt third-party binary is part
-      # of the link.  Building it here proves the vendored archive survives a
-      # fresh checkout and resolves on a toolchain with no newlib at all --
-      # the stack's own memcpy() comes from our mini-libc.
-      - name: Bluetooth LE example (LIBOPENWCH_BLE=1)
-        shell: bash
-        run: make -C template/examples/ch582_ble_advertise 2>&1 | tee -a "$BUILD_LOG"
       - name: Report the failure
         if: failure()
         run: |

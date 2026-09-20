@@ -68,7 +68,8 @@ therefore has to supply `memcpy` and `memset` alongside libgcc.
 This matters, because Debian's and Ubuntu's `gcc-riscv64-unknown-elf` ship
 **no newlib at all** for the `rv32e` or `rv32imac` multilibs, so any link that
 pulls in `-lc` or `-lgloss` fails outright.  The bundled mini-libc supplies
-what is missing, and applications built from `template/` have two modes:
+what is missing, and applications built from **libopenwch-template** have two
+modes:
 
 | mode | link | use when |
 |---|---|---|
@@ -76,7 +77,7 @@ what is missing, and applications built from `template/` have two modes:
 | `LIBOPENWCH_NOSTDLIB=1` | `-nostdlib` + `libopenwch_mini_libc_<family>.a` + `-lgcc` | it does not |
 
 ```sh
-make -C template/examples/blink LIBOPENWCH_NOSTDLIB=1
+make -C examples/blink LIBOPENWCH_NOSTDLIB=1   # in a libopenwch-template checkout
 ```
 
 The mini-libc is a small freestanding set — `memcpy`, `memmove`, `memset`,
@@ -194,11 +195,13 @@ for (;;) {
 }
 ```
 
-`template/examples/ch582_ble_advertise/` is that program complete: it
-advertises as "libopenwch" and lights an LED when a central connects.
+`examples/ch582_ble_advertise/` in
+[libopenwch-template](https://github.com/LrkSeraph/libopenwch-template) is that
+program complete: it advertises as "libopenwch" and lights an LED when a
+central connects.
 
 ```sh
-cd template/examples/ch582_ble_advertise
+cd examples/ch582_ble_advertise
 make            # LIBOPENWCH_BLE=1 and LIBOPENWCH_NOSTDLIB=1 are the defaults here
 make flash
 ```
@@ -220,22 +223,27 @@ a heap the application declares (`BLE_HEAP_DEFINE`) and about 145 KB of flash.
 
 ## Starting a project
 
-`template/` is an application skeleton, the counterpart of
-[libopencm3-template](https://github.com/bonedaddy/libopencm3-template):
+The application skeleton lives in its own repository,
+[**libopenwch-template**](https://github.com/LrkSeraph/libopenwch-template) —
+the counterpart of
+[libopencm3-template](https://github.com/bonedaddy/libopencm3-template), and
+for the same reason: the library is what you build *against*, the template is
+what you build *from*.
 
 ```sh
-cp -r libopenwch/template ~/src/my-firmware
+git clone https://github.com/LrkSeraph/libopenwch.git ~/src/libopenwch
+git clone https://github.com/LrkSeraph/libopenwch-template.git ~/src/my-firmware
 cd ~/src/my-firmware/examples/blink
-make OPENWCH_DIR=~/src/libopenwch
-make OPENWCH_DIR=~/src/libopenwch flash    # needs a WCH-Link programmer
+make                                        # finds the sibling libopenwch
+make OPENWCH_DIR=~/src/libopenwch flash     # needs a WCH-Link programmer
 ```
 
-Four working examples ship with it — `blink` and `uart_echo` for the CH32V003,
-`ch582_blink` and `ch582_uart_echo` for the CH58x.
+Five working examples ship with it — `blink` and `uart_echo` for the CH32V003,
+`ch582_blink`, `ch582_uart_echo` and `ch582_ble_advertise` for the CH58x.
 
 Each example is a self-contained directory with its own `Makefile`; `DEVICE`
 selects the part and everything else (ISA, linker script, library) is derived
-from it.  See `template/README.md` for the full variable reference.
+from it.  See that repository's README for the full variable reference.
 
 ## API conventions
 
@@ -272,8 +280,14 @@ lib/
     ch5xx58x/           CH58x family build
     mini_libc/          freestanding string/memory routines
     ble/                Bluetooth LE layer; ble/wch/ is WCH's binary
-template/           application skeleton (rules/, examples/)
 doc/  tests/
+```
+
+Related repositories, both separate works with their own licences and CI:
+
+```
+libopenwch-template/   the application skeleton this library is used from
+libopenwch-tools/      wchlink, a WCH-LinkE flasher (reached via tools/wchlink/)
 ```
 
 ## License

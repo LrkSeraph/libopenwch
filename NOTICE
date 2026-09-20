@@ -140,8 +140,15 @@ Everything else is original to this project, in particular:
   lib/ble/**                         the Bluetooth LE layer (not wch/)
   lib/mini_libc/**                   the freestanding mini libc
   include/libopenwch/mini_libc.h     its declarations
-  template/**                        the application skeleton
   tests/**                           the API smoke tests
+
+Not in this repository any more
+-------------------------------
+
+The application template was moved out into its own repository,
+`libopenwch-template`, which has its own LICENSE and NOTICE covering the build
+rules and examples.  This repository is now only the library.  Companion tools
+live in `libopenwch-tools`, likewise separate.
 
 The Bluetooth LE layer is a wrapper: it declares the subset of WCH's stack API
 that a peripheral needs, under this project's naming and documentation, and

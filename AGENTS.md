@@ -9,7 +9,7 @@
 | 文档 | 作用 | 何时读 |
 |---|---|---|
 | **`project.md`** | **总体设计**：项目定位、需求、参考工程角色、目录结构、核心层设计（`qingke/` ↔ libopencm3 的 `cm3/`）、API 命名规范与 WCH EVT 迁移对照表、构建系统改造点（ch32fun 式工具链适配）、ADR、扩展路线、验证策略 | **开工前必读全文** |
-| **`phase.md`** | **阶段性目标**：P0–P6 七阶段的交付物、任务复选框、每阶段验收标准、里程碑 Reviewer Checklist | 每次认领任务前读对应阶段 |
+| **`phase.md`** | **阶段性目标**：P0–P7 八阶段的交付物、任务复选框、每阶段验收标准、里程碑 Reviewer Checklist | 每次认领任务前读对应阶段 |
 | **`status.md`** | **当前完成情况**：阶段进度快照、已完成/未开始清单、**阻塞项与待决问题**、下一步动作、验证记录、变更日志 | **每次会话开始时读**，**每次会话结束前更新** |
 | `README.md` | 面向用户的快速上手（工具链安装、构建、示例） | 用户文档变更时 |
 
@@ -65,7 +65,8 @@
 
 10. **本仓库不含 host 侧 USB 代码，也不实现编程器协议**。库的构建只需要一条 RISC-V
     工具链，不得引入 `libusb`/`pkg-config`/`udev` 之类 host 依赖。
-    `template/rules/toolchain.mk` 的 `flash`/`monitor`/`unbrick` 只做**委派**：
+    **应用模板也不在本仓库**：它在独立仓库 `libopenwch-template` 里，其
+    `rules/toolchain.mk` 的 `flash`/`monitor`/`unbrick` 只做**委派**：
     优先使用 `tools/wchlink/` 下已构建的工具，否则回退到 `minichlink`。
 
     面向 WCH-LinkE 的烧录/调试工具位于**独立仓库**，以 **git submodule** 挂在
@@ -123,8 +124,8 @@ make clean
 # 文档
 make html        # 或 make -C doc html
 
-# 示例（在 template/examples/ 下）
-cd template/examples/blink && make
+# 示例在独立仓库 libopenwch-template 中（不在本仓库）
+cd ../libopenwch-template/examples/blink && make
 ```
 
 ---
@@ -164,6 +165,13 @@ libopenwch/
 │   └── ch5xx/      Makefile.include + common/ + 58x/
 ├── tools/wchlink/  ← WCH-LinkE 工具（git submodule，默认未初始化，见 §3.10）
 ├── doc/  tests/
+```
+
+**不在本仓库**（各自独立、各有 LICENSE/NOTICE/CI）：
+
+```
+../libopenwch-template/   应用骨架与示例（用户项目的起点）
+../libopenwch-tools/      wchlink：WCH-LinkE 烧录器
 ```
 
 ---
