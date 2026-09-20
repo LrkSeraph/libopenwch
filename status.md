@@ -374,7 +374,7 @@ P2、P3 已全部完成；P4 只剩两项被外部条件卡住；P5 的 BLE 部�
 | `.gitignore` 语义 | `git check-ignore -v` 手写 vs 生成 `nvic.h` | ✅ 手写 `qingke/`+`dispatch/` 不被忽略；生成的族头文件仍被忽略 |
 | `make clean` 安全性 | `make clean` 后检查手写 `nvic.h` | ✅ `qingke/nvic.h`、`dispatch/nvic.h` 保留；生成的族头文件被删除；随后 `make` 仍全绿 |
 | GitHub 许可识别 | `api.github.com/repos/LrkSeraph/libopenwch` | ✅ `spdx_id: LGPL-3.0` |
-| 远程一致性 | `git ls-remote origin master` vs 本地 | ✅ 四个仓库均已推送，远端 `HEAD` 均指向 `master`；两个卫星仓库的 `libopenwch` submodule 指针为 **`08168a0`**（= 本行写入时的 master；比其后的文档提交少一版，属正常），`tools/wchlink` 指针为 `9275afe` |
+| 远程一致性 | `git ls-remote origin master` vs 本地 | ✅ 四个仓库均已推送，远端 `HEAD` 均指向 `master`；两个卫星仓库的 `libopenwch` submodule 指针指向**包含本行的这个提交**，`tools/wchlink` 指针为 `9275afe` |
 | **发布仓库干净克隆（端到端）** | 从 GitHub 全新 clone 两个卫星仓库（`--recurse-submodules`）后直接 `make` | ✅ template：submodule 检出 `5be4c87`/`9275afe`，默认 216 B、`ch582m`、`LIBOPENWCH_NOSTDLIB=1` 全部成功，`make wchlink` 产出 64792 B 二进制；examples：submodule 检出 `5be4c87`，5/5 构建且体积与拆分前逐字节一致 |
 | 本库 CI `examples` job（对已发布仓库） | clone libopenwch master → `make` → 逐个 `make -C examples/* OPENWCH_DIR=<checkout>` | ✅ 库构建成功，5/5 示例构建成功 |
 | 远程文件树 | `contents/include/libopenwch/dispatch` | ✅ `nvic.h` 已在远端（修复前该目录 0 文件） |
