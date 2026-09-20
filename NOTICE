@@ -13,10 +13,9 @@ License summary
   (include/, lib/, ld/, mk/)                        COPYING.LGPL3
   scripts/checkpatch.pl       GPL-2.0               COPYING.GPL2
   lib/ble/wch/**              Apache-2.0            lib/ble/wch/LICENSE
-  Documentation and governance
-  (project.md, phase.md,       CC0-1.0 / public domain
-   status.md, AGENTS.md,       (original prose, no restriction intended)
-   README.md, NOTICE)
+  Documentation                CC0-1.0 / public domain
+  (README.md, NOTICE,          (original prose, no restriction intended)
+   HACKING)
 
 `LICENSE` carries the GNU LGPL version 3 text and is the top-level entry point
 for license scanners.  `COPYING.LGPL3` is the same text under its libopencm3

@@ -48,7 +48,7 @@ STYLECHECK      := scripts/checkpatch.pl
 ##   VOLATILE        MMIO register access is the library's whole purpose.
 ##   NEW_TYPEDEFS    `foo_t` names are part of the documented API style.
 ##   CAMELCASE       register and field names mirror the WCH reference manual,
-##                   which the project requires (see AGENTS.md).
+##                   which the project requires (see HACKING).
 ##   COMPLEX_MACRO   the CSR helpers are `__asm__ volatile` statements; there
 ##                   is no expression to parenthesise.
 ##   SPACING         the `:::` clobber list of an asm statement reads to

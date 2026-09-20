@@ -78,8 +78,9 @@ Absent, and reachable only through WCH's own names in the vendor header:
 
 The MAC address is the application's to supply.  WCH's helper for reading the
 address burned into the part is a macro over `libISP583.a`, another closed
-binary this project does not vendor; see the flash gap described in
-`status.md`.
+binary this project does not vendor -- the same ROM-resident ISP code that
+makes flash erase and program unimplemented for this family (see
+`flash_common_v1.h`).
 
 Not wrapped on purpose
 ----------------------
