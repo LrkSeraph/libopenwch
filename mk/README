@@ -19,6 +19,7 @@
 | `gcc-rules.mk` | 通用规则：`%.o`（`.c`/`.S`/`.s`/`.cpp`）、`%.elf`、`%.bin`、`%.hex`、`%.srec`、`%.list` |
 | `genlink-config.mk` | 用 `scripts/genlink.py` 查询 `ld/devices.data`，得到 `FAMILY/SUBFAMILY/MARCH/MABI/ZMMUL/CPPFLAGS`，据此设置 `ARCH_FLAGS`、自动选择 `libopenwch_<family>.a`、追加 `-I/-L` |
 | `genlink-rules.mk` | 由 `ld/linker.ld.S` 预处理生成 `generated.$(DEVICE).ld` |
+| `libc-config.mk` | 探测工具链在该 multilib 下有没有 C 库：有则 `-lc -lgcc -lnosys`，没有则改用本库的 mini-libc。`LIBOPENWCH_NOSTDLIB=0/1` 可强制 |
 
 ---
 
@@ -44,7 +45,11 @@ all: main.elf main.hex
 clean:
 	$(Q)$(RM) -rf main.* *.o *.d generated.*.ld
 
-# 4) 规则模块（靠后）
+# 4) C 库（可选，但应用基本都需要）：探测工具链有没有 newlib，
+#    没有就自动改用本库的 mini-libc
+include $(OPENWCH_DIR)/mk/libc-config.mk
+
+# 5) 规则模块（靠后）
 include $(OPENWCH_DIR)/mk/genlink-rules.mk
 include $(OPENWCH_DIR)/mk/gcc-rules.mk
 ```
@@ -93,6 +98,8 @@ include $(OPENWCH_DIR)/mk/gcc-rules.mk
 ---
 
 ## 无 newlib 的工具链
+
+（`mk/libc-config.mk` 会在构建时探测并自动选择，下面一节说明它为什么存在。）
 
 本库自身只使用 freestanding 头（`stdint.h`/`stdbool.h`/`stddef.h`），
 **不依赖 newlib**。应用若使用 `printf`/`memcpy` 等，可：

@@ -40,10 +40,15 @@ reference only libgcc — but `openwch_reset_init()`'s `.data`/`.bss` loops beco
 link has to supply both.  Debian and Ubuntu ship **no newlib** for the `rv32e`
 or `rv32imac` multilibs, so an application has two modes:
 
-| mode | link | use when |
+| mode | link | chosen when |
 |---|---|---|
-| default | `-lc -lgcc -lnosys` (newlib) | the toolchain has newlib |
-| `LIBOPENWCH_NOSTDLIB=1` | `-nostdlib` + `libopenwch_mini_libc_<family>.a` + `-lgcc` | it does not |
+| newlib | `-lc -lgcc -lnosys` | the toolchain has a libc for this multilib |
+| mini-libc | `-nostdlib` + `libopenwch_mini_libc_<family>.a` + `-lgcc` | it does not |
+
+An application does not have to choose: `mk/libc-config.mk` links an empty
+program with `-lc -lnosys` at build time and takes whichever works, so a
+distribution that ships no newlib for the `rv32e` multilib builds with no
+variable set.  `LIBOPENWCH_NOSTDLIB=1` (or `=0`) forces one.
 
 The mini-libc is a per-family archive of `memcpy`, `memmove`, `memset`,
 `memcmp`, `memchr`, `strlen`, `strnlen`, `strcmp`, `strncmp`, `strcpy`,
