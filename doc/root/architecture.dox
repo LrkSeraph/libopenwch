@@ -1,0 +1,63 @@
+/**
+@page project_architecture Architecture
+
+@tableofcontents
+
+@section arch_layers Layered layout
+
+| Layer | Files | Responsibility |
+| --- | --- | --- |
+| Public device headers | `include/libopenwch/<family>/<periph>.h` | Device-specific register definitions and public prototypes. |
+| Shared IP headers | `include/libopenwch/<family>/common/<periph>_common_<v>.h` | One implementation for several parts of a family; reachable only through the device header. |
+| Core layer | `include/libopenwch/qingke/`, `lib/qingke/` | CSR access, PFIC/NVIC, SysTick, DWT, vector table, reset path, assertions. |
+| Dispatch | `include/libopenwch/dispatch/` | Selects the generated family headers from the compile-time family define. |
+| Drivers | `lib/<family>/`, `lib/<family>/common/` | Register-level implementation of each peripheral. |
+| mini-libc | `lib/mini_libc/`, `include/libopenwch/mini_libc.h` | Optional freestanding `memcpy`/`memset`/string routines per family. |
+| BLE wrapper | `include/libopenwch/ble/`, `lib/ble/` | Lower-case, documented facade over WCH's vendor stack. |
+
+A call such as `gpio_set(GPIOC, GPIO1)` reaches the register through
+`GPIO_BSHR(gpioport)` and `MMIO32()`.  The same source implements every
+instance because the base address is a parameter.
+
+@section arch_interrupts Interrupts and vectors
+
+* External interrupt IDs start at slot 16; slots 0 to 15 are reserved for
+  RISC-V exceptions.
+* `irq.json` in the family directory is the source of truth.  The
+  <code>irq2nvic_h</code> script generates:
+  * `include/libopenwch/<family>/nvic.h` with interrupt IDs and weak ISR
+    prototypes;
+  * `lib/<family>/vector_handlers.c` and `vector_names.c`.
+* The vector table is linked through the family linker script and reaches the
+  PFIC, WCH's NVIC-compatible interrupt controller.
+* `make irq` performs only this generation and needs no RISC-V toolchain;
+  `make html` uses it before Doxygen runs.
+
+@section arch_common Shared IP variants
+
+Common implementation files are named
+`<periph>_common_<variant>.{c,h}`.  A variant is either an IP version
+(`v1`) or a set of parts.  Common headers use the libopencm3 guard pattern so
+that they cannot be included directly; the device header must be included
+first.  The Doxyfile deliberately includes the common directory so the API is
+documented even though the compiler includes it indirectly.
+
+@section arch_family_edges Family-specific rules
+
+<table>
+<tr><th>Concern</th><th>CH32V00x</th><th>CH58x</th></tr>
+<tr><td>ISA</td><td>RV32EC</td><td>RV32IMAC</td></tr>
+<tr><td>GPIO configuration</td><td>opaque four-bit CNF/MODE nibble</td><td>bit-parallel banks and alternate-function registers</td></tr>
+<tr><td>Protected registers</td><td>no RWA layer</td><td>RWA unlock/lock through safe helpers</td></tr>
+<tr><td>Flash / low-power code</td><td>runs from flash</td><td>must be tagged <code>OPENWCH_HIGH_CODE</code></td></tr>
+<tr><td>Optional BLE</td><td>not available</td><td>wrapper over vendor <code>LIBCH58xBLE.a</code></td></tr>
+</table>
+
+<section arch_ble BLE boundary
+
+The BLE layer is a wrapper, not a protocol stack.  It renames and documents
+the subset of WCH's API that a peripheral role needs, keeps WCH's event-driven
+TMOS model, and leaves central/observer/broadcaster, bonding, OTA, and mesh
+reachable through the vendor header.  The vendor binary is not part of
+<code>libopenwch_ch5xx58x.a</code>; applications link it explicitly.
+*/

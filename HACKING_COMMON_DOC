@@ -115,16 +115,21 @@ E. Documentation
     layer) must also extend the per-family extra-input selection in
     doc/Makefile.
 
-17. Run `make html`, check that doc/<family>/doxygen.log is empty, and open
-    doc/<family>/html/index.html.  The build skips cleanly if Doxygen is not
-    installed, so add an explicit note in the commit/status when it was not
-    actually exercised.
+17. Update the root-site pages in doc/root/: add the family to
+    supported_families.dox and api_index.dox, and mention it in the overview
+    or build pages where the family list appears.
+
+18. Run `make html`, check that doc/doxygen-root.log and
+    doc/<family>/doxygen.log are empty, and open both
+    doc/html/index.html and doc/<family>/html/index.html.  The build skips
+    cleanly if Doxygen is not installed, so add an explicit note in the
+    commit/status when it was not actually exercised.
 
 F. Housekeeping
 ---------------
 
-18. Add the LGPL header to every new file.
-19. Update README.md's supported-part list.
-20. Run `make stylecheck` and, if the family introduced new documented
+19. Add the LGPL header to every new file.
+20. Update README.md's supported-part list.
+21. Run `make stylecheck` and, if the family introduced new documented
     symbols, confirm that the @defgroup names do not collide with another
     family's.

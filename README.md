@@ -194,13 +194,14 @@ The API reference is generated with Doxygen and the vendored
 [Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css) theme:
 
 ```sh
-make html          # both families
+make html          # root site + both family sites
 ```
 
-This writes one self-contained site per family to
-`doc/<family>/html/index.html`.  The Doxygen build needs no RISC-V toolchain:
-`make html` generates the interrupt headers first, and skips cleanly when
-Doxygen is not installed.  Warnings are collected under
+This writes a project-wide landing page to `doc/html/index.html` and one
+self-contained API reference per family to `doc/<family>/html/index.html`.
+The Doxygen build needs no RISC-V toolchain: `make html` generates the
+interrupt headers first, and skips cleanly when Doxygen is not installed.
+Warnings are collected under `doc/doxygen-root.log` and
 `doc/<family>/doxygen.log`; see `doc/README.md` for details and for the
 requirements.
 

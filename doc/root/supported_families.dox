@@ -1,0 +1,62 @@
+/**
+@page supported_families Supported families
+
+@tableofcontents
+
+The first release of libopenwch targets two WCH families.  They share the
+QingKe core layer and the reusable build system, but have intentionally
+separate archives because their ISA and memory maps differ.
+
+@section families_summary Family summary
+
+| Family | Parts | Core / ISA | Archive | API reference |
+| --- | --- | --- | --- | --- |
+| CH32V00x | CH32V002, CH32V003, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2, RV32EC | `libopenwch_ch32v0.a` | <a href="../ch32v0/html/index.html">open</a> |
+| CH58x | CH582, CH583, CH584, CH585 | QingKe V4, RV32IMAC | `libopenwch_ch5xx58x.a` | <a href="../ch5xx58x/html/index.html">open</a> |
+
+The build system selects the archive, ISA flags, and linker script from
+<code>ld/devices.data</code> using the application's <code>DEVICE</code>
+variable.  Applications must not supply their own <code>-march</code> or
+<code>-mabi</code>.
+
+@section families_ch32v00x CH32V00x
+
+* QingKe V2 core in RV32EC mode: 16 registers, compressed instructions, no
+  hardware divide.
+* The CH32V003 is built as plain <code>rv32ec_zicsr_zifencei</code>.  Parts
+  that advertise <code>zmmul</code> get it from their device entry, but the
+  shared archive never claims it.
+* GPIO ports A, C, and D are eight bits wide.  Each pin's CNF/MODE nibble is
+  handled as an opaque value; see @ref project_overview.
+* There is no <code>.highcode</code> section requirement: the flash controller
+  is not reconfigured after boot.
+* Public API: 316 functions in the current tree.
+* Reference: <a href="../ch32v0/html/index.html">CH32V00x API documentation</a>.
+
+@section families_ch58x CH58x
+
+* QingKe V4 core in RV32IMAC mode.
+* A 32 MHz HSE crystal is mandatory; the PLL runs at a fixed 480 MHz.  Bring-up
+  must power the crystal before selecting the PLL as the system clock.
+* Most system, clock, power, and GPIO registers are RWA (write-protected).
+  Every access goes through the safe-access helpers in
+  @ref api_index ("RWA") rather than writing the register directly.
+* Code that reconfigures flash or enters low-power states must run from RAM; it
+  is tagged <code>OPENWCH_HIGH_CODE</code> and placed in the linker's
+  <code>.highcode</code> section.
+* BLE is available as a thin wrapper over WCH's closed-source
+  <code>LIBCH58xBLE.a</code>.  The binary keeps its Apache-2.0 licence and is
+  linked separately, opt-in through <code>LIBOPENWCH_BLE=1</code> in the
+  application template.  See @ref project_architecture and the
+  <a href="../ch5xx58x/html/group__ble__file.html">CH58x BLE API</a>.
+* Public API: 230 functions in the current tree (including 28 BLE-layer
+  functions).
+* Reference: <a href="../ch5xx58x/html/index.html">CH58x API documentation</a>.
+
+@section families_future Future families
+
+The device database and directory structure already anticipate additional WCH
+families such as CH32X035, CH32L103, CH32V103/203/208/303/305/307, CH571/573,
+and CH591/592.  Adding a family is a mechanical checklist: see
+@ref contributing and <code>HACKING_COMMON_DOC</code>.
+*/

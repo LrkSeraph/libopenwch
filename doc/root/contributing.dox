@@ -1,0 +1,56 @@
+/**
+@page contributing Contributing
+
+@tableofcontents
+
+@section contributing_read_first Read first
+
+* `README.md` — user-facing overview and quick start.
+* `HACKING` — coding style, naming rules, and the generated-file boundary.
+* `HACKING_COMMON_DOC` — checklist for adding a new WCH family.
+* `NOTICE` — provenance and licence rules; read it before importing anything.
+
+@section contributing_rules Hard rules
+
+1. Use lower-case `periph_verb_noun()` names, not WCH EVT CamelCase.
+2. Do not copy WCH EVT code.  WCH's EVT and ch32fun are reference material for
+   register facts, not source.
+3. Keep the build system libopencm3-shaped: `TARGETS` recursion, `mk/`
+   modules, `ld/devices.data`, `genlink.py`, and `irq.json`.
+4. One archive per family.  Never mix RV32EC and RV32IMAC objects in one
+   archive.
+5. CH58x RWA registers must go through the unlock/lock safe-access helpers.
+6. Do not hand-edit generated `nvic.h` or `vector_*.c` files.
+7. Run `clang-format`; `checkpatch.pl` is only a second opinion.
+8. New public API must be registered in the WCH-EVT-to-libopenwch mapping
+   table and documented in a Doxygen group.
+
+@section contributing_flow Suggested flow
+
+@code
+make clean && make
+make genlinktests
+make apitest
+make stylecheck
+make html
+@endcode
+
+Check that `doc/doxygen-root.log` and `doc/<family>/doxygen.log` are empty,
+and open the generated HTML before declaring documentation work complete.
+
+@section contributing_commits Commit messages
+
+Use `<area>: <imperative summary>` (for example `gpio: add alternate-function
+selection`).  Keep one logical change per commit.  The generated HTML output
+and build archives are not committed.
+
+@section contributing_repos Repository map
+
+The library is only one of four repositories; changes that affect the
+application skeleton, examples, or flasher belong in their own repositories:
+
+* <a href="https://github.com/LrkSeraph/libopenwch">libopenwch</a> — driver library.
+* <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a> — app skeleton.
+* <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> — worked examples.
+* <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a> — `wchlink` host tool.
+*/

@@ -1,0 +1,46 @@
+/**
+@page licensing_and_provenance Licensing and provenance
+
+@tableofcontents
+
+@section license_matrix Licence matrix
+
+| Part | Licence | Text |
+| --- | --- | --- |
+| Library code (`include/`, `lib/`, `ld/`, `mk/`) | LGPL-3.0-or-later | `LICENSE`, `COPYING.LGPL3` |
+| `scripts/checkpatch.pl` | GPL-2.0-only | `COPYING.GPL2` |
+| `lib/ble/wch/` and `include/libopenwch/ble/wch/` | Apache-2.0 | `lib/ble/wch/LICENSE` |
+| Project documentation and governance files | CC0-1.0 / public domain | `README.md`, `NOTICE`, `HACKING` |
+| Doxygen Awesome theme under `doc/awesome/` | MIT | `doc/awesome/LICENSE` |
+
+Applications that merely link against libopenwch are unaffected by the LGPL,
+as with libopencm3.  The vendored WCH BLE stack is a separate work and keeps
+its own Apache-2.0 terms.
+
+@section license_ble WCH BLE binary
+
+`lib/ble/wch/LIBCH58xBLE.a` and the matching vendor header are redistributed
+verbatim from WCH's CH583 SDK under Apache-2.0.  They are not LGPL.  The
+wrapper in `lib/ble/*.c` and `include/libopenwch/ble/*.h` is original to
+libopenwch and stays LGPL-3.0-or-later.
+
+@section license_upstream Derived from libopencm3
+
+The build system, directory conventions, linker-script skeleton, several
+scripts, and the Doxygen/header conventions are derived from libopencm3 and
+remain under the LGPL.  Individual copyright notices are retained.
+
+@section license_consulted Consulted as documentation only
+
+WCH's official EVT packages for the CH32V003 and CH583 were read to establish
+register addresses, bit positions, field layouts, and clock/flash ordering.
+No EVT source code was copied.  ch32fun influenced the toolchain strategy and
+supplied protocol facts; no ch32fun source was copied.
+
+@section license_details Full notice
+
+The repository root `NOTICE` contains the complete provenance record.  The
+family sites also include this licence page through
+<a href="../ch32v0/html/lgpl_license.html">CH32V00x</a> and
+<a href="../ch5xx58x/html/lgpl_license.html">CH58x</a>.
+*/

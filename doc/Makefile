@@ -34,9 +34,14 @@ fam_upper = $(shell echo $(1) | tr a-z A-Z)
 
 doc: html
 
-html:
+html: family-html root-html
+
+# One complete API reference per family.  The Doxyfile is substituted from
+# Doxyfile.in so the family define, input set, and output directory cannot be
+# forgotten in one family.
+family-html:
 	@if ! command -v $(DOXYGEN) >/dev/null 2>&1; then \
-		echo "  ----    doxygen not found; skipping documentation build"; \
+		echo "  ----    doxygen not found; skipping family API build"; \
 		echo "  NOTE    install doxygen to generate the API documentation"; \
 		exit 0; \
 	fi; \
@@ -53,11 +58,25 @@ html:
 		    Doxyfile.in > $$t/Doxyfile || exit $$?; \
 		(cd $(TOP) && $(DOXYGEN) doc/$$t/Doxyfile >/dev/null) || exit $$?; \
 	done
-	@echo "  ----    documentation written under doc/<family>/html/"
+	@echo "  ----    family API documentation written under doc/<family>/html/"
 	@echo "  NOTE    warnings (if any) are in doc/<family>/doxygen.log"
+
+# The project-wide landing site.  It has its own Doxyfile because it documents
+# the cross-family architecture and links to the family sites rather than
+# merging their same-named register groups into one namespace.
+root-html:
+	@if ! command -v $(DOXYGEN) >/dev/null 2>&1; then \
+		echo "  ----    doxygen not found; skipping root documentation build"; \
+		exit 0; \
+	fi; \
+	echo "  DOXYGEN root"; \
+	(cd $(TOP) && $(DOXYGEN) doc/Doxyfile-root >/dev/null) || exit $$?;
+	@echo "  ----    root documentation written to doc/html/index.html"
+	@echo "  NOTE    warnings (if any) are in doc/doxygen-root.log"
 
 clean:
 	@$(RM) -rf html
+	@$(RM) -f doxygen-root.log
 	@for t in $(TARGETS); do $(RM) -rf $$t; done
 
-.PHONY: doc html clean
+.PHONY: doc html family-html root-html clean

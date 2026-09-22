@@ -1,0 +1,77 @@
+/**
+@page project_overview Project overview
+
+@tableofcontents
+
+@section overview_identity What libopenwch is
+
+libopenwch is a driver library for WCH RISC-V microcontrollers.  It is
+deliberately modelled on libopencm3 in four dimensions:
+
+<table>
+<tr><th>Dimension</th><th>What that means</th></tr>
+<tr><td>API style</td><td>lower-case <code>periph_verb_noun()</code> functions,
+the peripheral base address as the first argument, constants named
+<code>PERIPH_REGISTER_BIT</code>, and types ending in <code>_t</code>.</td></tr>
+<tr><td>Directory layout</td><td><code>include/libopenwch/&lt;family&gt;/</code>,
+<code>lib/&lt;family&gt;/</code>, a <code>qingke/</code> core layer analogous to
+<code>cm3/</code>, and a <code>dispatch/</code> header layer.</td></tr>
+<tr><td>Build system</td><td>recursive <code>TARGETS</code>, reusable
+<code>mk/</code> modules, <code>ld/devices.data</code> plus
+<code>genlink.py</code>, and generated <code>nvic.h</code> from
+<code>irq.json</code>.</td></tr>
+<tr><td>Code conventions</td><td>clang-format is the formatting authority;
+<code>checkpatch.pl</code> is a second opinion; generated files are never
+edited by hand.</td></tr>
+</table>
+
+The archive is the only library product: one archive per family, plus an
+optional mini-libc archive.  An application includes the reusable
+<code>mk/</code> modules, selects a device, and links the matching archive.
+
+@section overview_example A first call
+
+@code
+#include <libopenwch/ch32v0/gpio.h>
+#include <libopenwch/ch32v0/rcc.h>
+
+int main(void)
+{
+gpio_set_mode(GPIOC, GPIO_MODE_OUT_PP, GPIO1 | GPIO2);
+for (;;) {
+gpio_toggle(GPIOC, GPIO1 | GPIO2);
+}
+}
+@endcode
+
+The same call shape is used by every driver: the first argument is the
+peripheral base address.
+
+@section overview_ecosystem The four repositories
+
+| Repository | Role | Relationship |
+| --- | --- | --- |
+| <a href="https://github.com/LrkSeraph/libopenwch">libopenwch</a> | the driver library | this documentation set |
+| <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a> | application skeleton | submodules: library and flasher |
+| <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> | five worked examples and CI integration tests | submodule: library |
+| <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a> | <code>wchlink</code>, the WCH-LinkE flasher | referenced by the template |
+
+The four repositories can be cloned and built independently.  The library
+repository itself has no submodules and needs only a RISC-V toolchain.
+
+@section overview_references Design references
+
+WCH's official EVT packages for the CH32V003 and CH583 were consulted as
+register- and timing-level reference material.  The implementation is original
+and uses different names and structure; no EVT code is copied.  ch32fun
+influenced the toolchain strategy only.  See @ref licensing_and_provenance for
+the full provenance summary.
+
+@section overview_api_style One deliberate API deviation
+
+On CH32V00x, `gpio_set_mode(port, nibble, pins)` takes one opaque four-bit
+CNF/MODE nibble rather than libopencm3's `(mode, cnf)` pair.  The nibble is not
+a bit-field decomposition: exhaustive enumeration of all two-bit field
+positions shows no mapping that reproduces WCH's documented values.  The
+documented encoding is therefore preserved as an opaque value.
+*/

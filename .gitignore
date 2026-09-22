@@ -39,6 +39,7 @@ doc/html/
 doc/*/html/
 doc/*/doxy.sourcelist
 doc/*/Doxyfile
+doc/doxygen-root.log
 doc/*/doxygen.log
 doc/*/DoxygenLayout_*.xml
 

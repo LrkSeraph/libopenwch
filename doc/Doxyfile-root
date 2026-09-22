@@ -1,0 +1,56 @@
+# Root-level documentation for libopenwch.
+#
+# Unlike Doxyfile.in, this run documents the project rather than a single
+# device family.  Its input is only doc/root/; the generated site links to the
+# per-family API references under doc/<family>/html/.
+#
+# Doxygen is run from the repository root by doc/Makefile, so every relative
+# path below is anchored at the repository root.
+
+PROJECT_NAME           = "libopenwch"
+PROJECT_BRIEF          = "libopencm3-style drivers for WCH RISC-V MCUs"
+PROJECT_NUMBER         = 0.1.0
+PROJECT_LOGO           = doc/templates/libopenwch-logo.svg
+
+OUTPUT_DIRECTORY       = doc
+HTML_OUTPUT            = html
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+WARN_LOGFILE           = doc/doxygen-root.log
+
+INPUT                  = doc/root
+RECURSIVE              = YES
+FILE_PATTERNS          = *.dox
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+WARN_AS_ERROR          = NO
+
+EXTRACT_ALL            = NO
+SOURCE_BROWSER         = NO
+ALPHABETICAL_INDEX     = NO
+SEARCHENGINE           = YES
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+DISABLE_INDEX          = NO
+PAGE_OUTLINE_PANEL     = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_COPY_CLIPBOARD    = NO
+HTML_DYNAMIC_SECTIONS  = YES
+HAVE_DOT               = NO
+
+HTML_EXTRA_STYLESHEET  = doc/awesome/doxygen-awesome.css \
+                         doc/awesome/doxygen-awesome-sidebar-only.css \
+                         doc/awesome/doxygen-awesome-sidebar-only-darkmode-toggle.css \
+                         doc/templates/libopenwch-custom.css
+HTML_EXTRA_FILES       = doc/awesome/doxygen-awesome-darkmode-toggle.js \
+                         doc/awesome/doxygen-awesome-fragment-copy-button.js \
+                         doc/awesome/doxygen-awesome-paragraph-link.js \
+                         doc/awesome/doxygen-awesome-interactive-toc.js \
+                         doc/awesome/doxygen-awesome-tabs.js
+HTML_HEADER            = doc/templates/header.html

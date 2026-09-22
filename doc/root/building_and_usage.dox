@@ -1,0 +1,102 @@
+/**
+@page building_and_usage Building and using libopenwch
+
+@tableofcontents
+
+@section build_library Building the library
+
+From the repository root:
+
+@code
+make                       # both families
+make TARGETS=ch32v0        # one family
+make clean
+@endcode
+
+The build produces:
+
+@code
+lib/libopenwch_ch32v0.a
+lib/libopenwch_ch5xx58x.a
+lib/libopenwch_mini_libc_ch32v0.a
+lib/libopenwch_mini_libc_ch5xx58x.a
+@endcode
+
+Generated interrupt files are written under
+<code>include/libopenwch/&lt;family&gt;/nvic.h</code> and
+<code>lib/&lt;family&gt;/vector_*.c</code>.  They are untracked build artifacts;
+edit <code>irq.json</code> or the generator, never the generated files.
+<code>make irq</code> regenerates them without a RISC-V toolchain.
+
+@section build_application An application Makefile
+
+The library is used through the same small set of make modules as libopencm3:
+
+@code
+OPENWCH_DIR ?= ../libopenwch
+DEVICE      ?= ch32v003f4p6
+
+include $(OPENWCH_DIR)/mk/genlink-config.mk
+include $(OPENWCH_DIR)/mk/gcc-config.mk
+include $(OPENWCH_DIR)/mk/genlink-rules.mk
+include $(OPENWCH_DIR)/mk/gcc-rules.mk
+
+all: $(BINARY).elf
+@endcode
+
+`DEVICE` selects the memory map, ISA, archive, and linker script from
+`ld/devices.data`.  Applications must not add their own `-march` or `-mabi`:
+mixing `ilp32` and `ilp32e` objects silently breaks the ABI.
+
+The application contract is documented in `mk/README`:
+
+* `CPPFLAGS`, `LDLIBS`, `LDFLAGS`, and `LIBDEPS` are append-only.
+* `ARCH_FLAGS` and `LDSCRIPT` are replaced by genlink.
+* `-nostartfiles` is required: the reset path and vector table come from the
+  library, not from the toolchain's crt0.
+
+@section build_nostdlib Freestanding applications
+
+The library itself does not need a C library, but an application often calls
+`memcpy()` or `memset()`.  If the toolchain has no suitable newlib multilib,
+set:
+
+@code
+LIBOPENWCH_NOSTDLIB=1 make
+@endcode
+
+This links the per-family mini-libc archive and ignores the toolchain C
+library.  Without that switch the toolchain library is used and the mini-libc
+archive is not linked, so the two never shadow each other accidentally.
+
+@section build_examples Start from a working project
+
+* <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a>
+  is the application skeleton: `Makefile`, `src/main.c`, and submodules for
+  the library and the flasher.
+* <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a>
+  contains five complete examples, including CH32V003 blink, CH32V003 UART
+  echo, CH582 blink, CH582 UART echo, and a CH582 BLE advertiser.
+* <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a>
+  provides `wchlink`, the host-side WCH-LinkE flasher.
+
+@section build_docs Building these documents
+
+`make html` builds the root site and both family API references:
+
+@code
+make html
+@endcode
+
+Outputs:
+
+| Site | Path |
+| --- | --- |
+| project root | `doc/html/index.html` |
+| CH32V00x API | `doc/ch32v0/html/index.html` |
+| CH58x API | `doc/ch5xx58x/html/index.html` |
+
+The build uses Doxygen plus the vendored Doxygen Awesome theme.  It skips
+cleanly if Doxygen is not installed; if it is installed in a non-standard
+location, set `DOXYGEN=/path/to/doxygen`.
+*/

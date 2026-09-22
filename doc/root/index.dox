@@ -1,0 +1,95 @@
+/**
+@mainpage libopenwch
+
+@tableofcontents
+
+@brief libopencm3-style peripheral drivers for WCH (Qinheng) RISC-V MCUs.
+
+libopenwch is a structured, freestanding driver library for WCH's QingKe
+RISC-V microcontroller families.  It follows libopencm3 in API style,
+directory layout, build system, and code conventions, while adapting the
+toolchain and startup path to the bare-metal `riscv64-unknown-elf` world.
+
+<div class="libopenwch-cards">
+<div>
+<h3><a href="project_overview.html">Project overview</a></h3>
+<p>What the library is, how it is positioned, and how the four repositories
+fit together.</p>
+</div>
+<div>
+<h3><a href="supported_families.html">Supported families</a></h3>
+<p>CH32V00x (RV32EC) and CH58x (RV32IMAC): parts, archives, and family-specific
+rules.</p>
+</div>
+<div>
+<h3><a href="project_architecture.html">Architecture</a></h3>
+<p>The QingKe core layer, shared IP variants, generated vectors, and the
+optional BLE wrapper.</p>
+</div>
+<div>
+<h3><a href="building_and_usage.html">Building and using</a></h3>
+<p>Build the library, write an application Makefile, and select a linker
+script through the device database.</p>
+</div>
+<div>
+<h3><a href="api_index.html">API index</a></h3>
+<p>Direct links into the generated CH32V00x and CH58x API references.</p>
+</div>
+<div>
+<h3><a href="verification_and_ci.html">Verification and CI</a></h3>
+<p>The reproducible build, link, style, example, and documentation checks.</p>
+</div>
+</div>
+
+@section home_family_apis Family API references
+
+Each family has its own complete Doxygen reference, generated from that
+family's public headers and sources:
+
+<table>
+<tr><th>Family</th><th>ISA / core</th><th>Archive</th><th>API reference</th></tr>
+<tr>
+<td>CH32V002 / 003 / 004 / 005 / 006 / 007</td>
+<td>RV32EC, QingKe V2</td>
+<td><code>libopenwch_ch32v0.a</code></td>
+<td><a href="../ch32v0/html/index.html">CH32V00x API</a></td>
+</tr>
+<tr>
+<td>CH582 / CH583 / CH584 / CH585</td>
+<td>RV32IMAC, QingKe V4</td>
+<td><code>libopenwch_ch5xx58x.a</code></td>
+<td><a href="../ch5xx58x/html/index.html">CH58x API</a></td>
+</tr>
+</table>
+
+The family sites are self-contained: each has its own search index, source
+browser, group hierarchy, and Doxygen Awesome light/dark theme.  The root site
+you are reading supplies the cross-family overview and the module map.
+
+@section home_status Current scope
+
+| Area | Status |
+| --- | --- |
+| CH32V00x drivers | 15 peripherals, full public API, API smoke link |
+| CH58x drivers | 12 peripherals, RWA-safe access, API smoke link |
+| QingKe core | vectors, reset path, PFIC/NVIC, SysTick, DWT, CSR, assertions |
+| mini-libc | optional freestanding string/memory archive per family |
+| BLE | peripheral-role wrapper over WCH's Apache-2.0 binary stack |
+| Documentation | per-family API sites plus this root site |
+| Hardware-in-the-loop | not yet verified; no WCH-LinkE and boards here |
+
+@section home_doc_build Building this documentation
+
+From the library root:
+
+@code
+make html
+@endcode
+
+This writes the root site to <code>doc/html/index.html</code>, the CH32V00x
+reference to <code>doc/ch32v0/html/index.html</code>, and the CH58x reference
+to <code>doc/ch5xx58x/html/index.html</code>.  Doxygen warnings are collected
+in <code>doc/doxygen-root.log</code> and
+<code>doc/&lt;family&gt;/doxygen.log</code>; the build skips cleanly when
+Doxygen is not installed.
+*/

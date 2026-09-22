@@ -1,0 +1,121 @@
+/**
+@page api_index API index
+
+@tableofcontents
+
+The complete function reference lives in the two family sites.  Start here for
+the cross-family module map.
+
+@section api_family_sites Family sites
+
+<table>
+<tr><th>Family</th><th>Complete API reference</th><th>Module tables</th></tr>
+<tr>
+<td>CH32V002 / 003 / 004 / 005 / 006 / 007</td>
+<td><a href="../ch32v0/html/index.html">CH32V00x API</a></td>
+<td><a href="../ch32v0/html/topics.html">module tree</a></td>
+</tr>
+<tr>
+<td>CH582 / CH583 / CH584 / CH585</td>
+<td><a href="../ch5xx58x/html/index.html">CH58x API</a></td>
+<td><a href="../ch5xx58x/html/topics.html">module tree</a></td>
+</tr>
+</table>
+
+@section api_module_map Module map
+
+The table links directly to the generated Doxygen group pages.  An em dash
+means the module is not present in that family.
+
+<table>
+<tr><th>Module</th><th>CH32V00x</th><th>CH58x</th></tr>
+<tr><td>QingKe core</td>
+<td><a href="../ch32v0/html/group__qingke__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__qingke__file.html">open</a></td></tr>
+<tr><td>GPIO</td>
+<td><a href="../ch32v0/html/group__gpio__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__gpio__file.html">open</a></td></tr>
+<tr><td>RCC / clock</td>
+<td><a href="../ch32v0/html/group__rcc__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__clk__file.html">open</a></td></tr>
+<tr><td>USART / UART</td>
+<td><a href="../ch32v0/html/group__usart__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__uart__file.html">open</a></td></tr>
+<tr><td>SPI</td>
+<td><a href="../ch32v0/html/group__spi__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__spi__file.html">open</a></td></tr>
+<tr><td>I2C</td>
+<td><a href="../ch32v0/html/group__i2c__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__i2c__file.html">open</a></td></tr>
+<tr><td>TIM / TMR</td>
+<td><a href="../ch32v0/html/group__tim__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__tmr__file.html">open</a></td></tr>
+<tr><td>PWM</td>
+<td>&mdash;</td>
+<td><a href="../ch5xx58x/html/group__pwm__file.html">open</a></td></tr>
+<tr><td>ADC</td>
+<td><a href="../ch32v0/html/group__adc__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__adc__file.html">open</a></td></tr>
+<tr><td>DMA</td>
+<td><a href="../ch32v0/html/group__dma__file.html">open</a></td>
+<td>&mdash;</td></tr>
+<tr><td>EXTI</td>
+<td><a href="../ch32v0/html/group__exti__file.html">open</a></td>
+<td>&mdash;</td></tr>
+<tr><td>FLASH</td>
+<td><a href="../ch32v0/html/group__flash__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__flash__file.html">open</a></td></tr>
+<tr><td>PWR</td>
+<td><a href="../ch32v0/html/group__pwr__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__pwr__file.html">open</a></td></tr>
+<tr><td>IWDG</td>
+<td><a href="../ch32v0/html/group__iwdg__file.html">open</a></td>
+<td>&mdash;</td></tr>
+<tr><td>WWDG</td>
+<td><a href="../ch32v0/html/group__wwdg__file.html">open</a></td>
+<td>&mdash;</td></tr>
+<tr><td>OPA</td>
+<td><a href="../ch32v0/html/group__opa__file.html">open</a></td>
+<td>&mdash;</td></tr>
+<tr><td>DBGMCU</td>
+<td><a href="../ch32v0/html/group__dbgmcu__file.html">open</a></td>
+<td>&mdash;</td></tr>
+<tr><td>SYS</td>
+<td>&mdash;</td>
+<td><a href="../ch5xx58x/html/group__sys__file.html">open</a></td></tr>
+<tr><td>RWA safe access</td>
+<td>&mdash;</td>
+<td><a href="../ch5xx58x/html/group__rwa__file.html">open</a></td></tr>
+<tr><td>BLE peripheral layer</td>
+<td>&mdash;</td>
+<td><a href="../ch5xx58x/html/group__ble__file.html">open</a></td></tr>
+<tr><td>Assertions</td>
+<td><a href="../ch32v0/html/group__qingke__assert__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__qingke__assert__file.html">open</a></td></tr>
+<tr><td>PFIC / NVIC</td>
+<td><a href="../ch32v0/html/group__qingke__nvic__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__qingke__nvic__file.html">open</a></td></tr>
+<tr><td>SysTick</td>
+<td><a href="../ch32v0/html/group__qingke__systick__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__qingke__systick__file.html">open</a></td></tr>
+<tr><td>Vector table</td>
+<td><a href="../ch32v0/html/group__qingke__vector__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__qingke__vector__file.html">open</a></td></tr>
+<tr><td>mini-libc</td>
+<td><a href="../ch32v0/html/group__mini__libc__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__mini__libc__file.html">open</a></td></tr>
+</table>
+
+@section api_register_index Register definitions
+
+Register and bit definitions are grouped separately from driver functions.
+For example:
+
+* <a href="../ch32v0/html/group__gpio__defines.html">CH32V00x GPIO defines</a>
+  and <a href="../ch32v0/html/group__rcc__defines.html">RCC defines</a>;
+* <a href="../ch5xx58x/html/group__gpio__defines.html">CH58x GPIO defines</a>,
+  <a href="../ch5xx58x/html/group__clk__defines.html">clock defines</a>, and
+  <a href="../ch5xx58x/html/group__rwa__defines.html">RWA defines</a>.
+
+Use the family module tree for the complete list.
+*/
