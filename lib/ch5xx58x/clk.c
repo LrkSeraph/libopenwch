@@ -145,6 +145,15 @@ void clk_32k_select(uint32_t source) {
 
 /* --- System clock -------------------------------------------------------- */
 
+/*
+ * The frequency of the tree clk_set_sys_clock() last selected, in Hz.
+ *
+ * Published the way libopencm3 publishes its clock frequencies, so that a
+ * driver or an application reads rcc_sysclk_frequency instead of calling
+ * clk_get_sys_clock() and keeping the answer in a variable of its own.
+ */
+uint32_t rcc_sysclk_frequency;
+
 void clk_set_sys_clock(clk_source_t source) {
 	uint8_t cfg = (uint8_t)source;
 
@@ -194,6 +203,9 @@ void clk_set_sys_clock(clk_source_t source) {
 		RWA_MODIFY(MMIO16(R16_CLK_SYS_CFG), CLK_SYS_CFG_MOD_MASK,
 			   CLK_SYS_CFG_MOD_32K);
 	}
+
+	/* Publish what the tree now is, so nobody has to measure it. */
+	rcc_sysclk_frequency = clk_get_sys_clock();
 }
 
 uint32_t clk_get_sys_clock(void) {

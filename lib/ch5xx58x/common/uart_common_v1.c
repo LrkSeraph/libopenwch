@@ -57,22 +57,19 @@ static inline bool uart_is_valid(uint32_t uart) {
 /* --- Line format --------------------------------------------------------- */
 
 void uart_set_baudrate(uint32_t uart, uint32_t baud) {
-	uint32_t fsys;
 	uint32_t divisor;
 
 	openwch_assert(uart_is_valid(uart));
 	openwch_assert(baud != 0);
 
-	fsys = clk_get_sys_clock();
-
 	/*
 	 * WCH's 10 * Fsys would already overflow a uint32_t if the clock were
-	 * the full 480 MHz PLL, which clk_get_sys_clock() only reports for the
-	 * illegal divide-by-zero setting.  Evaluating the quotient as
+	 * the full 480 MHz PLL, which rcc_sysclk_frequency only reports for
+	 * the illegal divide-by-zero setting.  Evaluating the quotient as
 	 * 5 * Fsys / 4 gives exactly the same integer result and stays below
 	 * 2^31 for every clock the part can produce.
 	 */
-	divisor = (5u * fsys) / 4u / baud;
+	divisor = (5u * rcc_sysclk_frequency) / 4u / baud;
 	divisor = (divisor + 5u) / 10u;
 
 	/*

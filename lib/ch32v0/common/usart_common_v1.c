@@ -48,19 +48,16 @@
 #define USART_BRR_MAX_DIVIDER 0xffffu
 
 void usart_set_baudrate(uint32_t usart, uint32_t baud) {
-	struct rcc_clock_scale clocks;
 	uint32_t divider;
 
 	openwch_assert(baud != 0);
 
-	/* USART1 is on APB2. */
-	rcc_get_clocks_freq(&clocks);
-
 	/*
 	 * The 12.4 divider is round(fPCLK / baud): the four fraction bits are
-	 * the sixteenths of a bit period.  Round to nearest.
+	 * the sixteenths of a bit period.  Round to nearest.  USART1 is on
+	 * APB2, whose frequency the clock setup published.
 	 */
-	divider = (clocks.pclk2 + (baud / 2u)) / baud;
+	divider = (rcc_apb2_frequency + (baud / 2u)) / baud;
 
 	/*
 	 * A divider above 0xffff cannot be represented, which happens when the

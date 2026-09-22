@@ -249,21 +249,94 @@ enum rcc_sysclk {
 	RCC_SYSCLK_PLL_HSE_48MHZ,
 };
 
-/** A clock measurement of the whole tree, in Hz. */
+/** Index into @ref rcc_hsi_configs. */
+enum rcc_clock_hsi {
+	RCC_CLOCK_HSI_24MHZ = 0,
+	RCC_CLOCK_PLL_HSI_48MHZ,
+	RCC_CLOCK_HSI_END,
+};
+
+/** Index into @ref rcc_hse_configs. */
+enum rcc_clock_hse {
+	RCC_CLOCK_HSE_DIRECT = 0,
+	RCC_CLOCK_PLL_HSE_48MHZ,
+	RCC_CLOCK_HSE_END,
+};
+
+/**
+ * One selectable system clock configuration.
+ *
+ * The first group of fields is the request -- what rcc_clock_setup_pll()
+ * programs.  The second group is the outcome, recorded in the table so that
+ * the setup call can publish the resulting frequencies without measuring
+ * anything.  Both live in one structure because that is the shape libopencm3
+ * gives its clock tables, and it is what lets a caller name a whole clock tree
+ * in a single line:
+ *
+ *	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
+ *
+ * The prescaler fields carry the register's own codes, not the divider.
+ */
 struct rcc_clock_scale {
-	uint32_t sysclk;
-	uint32_t hclk;
-	uint32_t pclk1;
-	uint32_t pclk2;
-	uint32_t adcclk;
+	enum rcc_sysclk source;	 /**< which tree to bring up */
+	uint32_t pll_source;	 /**< non-zero: PLL from HSE, zero: from HSI */
+	uint32_t flash_latency;	 /**< FLASH_ACTLR latency code */
+	uint32_t ahb_prescaler;	 /**< RCC_CFGR0_HPRE_* code */
+	uint32_t apb1_prescaler; /**< RCC_CFGR0_PPRE_DIV* code */
+	uint32_t apb2_prescaler; /**< RCC_CFGR0_PPRE_DIV* code */
+	uint32_t adc_prescaler;	 /**< RCC_CFGR0_ADCPRE_DIV* code */
+
+	uint32_t sysclk_frequency; /**< resulting SYSCLK, in Hz */
+	uint32_t ahb_frequency;	   /**< resulting HCLK, in Hz */
+	uint32_t apb1_frequency;   /**< resulting PCLK1, in Hz */
+	uint32_t apb2_frequency;   /**< resulting PCLK2, in Hz */
+	uint32_t adc_frequency;	   /**< resulting ADCCLK, in Hz */
 };
 
 BEGIN_DECLS
 
-void rcc_clock_setup_sysclk(enum rcc_sysclk source);
+/* --- Clock setup --------------------------------------------------------- */
+
+/** Configurations derived from the internal RC oscillator. */
+extern const struct rcc_clock_scale rcc_hsi_configs[RCC_CLOCK_HSI_END];
+/** Configurations derived from the external crystal. */
+extern const struct rcc_clock_scale rcc_hse_configs[RCC_CLOCK_HSE_END];
+
+/**
+ * Bring the system clock up to @p clock.
+ *
+ * Everything the tree needs comes from the descriptor: the oscillator is
+ * started and waited for, the prescalers and the flash latency are set, and
+ * the system clock is switched.  One call, no temporary, no follow-up
+ * measurement -- the rcc_*_frequency variables below already describe the new
+ * tree when this returns.
+ */
+void rcc_clock_setup_pll(const struct rcc_clock_scale *clock);
+
+/** The named configurations, for callers that prefer a function name. */
+void rcc_clock_setup_hsi_24mhz(void);
 void rcc_clock_setup_hsi_48mhz(void);
 void rcc_clock_setup_hse_48mhz(void);
 void rcc_clock_setup_pll_hse_48mhz(void);
+
+/** Select a configuration by @ref rcc_sysclk value. */
+void rcc_clock_setup_sysclk(enum rcc_sysclk source);
+
+/*
+ * The frequencies of the running tree, in Hz.
+ *
+ * Published as variables the way libopencm3 publishes them, so that a driver
+ * or an application reads the number it needs instead of asking for a
+ * measurement and holding the answer in a temporary of its own.
+ */
+extern uint32_t rcc_sysclk_frequency; /**< SYSCLK */
+extern uint32_t rcc_ahb_frequency;    /**< HCLK */
+extern uint32_t rcc_apb1_frequency;   /**< PCLK1 */
+extern uint32_t rcc_apb2_frequency;   /**< PCLK2 */
+extern uint32_t rcc_adc_frequency;    /**< ADCCLK */
+
+/** Re-measure the tree from the registers and refresh the variables above. */
+void rcc_measure_clocks(void);
 
 void rcc_osc_on(uint32_t osc);
 void rcc_osc_off(uint32_t osc);
@@ -282,7 +355,6 @@ void rcc_apb1_set_prescaler(uint32_t ppre);
 void rcc_apb2_set_prescaler(uint32_t ppre);
 void rcc_adc_set_prescaler(uint32_t ppre);
 
-void rcc_get_clocks_freq(struct rcc_clock_scale *clocks);
 uint32_t rcc_get_sysclk_frequency(void);
 
 void rcc_clock_security_system_enable(void);

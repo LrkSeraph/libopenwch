@@ -110,13 +110,17 @@ void api_smoke(void) {
 	rcc_clock_security_system_disable();
 	rcc_clear_reset_flags();
 	(void)rcc_get_reset_flags();
-	{
-		struct rcc_clock_scale clocks;
-
-		rcc_get_clocks_freq(&clocks);
-		(void)clocks.sysclk;
-	}
+	/* The one-call form, and the frequencies it publishes. */
+	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
 	(void)rcc_get_sysclk_frequency();
+	(void)rcc_ahb_frequency;
+	(void)rcc_apb1_frequency;
+	(void)rcc_apb2_frequency;
+	(void)rcc_adc_frequency;
+	rcc_measure_clocks();
+	rcc_clock_setup_hsi_24mhz();
+	rcc_clock_setup_hse_48mhz();
+	rcc_clock_setup_pll_hse_48mhz();
 	rcc_clock_setup_sysclk(RCC_SYSCLK_PLL_HSI_48MHZ);
 
 	/* --- usart --- */

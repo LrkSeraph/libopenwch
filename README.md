@@ -97,10 +97,14 @@ from this library, not from the toolchain's crt0.
 
 ```c
 #include <libopenwch/ch32v0/gpio.h>
+#include <libopenwch/ch32v0/rcc.h>
 #include <libopenwch/qingke/nvic.h>
 
 int main(void)
 {
+	/* 48 MHz from the internal RC oscillator and its PLL, in one line. */
+	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
+
 	rcc_periph_clock_enable(RCC_GPIOA);
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_10MHZ,
 	              GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
@@ -109,6 +113,15 @@ int main(void)
 	}
 }
 ```
+
+Clock setup follows libopencm3: the configurations are data
+(`rcc_hsi_configs[]`, `rcc_hse_configs[]`, and `clk_source_t` on the CH58x),
+one call selects one, and the resulting frequencies are left in
+`rcc_sysclk_frequency`, `rcc_ahb_frequency`, `rcc_apb1_frequency`,
+`rcc_apb2_frequency` and `rcc_adc_frequency` — so a driver or an application
+reads a variable instead of measuring the tree into a temporary of its own.
+The named wrappers (`rcc_clock_setup_hsi_48mhz()` and friends) are one-line
+equivalents for callers that prefer a function name.
 
 **Start a new project from
 [libopenwch-template](https://github.com/LrkSeraph/libopenwch-template)**, not

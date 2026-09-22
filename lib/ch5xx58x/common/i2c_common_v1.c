@@ -32,7 +32,7 @@
  * by hand with start/stop/address/data, waiting on the STAR1/STAR2 flags.
  *
  * The clock divider and the maximum rise time are derived from
- * clk_get_sys_clock(), so a caller only names the bus speed it wants.  Note
+ * rcc_sysclk_frequency, so a caller only names the bus speed it wants.  Note
  * that FREQ is six bits: the system clock must be between 2 and 63 MHz.
  *
  * LGPL License Terms @ref lgpl_license
@@ -72,33 +72,27 @@ static uint16_t i2c_rise_time(uint32_t sysclock, bool fast) {
 /* --- Clock generation ---------------------------------------------------- */
 
 void i2c_set_clock_frequency(uint32_t i2c) {
-	uint32_t sysclock;
-
 	i2c_assert_valid(i2c);
 
-	sysclock = clk_get_sys_clock();
-
-	openwch_assert(sysclock >= I2C_MIN_CLOCK_FREQUENCY);
-	openwch_assert(sysclock <= I2C_MAX_CLOCK_FREQUENCY);
+	openwch_assert(rcc_sysclk_frequency >= I2C_MIN_CLOCK_FREQUENCY);
+	openwch_assert(rcc_sysclk_frequency <= I2C_MAX_CLOCK_FREQUENCY);
 
 	/* FREQ is the peripheral clock in whole MHz; the caller does not get
 	 * to name it because the block is fed straight from the system
 	 * clock. */
-	I2C_CTRL2(i2c) = (uint16_t)((I2C_CTRL2(i2c) & (uint16_t)~RB_I2C_FREQ) |
-				    ((sysclock / 1000000u) & RB_I2C_FREQ));
+	I2C_CTRL2(i2c) =
+	    (uint16_t)((I2C_CTRL2(i2c) & (uint16_t)~RB_I2C_FREQ) |
+		       ((rcc_sysclk_frequency / 1000000u) & RB_I2C_FREQ));
 }
 
 /* --- Initialisation ------------------------------------------------------ */
 
 void i2c_init_master(uint32_t i2c, uint32_t speed) {
-	uint32_t sysclock;
 	uint16_t ckcfgr;
 
 	i2c_assert_valid(i2c);
 	openwch_assert(speed != 0);
 	openwch_assert(speed <= I2C_SPEED_FAST);
-
-	sysclock = clk_get_sys_clock();
 
 	/* Reset the block, then tell it the clock before anything else. */
 	i2c_software_reset(i2c);
@@ -106,7 +100,7 @@ void i2c_init_master(uint32_t i2c, uint32_t speed) {
 	i2c_disable(i2c);
 
 	if (speed <= I2C_SPEED_STANDARD) {
-		uint32_t ccr = sysclock / (speed * 2u);
+		uint32_t ccr = rcc_sysclk_frequency / (speed * 2u);
 
 		/* The reference manual sets a floor of four on CCR. */
 		if (ccr < 4u) {
@@ -117,7 +111,7 @@ void i2c_init_master(uint32_t i2c, uint32_t speed) {
 	} else {
 		/* Fast mode with Tlow/Thigh = 2: SCL high and low together
 		 * span three CCR counts. */
-		uint32_t ccr = sysclock / (speed * 3u);
+		uint32_t ccr = rcc_sysclk_frequency / (speed * 3u);
 
 		if (ccr == 0u) {
 			ccr = 1u;
@@ -126,7 +120,8 @@ void i2c_init_master(uint32_t i2c, uint32_t speed) {
 		ckcfgr = (uint16_t)((ccr & RB_I2C_CCR) | RB_I2C_F_S);
 	}
 
-	I2C_RTR(i2c) = i2c_rise_time(sysclock, speed > I2C_SPEED_STANDARD);
+	I2C_RTR(i2c) =
+	    i2c_rise_time(rcc_sysclk_frequency, speed > I2C_SPEED_STANDARD);
 	I2C_CKCFGR(i2c) = ckcfgr;
 
 	i2c_enable(i2c);

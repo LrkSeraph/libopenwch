@@ -176,11 +176,23 @@ void clk_32k_select(uint32_t source);
 /**
  * Switch the system clock to `source`.  Powers the crystal and the PLL first
  * if they are not already running, so this is safe to call straight from
- * reset.
+ * reset -- one call names the whole tree:
+ *
+ *	clk_set_sys_clock(CLK_SOURCE_PLL_60MHZ);
  */
 void clk_set_sys_clock(clk_source_t source);
 
-/** Current system clock frequency in Hz, measured from R16_CLK_SYS_CFG. */
+/**
+ * The system clock frequency in Hz, as selected by clk_set_sys_clock().
+ *
+ * Published as a variable the way libopencm3 publishes its clock
+ * frequencies, so that a caller reads it rather than measuring and holding a
+ * temporary.  Use clk_get_sys_clock() only to measure a tree somebody else
+ * configured.
+ */
+extern uint32_t rcc_sysclk_frequency;
+
+/** Measure the system clock in Hz from R16_CLK_SYS_CFG. */
 uint32_t clk_get_sys_clock(void);
 
 /** Convenience: 48 MHz from the PLL, the configuration USB requires. */

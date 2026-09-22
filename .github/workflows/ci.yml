@@ -221,6 +221,28 @@ jobs:
                 echo "::error::$line"
               done
 
+  hygiene:
+    name: no local paths or credentials in tracked files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # A developer's absolute path in a committed file is a small leak that is
+      # invisible in code review, and these repositories are public.  Cheap to
+      # check here; expensive to discover later in the history.
+      - name: No local paths or credentials in tracked files
+        run: |
+          fail=0
+          if git grep -n -I -E '/home/[a-z]+/|/Users/[A-Za-z]+/|C:\\Users' -- . ; then
+            echo "::error::a tracked file contains an absolute path from a developer's machine"
+            fail=1
+          fi
+          if git grep -n -I -E 'PRIVATE KEY-----|password[[:space:]]*=|api[_-]?key[[:space:]]*=|ghp_[A-Za-z0-9]{20,}|github_pat_' -- . ; then
+            echo "::error::a tracked file looks like it contains a credential"
+            fail=1
+          fi
+          if [ "$fail" != 0 ]; then exit 1; fi
+          echo "no local paths or credentials in tracked files"
+
   # The examples are a separate project with its own CI, but they are also the
   # only code that consumes the library's public interface from outside, so
   # breakage that the smoke tests cannot see -- a macro that stopped being
