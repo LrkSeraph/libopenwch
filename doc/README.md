@@ -39,9 +39,14 @@ Doxygen is recommended (the theme itself lists 1.9.6 and later).
 | `templates/` | header template, project logo, and small project stylesheet |
 | `awesome/` | vendored Doxygen Awesome assets and their MIT licence |
 
-`doc/Makefile` first builds the generated interrupt headers with
-`make -C .. irq` (no RISC-V toolchain needed), then runs Doxygen from the
-repository root so source paths in the HTML are clean and stable.
+The top-level `make html`/`make doc` target declares `irq` as a prerequisite
+(note: `irq` itself does not need a RISC-V toolchain), then delegates to
+`doc/Makefile`.  Doxygen runs from the repository root so source paths in the
+HTML are clean and stable.
+
+If you invoke `doc/Makefile` directly (for example `make -C doc html`), first
+run `make irq` from the repository root; otherwise the generated `nvic.h`
+files may be missing and the interrupt API will be incomplete.
 
 The per-family input set is selected by substitution: the shared QingKe core,
 the dispatch and mini-libc headers, and only the requested

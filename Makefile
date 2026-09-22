@@ -170,7 +170,12 @@ lib: $(LIB_DIRS)
 	done;
 	$(Q)[ -f .stamp_failure_tld ] && cat .stamp_failure_tld && exit 1 || true;
 
-html doc:
+##
+## The family API Doxygen input includes the generated
+## include/libopenwch/<family>/nvic.h, so IRQ generation is a declared
+## prerequisite rather than a command hidden inside the documentation recipe.
+##
+html doc: irq
 	$(Q)$(MAKE) -C doc html TARGETS="$(TARGETS)"
 
 clean: $(IRQ_DEFN_FILES:=.cleanhdr) $(LIB_DIRS:=.clean) doc.clean styleclean genlinktests.clean apitest.clean

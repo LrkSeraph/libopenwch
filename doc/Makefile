@@ -39,13 +39,17 @@ html: family-html root-html
 # One complete API reference per family.  The Doxyfile is substituted from
 # Doxyfile.in so the family define, input set, and output directory cannot be
 # forgotten in one family.
+#
+# The generated nvic.h files are documented API input.  The top-level `html`
+# and `doc` targets make `irq` a prerequisite before entering this Makefile; if
+# this file is invoked directly instead, run `make irq` in the repository root
+# first for a complete interrupt API and a warning-free build.
 family-html:
 	@if ! command -v $(DOXYGEN) >/dev/null 2>&1; then \
 		echo "  ----    doxygen not found; skipping family API build"; \
 		echo "  NOTE    install doxygen to generate the API documentation"; \
 		exit 0; \
 	fi; \
-	$(MAKE) -C $(TOP) irq || exit $$?; \
 	for t in $(TARGETS); do \
 		u=$$(echo $$t | tr a-z A-Z); \
 		extra=$$(if [ "$$t" = "ch5xx58x" ]; then echo "include/libopenwch/ble lib/ble"; fi); \
