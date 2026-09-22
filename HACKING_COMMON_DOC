@@ -30,9 +30,11 @@ B. include/
    address and the bus bases.  Include
    <libopenwch/qingke/memorymap.h> for the core region.
 
-6. Add include/libopenwch/<family>/doc-<family>.h providing the Doxygen
-   @page and the @defgroup <FAMILY>_defines group that every other file in
-   the family adds to.
+6. The family's Doxygen groups are declared centrally in
+   doc/source/groups.dox, guarded by @if <family> ... @endif.  Add
+   @defgroup <FAMILY>, @defgroup <FAMILY>_defines, and the family overview
+   text there.  (The libopencm3 per-family doc-<family>.h style is not used,
+   so one file cannot be left out when a family is added.)
 
 7. Add the per-peripheral device headers
    include/libopenwch/<family>/<periph>.h.  Each one:
@@ -107,11 +109,22 @@ E. Documentation
 
 15. Add the family to the TARGETS default in doc/Makefile.
 
+16. Add the family's @if block to doc/source/groups.dox and, if it appears in
+    the main page table or prose, to doc/source/mainpage.dox.  A family that
+    has optional extra sources (currently only ch5xx58x, which adds the BLE
+    layer) must also extend the per-family extra-input selection in
+    doc/Makefile.
+
+17. Run `make html`, check that doc/<family>/doxygen.log is empty, and open
+    doc/<family>/html/index.html.  The build skips cleanly if Doxygen is not
+    installed, so add an explicit note in the commit/status when it was not
+    actually exercised.
+
 F. Housekeeping
 ---------------
 
-16. Add the LGPL header to every new file.
-17. Update README.md's supported-part list.
-18. Run `make stylecheck` and, if the family introduced new documented
+18. Add the LGPL header to every new file.
+19. Update README.md's supported-part list.
+20. Run `make stylecheck` and, if the family introduced new documented
     symbols, confirm that the @defgroup names do not collide with another
     family's.

@@ -1,0 +1,106 @@
+/**
+@mainpage libopenwch API reference
+
+@tableofcontents
+
+@brief libopencm3-style peripheral drivers for WCH QingKe RISC-V MCUs.
+
+libopenwch is a driver library for WCH (Qinheng) RISC-V microcontrollers.  It
+follows libopencm3 in API style, directory layout, build system, and code
+conventions, while adapting the toolchain layer to the
+`riscv64-unknown-elf` bare-metal world and to WCH's QingKe cores.
+
+The first releases document two families:
+
+<table>
+<tr><th>Family</th><th>ISA</th><th>Example parts</th><th>Archive</th></tr>
+<tr><td>@if ch32v0 @ref CH32V0 "CH32V00x" @endif</td>
+    <td>RV32EC</td>
+    <td>CH32V003, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007</td>
+    <td><code>libopenwch_ch32v0.a</code></td></tr>
+<tr><td>@if ch5xx58x @ref CH5XX58X "CH58x" @endif</td>
+    <td>RV32IMAC</td>
+    <td>CH582, CH583, CH584, CH585</td>
+    <td><code>libopenwch_ch5xx58x.a</code></td></tr>
+</table>
+
+@section main_api_style API style
+
+Every public function is lower-case and uses the
+<tt>periph_verb_noun()</tt> shape.  The first argument is the peripheral base
+address, so one driver handles every instance:
+
+@code
+usart_set_baudrate(USART1, 115200);
+gpio_set_mode(GPIOC, GPIO_MODE_OUT_PP, GPIO1 | GPIO2);
+@endcode
+
+Registers are accessed through <tt>MMIO32()</tt> and retain the WCH reference
+manual names where the style rules allow it.  Constants are named
+<tt>PERIPH_REGISTER_BIT</tt> and types end in <tt>_t</tt>.  See the
+<code>HACKING</code> "coding rules" for the full convention.
+
+@section main_layout Library layout
+
+<table>
+<tr><th>Path</th><th>Purpose</th></tr>
+<tr><td><code>include/libopenwch/qingke/</code></td><td>Core layer: CSR helpers, PFIC/NVIC, SysTick, DWT, vectors, assertions.</td></tr>
+<tr><td><code>include/libopenwch/&lt;family&gt;/</code></td><td>Register maps and public peripheral headers for one family.</td></tr>
+<tr><td><code>include/libopenwch/&lt;family&gt;/common/</code></td><td>Shared IP-variant headers.  Include these only through the device header.</td></tr>
+<tr><td><code>include/libopenwch/dispatch/</code></td><td>Compile-time dispatch from a device family to its generated headers.</td></tr>
+<tr><td><code>include/libopenwch/ble/</code></td><td>Thin, documented layer over WCH's closed-source BLE stack.</td></tr>
+<tr><td><code>lib/</code></td><td>Driver implementations and per-family archives.</td></tr>
+<tr><td><code>ld/</code>, <code>mk/</code>, <code>scripts/</code></td><td>Device database, linker scripts, reusable application build rules, and generators.</td></tr>
+</table>
+
+@section main_building Building an application
+
+The library is used exactly like libopencm3: an application includes the
+reusable make modules from <code>mk/</code> and links the archive for its
+family.  A typical Makefile is only a handful of lines:
+
+@code
+OPENWCH_DIR ?= ../libopenwch
+DEVICE      ?= ch32v003f4p6
+
+include $(OPENWCH_DIR)/mk/genlink-config.mk
+include $(OPENWCH_DIR)/mk/gcc-config.mk
+include $(OPENWCH_DIR)/mk/genlink-rules.mk
+include $(OPENWCH_DIR)/mk/gcc-rules.mk
+
+all: $(BINARY).elf
+@endcode
+
+The <code>genlink</code> module selects the correct <code>-march</code>,
+<code>-mabi</code>, library archive, and linker script from
+<code>ld/devices.data</code>.  Applications must not add their own
+<code>-march</code> or <code>-mabi</code>: mixing <code>ilp32</code> and
+<code>ilp32e</code> objects silently corrupts the ABI.
+
+@section main_docs Building this documentation
+
+The API reference is generated from annotated headers and source files with
+Doxygen.  From the library root:
+
+@code
+make html
+@endcode
+
+This creates one self-contained site per family under
+<code>doc/&lt;family&gt;/html/</code>.  The build skips cleanly when Doxygen is
+not installed, so it never blocks a normal library build.
+
+The site uses the vendored
+<a href="https://github.com/jothepro/doxygen-awesome-css">Doxygen Awesome</a>
+theme (MIT), with a small project-specific stylesheet.  It supports a light and
+dark colour scheme, a search-friendly tree view, copy buttons on code
+fragments, and paragraph anchors.
+
+@section main_licence Licence
+
+The library sources under <code>include/</code>, <code>lib/</code>,
+<code>ld/</code>, and <code>mk/</code> are LGPL-3.0-or-later.  The vendored BLE
+stack under <code>lib/ble/wch/</code> is Apache-2.0 and is not covered by the
+LGPL.  See @ref lgpl_license for details and the repository's
+<code>NOTICE</code> for provenance.
+*/

@@ -1,0 +1,44 @@
+/**
+@page lgpl_license Licence and provenance
+
+@tableofcontents
+
+@section licence_library Library code
+
+Everything under <code>include/</code>, <code>lib/</code>, <code>ld/</code>,
+and <code>mk/</code> is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+details.
+
+A copy of the licence is shipped in the repository root as
+<code>LICENSE</code> and <code>COPYING.LGPL3</code>.  The GPL version 3 text,
+which the LGPL incorporates by reference, is in <code>COPYING.GPL3</code>.
+
+@section licence_scripts Scripts
+
+<code>scripts/checkpatch.pl</code> is taken from the Linux kernel and is
+GPL-2.0-only.  Its licence text is in <code>COPYING.GPL2</code>.
+
+@section licence_ble Vendored Bluetooth LE stack
+
+<code>lib/ble/wch/</code> and <code>include/libopenwch/ble/wch/</code> are
+redistributed from WCH's CH583 SDK under the Apache License, Version 2.0.  They
+are <b>not</b> LGPL.  See <code>lib/ble/wch/LICENSE</code> and the repository
+root <code>NOTICE</code>.
+
+@section licence_docs Documentation and governance files
+
+The README, NOTICE, HACKING, and the documentation prose are original to the
+project and are released to the public domain / CC0-1.0.
+
+@section licence_theme Doxygen theme
+
+The vendored Doxygen Awesome theme under <code>doc/awesome/</code> is
+MIT-licensed.  Its licence text is in <code>doc/awesome/LICENSE</code>.
+*/

@@ -1,13 +1,20 @@
 # Doxygen configuration for libopenwch.
 #
-# This file is a template: doc/Makefile substitutes @FAMILY@, @FAMILY_UPPER@
-# and @OUTPUT_DIR@ to produce one Doxyfile per family.  Keeping one template
-# rather than one file per family means a change to the settings cannot be
-# applied to some families and forgotten for others.
+# This file is a template.  doc/Makefile substitutes:
+#
+#   @FAMILY@             the target name, e.g. ch32v0
+#   @FAMILY_UPPER@       its upper-case form, used as the dispatch define
+#   @OUTPUT_DIR@         where the generated site is rooted, e.g. doc/ch32v0
+#   @FAMILY_EXTRA_INPUT@ family-specific input, currently the BLE layer for
+#                        ch5xx58x and empty for every other family
+#
+# Doxygen is run from the repository root so that all paths below are simple
+# and stable, and so that generated HTML shows source paths without "../".
 
 PROJECT_NAME           = "libopenwch — @FAMILY@"
 PROJECT_BRIEF          = "libopencm3-style drivers for WCH RISC-V MCUs"
 PROJECT_NUMBER         = 0.1.0
+PROJECT_LOGO           = doc/templates/libopenwch-logo.svg
 
 OUTPUT_DIRECTORY       = @OUTPUT_DIR@
 HTML_OUTPUT            = html
@@ -15,17 +22,30 @@ GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 GENERATE_MAN           = NO
 GENERATE_XML           = NO
+WARN_LOGFILE           = @OUTPUT_DIR@/doxygen.log
 
-# Only the library's own headers and sources; the application template and the
-# tests are not part of the documented API.
-INPUT                  = ../include/libopenwch ../lib
+# Only the selected family plus the shared core, dispatch headers, mini libc,
+# and the family-specific optional BLE wrapper.  Keeping the other family out
+# avoids duplicate @defgroup names and cross-family references.
+INPUT                  = include/libopenwch/qingke \
+                         include/libopenwch/@FAMILY@ \
+                         include/libopenwch/dispatch \
+                         include/libopenwch/mini_libc.h \
+                         lib/qingke \
+                         lib/@FAMILY@ \
+                         lib/mini_libc \
+                         doc/source \
+                         @FAMILY_EXTRA_INPUT@
 RECURSIVE              = YES
-FILE_PATTERNS          = *.h *.c
-EXCLUDE_PATTERNS       = */common/*
+FILE_PATTERNS          = *.c *.h *.dox
+EXCLUDE_PATTERNS       = */ble/wch/* */vector_handlers.c */vector_names.c
 
-# The family this run documents.  Selecting it makes the dispatch headers pick
-# the right branch instead of warning about an undefined family.
+# Select the family for the dispatch headers and hide compiler attributes from
+# the parser.  __riscv is defined so that qingke/common.h chooses the RISC-V
+# branch instead of reaching its #error guard.
 PREDEFINED             = @FAMILY_UPPER@=1 \
+                         __riscv=1 \
+                         __riscv_xlen=32 \
                          __attribute__(x)= \
                          OPENWCH_INTERRUPT= \
                          OPENWCH_HIGH_CODE= \
@@ -33,29 +53,59 @@ PREDEFINED             = @FAMILY_UPPER@=1 \
                          OPENWCH_WEAK= \
                          OPENWCH_USED= \
                          RWA_INLINE=
+ENABLED_SECTIONS       = @FAMILY@
 ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
+INCLUDE_PATH           = include
 
 QUIET                  = YES
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = NO
 WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
 WARN_AS_ERROR          = NO
 
-EXTRACT_ALL            = NO
+# Extract every public declaration, even where the prose is still terse.  This
+# is what makes the reference complete: the groups and prose pages explain the
+# architecture, while the generated pages carry the full symbol list.
+EXTRACT_ALL            = YES
 EXTRACT_STATIC         = NO
 HIDE_UNDOC_MEMBERS     = NO
+
 SOURCE_BROWSER         = YES
 INLINE_SOURCES         = NO
 REFERENCED_BY_RELATION = YES
 REFERENCES_RELATION    = YES
-GENERATE_TREEVIEW      = YES
-FULL_SIDEBAR           = NO
 ALPHABETICAL_INDEX     = YES
 SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 JAVADOC_AUTOBRIEF      = YES
 OPTIMIZE_OUTPUT_FOR_C  = YES
 TAB_SIZE               = 8
+
+# Use Doxygen's own C/C++ parser for symbols and do not shell out to Graphviz.
+# The library's value is the API surface, not call graphs, and this keeps the
+# documentation build independent of a dot binary.
+HAVE_DOT               = NO
+
+# Doxygen Awesome theme.  The assets are vendored under doc/awesome and copied
+# into each generated site by HTML_EXTRA_FILES.
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+DISABLE_INDEX          = NO
+PAGE_OUTLINE_PANEL     = NO
+HTML_COLORSTYLE        = LIGHT
+HTML_COPY_CLIPBOARD    = NO
+HTML_DYNAMIC_SECTIONS  = YES
+HTML_EXTRA_STYLESHEET  = doc/awesome/doxygen-awesome.css \
+                         doc/awesome/doxygen-awesome-sidebar-only.css \
+                         doc/awesome/doxygen-awesome-sidebar-only-darkmode-toggle.css \
+                         doc/templates/libopenwch-custom.css
+HTML_EXTRA_FILES       = doc/awesome/doxygen-awesome-darkmode-toggle.js \
+                         doc/awesome/doxygen-awesome-fragment-copy-button.js \
+                         doc/awesome/doxygen-awesome-paragraph-link.js \
+                         doc/awesome/doxygen-awesome-interactive-toc.js \
+                         doc/awesome/doxygen-awesome-tabs.js
+HTML_HEADER            = doc/templates/header.html

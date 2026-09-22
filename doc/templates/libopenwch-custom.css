@@ -1,0 +1,73 @@
+/*
+ * libopenwch-specific tuning for the Doxygen Awesome theme.
+ *
+ * The theme exposes its colours as CSS custom properties; only those are
+ * overridden here.  Everything else, including the dark-mode variants, is
+ * inherited from Doxygen Awesome so that a theme update keeps working.
+ */
+
+html {
+--primary-color: #0b7285;
+--primary-dark-color: #095c6b;
+--primary-light-color: #66c2cf;
+--link-color: #0b7285;
+--page-background-color: #fbfcfd;
+--side-nav-background: #f2f6f7;
+--side-nav-foreground: #24363a;
+--code-background: #f2f6f7;
+--fragment-background: #eef4f5;
+--separator-color: #d7e2e5;
+--border-radius-small: 5px;
+--border-radius-medium: 8px;
+--border-radius-large: 12px;
+}
+
+html.dark-mode {
+--primary-color: #56cfe1;
+--primary-dark-color: #38a3b4;
+--primary-light-color: #9be7f0;
+--link-color: #7fdbeb;
+--page-background-color: #10181a;
+--side-nav-background: #162326;
+--side-nav-foreground: #d7e8eb;
+--code-background: #162326;
+--fragment-background: #18292d;
+--separator-color: #2d454b;
+}
+
+/* A small, readable status card used by the project overview page. */
+.libopenwch-cards {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+gap: var(--spacing-medium);
+margin: var(--spacing-medium) 0;
+}
+
+.libopenwch-cards > div {
+border: 1px solid var(--separator-color);
+border-radius: var(--border-radius-medium);
+padding: var(--spacing-medium);
+background: var(--code-background);
+}
+
+.libopenwch-cards h3 {
+margin-top: 0;
+}
+
+/*
+ * Doxygen Awesome already styles fragments; adding a left accent makes the
+ * examples on the main page visually distinct without changing their layout.
+ */
+div.fragment {
+border-left: 3px solid var(--primary-color);
+}
+
+/* Give the title area a subtle accent while preserving the sidebar-only layout. */
+#titlearea {
+border-bottom: 2px solid var(--primary-color);
+}
+
+/* Compact signature blocks on function pages. */
+.memitem .memproto {
+border-left: 3px solid var(--primary-light-color);
+}

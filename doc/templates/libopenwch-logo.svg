@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="libopenwch">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b7285"/>
+      <stop offset="1" stop-color="#56cfe1"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#g)"/>
+  <path d="M18 22h8v18h12v6H18zM36 22h10v6h-4v18h-6z" fill="#fff" opacity=".95"/>
+  <circle cx="46" cy="18" r="4" fill="#fff" opacity=".9"/>
+</svg>

@@ -309,6 +309,7 @@ void adc_disable_touchkey(uint32_t adc);
 /**
  * Run one touch-key conversion.
  *
+ * @param adc         the ADC base address
  * @param charge      charge time, 5 bits, in ADC clocks
  * @param discharge   discharge time, 3 bits, in ADC clocks
  * @return            the equivalent touch-key data value

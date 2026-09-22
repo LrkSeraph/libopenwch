@@ -188,6 +188,22 @@ deliberately does not.  One intentional deviation from libopencm3:
 CNF/MODE nibble rather than a `(mode, cnf)` pair, because that nibble is not a
 bitfield decomposition.
 
+## Documentation
+
+The API reference is generated with Doxygen and the vendored
+[Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css) theme:
+
+```sh
+make html          # both families
+```
+
+This writes one self-contained site per family to
+`doc/<family>/html/index.html`.  The Doxygen build needs no RISC-V toolchain:
+`make html` generates the interrupt headers first, and skips cleanly when
+Doxygen is not installed.  Warnings are collected under
+`doc/<family>/doxygen.log`; see `doc/README.md` for details and for the
+requirements.
+
 ## Layout
 
 ```
@@ -198,7 +214,9 @@ scripts/            genlink.py, irq2nvic_h, genlinktest.sh, checkpatch.pl
 ld/                 devices.data + linker.ld.S + tests
 include/libopenwch/ qingke/ (core)  ch32v0/  ch5xx58x/  dispatch/  ble/
 lib/                Makefile.include + per-family sources + mini_libc/ + ble/
-doc/  tests/        Doxygen; per-family API smoke tests
+doc/                Doxyfile template, source pages, Doxygen Awesome
+                    theme, per-family HTML output (not committed)
+tests/              per-family API smoke tests
 ```
 
 ## Licence and references

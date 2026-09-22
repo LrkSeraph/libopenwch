@@ -17,7 +17,7 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @addtogroup rcc_file RCC
+/** @addtogroup rcc_file Reset and Clock Control
  *
  * @ingroup CH32V0
  *

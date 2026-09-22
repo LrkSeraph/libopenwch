@@ -17,7 +17,7 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @addtogroup gpio_file GPIO
+/** @addtogroup gpio_file General Purpose I/O
  *
  * @ingroup CH32V0
  *

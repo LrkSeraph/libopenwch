@@ -161,6 +161,7 @@ ble_status_t ble_gap_role_terminate_link(ble_conn_handle_t conn);
 
 /**
  * Ask the central to change the connection parameters.
+ * @param conn          connection handle
  * @param min_interval  minimum interval, in 1.25 ms units
  * @param max_interval  maximum interval, in 1.25 ms units
  * @param latency       slave latency, in connection events
@@ -176,6 +177,7 @@ ble_status_t ble_gap_role_conn_param_update(ble_conn_handle_t conn,
 
 /**
  * Request a PHY change.
+ * @param conn      connection handle
  * @param all_phys  0 to allow either PHY to change, 1 to change only tx,
  *                  2 for only rx, 3 to change both
  * @param tx_phys   bitmask of allowed TX PHYs (1 = 1M, 2 = 2M, 4 = coded)

@@ -142,6 +142,16 @@ Everything else is original to this project, in particular:
   include/libopenwch/mini_libc.h     its declarations
   tests/**                           the API smoke tests
 
+Doxygen theme (MIT)
+--------------------
+
+The API documentation uses vendored assets from Doxygen Awesome
+(https://github.com/jothepro/doxygen-awesome-css), release v2.5.0.  The theme
+files under `doc/awesome/` are unmodified; the project's own CSS lives in
+`doc/templates/libopenwch-custom.css` and is not part of Doxygen Awesome.
+Doxygen Awesome is MIT-licensed; its licence text is kept at
+`doc/awesome/LICENSE`.
+
 Not in this repository any more
 -------------------------------
 

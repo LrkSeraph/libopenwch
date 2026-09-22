@@ -1,0 +1,100 @@
+/**
+@defgroup libopenwch libopenwch
+@brief Project-wide documentation root.
+
+libopenwch groups its public API by device family and by core or peripheral
+component.  Start at @ref peripheral_apis for the drivers.
+
+@if ch5xx58x
+Bluetooth LE applications should start at @ref BLE.
+@endif
+*/
+
+/**
+@defgroup peripheral_apis Peripheral APIs
+@ingroup libopenwch
+@brief Core and peripheral drivers.
+
+This group contains the QingKe core layer and the device families.  A family
+page lists register definitions, configuration constants, and driver
+functions.  The same driver source is shared by all parts in a family; the
+device database in <code>ld/devices.data</code> adds the part-specific memory
+map and ISA flags at link time.
+*/
+
+/**
+@defgroup qingke_file QingKe core
+@ingroup peripheral_apis
+@brief Architecture core support shared by every WCH family.
+
+The QingKe layer corresponds to libopencm3's <code>cm3/</code> directory.  It
+provides the reset path and vector table, the PFIC (WCH's NVIC-compatible
+interrupt controller), SysTick, DWT, CSR access, synchronisation helpers, and
+the assertion hook.
+*/
+
+/**
+@defgroup qingke_nvic_isrprototypes Interrupt service routine prototypes
+@ingroup qingke_file
+@brief Weak ISR entry points generated from each family's <code>irq.json</code>.
+
+The names are lower-case versions of the interrupt source names in the WCH
+reference manual.  An application overrides the handler it needs; the weak
+default implementation in the family's vector table does nothing.
+*/
+
+@if ch32v0
+/**
+@defgroup CH32V0 CH32V00x
+@ingroup peripheral_apis
+@brief Drivers for the CH32V002/003/004/005/006/007 family.
+
+These parts use the QingKe V2 core in RV32EC mode with 16 registers and
+compressed instructions.  Ports are eight bits wide and each pin is configured
+by one opaque four-bit nibble in the GPIO configuration register; see
+@ref gpio_defines and @ref gpio_file.
+
+The family archive is <code>libopenwch_ch32v0.a</code>.
+*/
+
+/**
+@defgroup CH32V0_defines CH32V00x definitions
+@ingroup CH32V0
+@brief Register bit definitions, constants, and types for the CH32V00x family.
+*/
+@endif
+
+@if ch5xx58x
+/**
+@defgroup CH5XX58X CH58x
+@ingroup peripheral_apis
+@brief Drivers for the CH582/583/584/585 family.
+
+These parts use the QingKe V4 core in RV32IMAC mode.  A 32 MHz HSE crystal is
+mandatory, most control registers are RWA (write-protected), and code that
+reconfigures flash or enters low-power states must run from RAM through
+<code>OPENWCH_HIGH_CODE</code>.
+
+The family archive is <code>libopenwch_ch5xx58x.a</code>.  The optional BLE
+wrapper links separately against WCH's Apache-2.0 binary; see @ref BLE.
+*/
+
+/**
+@defgroup CH5XX58X_defines CH58x definitions
+@ingroup CH5XX58X
+@brief Register bit definitions, constants, and types for the CH58x family.
+*/
+
+/**
+@defgroup BLE Bluetooth LE
+@ingroup libopenwch
+@brief Thin wrapper around WCH's closed-source BLE stack.
+
+The wrapper documents and renames the subset of WCH's <code>LIBCH58xBLE.a</code>
+API that a peripheral role needs.  It keeps WCH's event-driven TMOS model and
+does not reimplement Bluetooth.  Applications must link the vendor archive and
+the mini libc; the application template does that with
+<code>LIBOPENWCH_BLE=1</code>.  The binary remains under WCH's Apache-2.0
+licence.
+*/
+@endif

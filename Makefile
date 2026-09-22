@@ -68,10 +68,18 @@ STYLECHECK      := scripts/checkpatch.pl
 ##
 ##   LEADING_SPACE          clang-format alignment padding.
 ##   SUSPECT_CODE_INDENT    ditto, for a macro body broken across lines.
+##   OPEN_BRACE             checkpatch wants a designated initializer's `{`
+##                          attached to the `=`, but clang-format's
+##                          DesignatedInitializer handling always breaks it
+##                          to the next line.  The formatter wins here too;
+##                          `OPEN_BRACE` also covers the same check for
+##                          functions and aggregate declarations, but those are
+##                          already held to the house style by clang-format.
 ##
 STYLECHECKIGNORE := VOLATILE,NEW_TYPEDEFS,CAMELCASE,COMPLEX_MACRO,SPACING
 STYLECHECKIGNORE := $(STYLECHECKIGNORE),AVOID_EXTERNS,STORAGE_CLASS,BRACES
 STYLECHECKIGNORE := $(STYLECHECKIGNORE),LEADING_SPACE,SUSPECT_CODE_INDENT
+STYLECHECKIGNORE := $(STYLECHECKIGNORE),OPEN_BRACE
 
 STYLECHECKFLAGS := --no-tree -f --terse --mailback --ignore $(STYLECHECKIGNORE)
 
@@ -148,6 +156,12 @@ $(LIB_DIRS): $(IRQ_GENERATED_FILES)
 	@printf "  BUILD   $@\n";
 	$(Q)$(MAKE) --directory=$@ PREFIX="$(PREFIX)" || \
 		echo "Failure building: $@: code: $$?" > .stamp_failure_$(subst /,_,$@)
+
+##
+## IRQ generation without a toolchain (used by `make html`; useful on its own
+## for documentation and for inspecting generated headers without building).
+##
+irq: $(IRQ_GENERATED_FILES)
 
 lib: $(LIB_DIRS)
 	$(Q)$(RM) .stamp_failure_tld
@@ -261,6 +275,6 @@ genlinktests.clean:
 list-targets:
 	@echo $(TARGETS)
 
-.PHONY: build lib $(LIB_DIRS) doc html clean generatedheaders cleanheaders \
+.PHONY: build irq lib $(LIB_DIRS) doc html clean generatedheaders cleanheaders \
 	stylecheck styleclean genlinktests genlinktests.clean apitest apitest.clean \
 	list-targets
