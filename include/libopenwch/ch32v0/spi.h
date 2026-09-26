@@ -39,10 +39,10 @@ LGPL License Terms @ref lgpl_license
 
 /*
  * The CH32V00x has a single SPI instance, SPI1, on APB2.  Its default pins
- * are PA5 (SCK), PA6 (MISO), PA7 (MOSI) and PA4 (NSS); the remap bit
- * AFIO_PCFR1_SPI1_REMAP moves it to PC5/PC6/PC7/PC4.  Configure the pins with
- * gpio_set_mode(..., GPIO_MODE_AF_PP), enable the clock with the RCC driver
- * and select the remap with gpio_primary_remap(GPIO_REMAP_SPI1).
+ * are PC5 (SCK), PC6 (MOSI), PC7 (MISO) and PC1 (NSS); the remap bit
+ * AFIO_PCFR1_SPI1_REMAP selects the alternate pin mapping documented by WCH.
+ * Configure the pins with gpio_set_mode(..., GPIO_MODE_AF_PP), enable the
+ * clock with the RCC driver, and leave the remap bit clear for the PC pins.
  */
 #define SPI1 SPI1_BASE
 

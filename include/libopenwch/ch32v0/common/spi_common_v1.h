@@ -44,11 +44,11 @@ specific memorymap.h header before including this header file. */
  * spaces the 16-bit registers out to 32-bit boundaries.  Every register is
  * therefore accessed as MMIO16 at a stride of 4.
  *
- * The only instance is SPI1, on APB2, with its default pins PA5 (SCK),
- * PA6 (MISO), PA7 (MOSI) and PA4 (NSS); the remap bit AFIO_PCFR1_SPI1_REMAP
- * moves it to PC5..PC7/PC4 style positions (see the vendor header).  The pins
- * are configured with gpio_set_mode(..., GPIO_MODE_AF_PP) and the clock is
- * enabled through the RCC driver.
+ * The only instance is SPI1, on APB2, with default pins PC5 (SCK),
+ * PC6 (MOSI), PC7 (MISO) and PC1 (NSS); AFIO_PCFR1_SPI1_REMAP selects the
+ * alternate pin mapping documented by WCH.  The pins are configured with
+ * gpio_set_mode(..., GPIO_MODE_AF_PP) and the clock is enabled through the
+ * RCC driver.
  */
 
 /* --- Register accessors -------------------------------------------------- */
