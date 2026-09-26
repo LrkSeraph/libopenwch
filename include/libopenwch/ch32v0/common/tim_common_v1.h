@@ -179,7 +179,7 @@ specific memorymap.h header before including this header file. */
 #define TIM_INTFR_CC3OF (1 << 11) /**< CC3 overcapture flag */
 #define TIM_INTFR_CC4OF (1 << 12) /**< CC4 overcapture flag */
 
-/** All interrupt flag bits that are cleared by writing a 1 to INTFR. */
+/** All interrupt flag bits; INTFR is cleared by writing a 0 to the bit. */
 #define TIM_INTFR_IRQ_MASK                                                     \
 	(TIM_INTFR_UIF | TIM_INTFR_CC1IF | TIM_INTFR_CC2IF | TIM_INTFR_CC3IF | \
 	 TIM_INTFR_CC4IF | TIM_INTFR_COMIF | TIM_INTFR_TIF | TIM_INTFR_BIF)

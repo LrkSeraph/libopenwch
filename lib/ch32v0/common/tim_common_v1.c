@@ -483,12 +483,12 @@ uint16_t timer_get_flag(uint32_t tim, enum tim_flag flag) {
 
 void timer_clear_flag(uint32_t tim, enum tim_flag flag) {
 	/*
-	 * INTFR is a write-1-to-clear register, so writing the wanted mask
-	 * directly clears exactly those flags: the ones written as 0 keep
-	 * their state, and no read-modify-write race can lose flags raised in
-	 * between.
+	 * INTFR is a write-0-to-clear register.  Clear only the requested
+	 * flags by writing zeroes there and ones everywhere else.  A direct
+	 * write is used rather than read-modify-write so a flag raised between
+	 * the read and the write cannot be lost.
 	 */
-	TIM_INTFR(tim) = tim_flag_mask(flag);
+	TIM_INTFR(tim) = (uint16_t)~tim_flag_mask(flag);
 }
 
 uint8_t timer_get_interrupt_source(uint32_t tim, uint16_t irq) {
