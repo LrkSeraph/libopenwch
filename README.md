@@ -1,26 +1,21 @@
 # libopenwch
 
-An open-source peripheral driver library for **WCH (Nanjing Qinheng) RISC-V
-microcontrollers**, written in the style of
-[libopencm3](https://github.com/libopencm3/libopencm3): a small, direct
-register-level API with **lowercase_snake_case** names, a family/subfamily
-directory layout, and a `Makefile`-based build that generates the right linker
-script from the part number.
+Open-source peripheral driver library for **WCH RISC-V microcontrollers**,
+modeled on [libopencm3](https://github.com/libopencm3/libopencm3):
+lowercase_snake_case API, family directories, and a Makefile that derives the
+ISA and linker script from the part number.
 
-> **Incubating — not ready for production.**  Pre-1.0, API not frozen, and
-> **nothing has run on silicon**: this project has no development board and no
-> WCH-Link.  What *is* verified is that the whole public API compiles and links,
-> that the archives carry the right ISA, and that the register descriptions
-> match WCH's reference manual.  That is not the same as having run it.
+> **Incubating — not production-ready, not silicon-validated.** The public API
+> compiles and links, and the register descriptions follow WCH's manual. That is
+> not the same as having run on hardware.
 
-| Family | Parts | Core | State |
+| Family | Parts | Core / ISA | State |
 |---|---|---|---|
 | `ch32v0` | CH32V003/002/004/005/006/007 | QingKe V2, RV32EC | 316 public functions, 15 peripherals |
-| `ch5xx58x` | CH582/583/584/585 | QingKe V4, RV32IMAC | 230 public functions, 12 peripherals + Bluetooth LE |
+| `ch5xx58x` | CH582/583/584/585 | QingKe V4, RV32IMAC | 230 public functions, 12 peripherals + BLE |
 
-Two open questions need a real part to settle: the `DBGMCU_CR` bit layout
-(CSR `0x7c0`), where WCH's EVT and ch32fun disagree, and whether the BLE layer
-works at all — it links WCH's closed-source stack and has never executed.
+Open questions that need a real part: the `DBGMCU_CR` bit layout and whether the
+BLE wrapper works at all.
 
 ## Toolchain
 
@@ -29,51 +24,29 @@ sudo apt-get install -y gcc-riscv64-unknown-elf
 ```
 
 `mk/gcc-config.mk` probes `riscv64-unknown-elf`, `riscv64-none-elf`,
-`riscv32-unknown-elf`, `riscv-none-elf`, `riscv64-elf`, `riscv32-elf`, in that
-order; override with `make PREFIX=/opt/xpack/bin/riscv-none-elf`.
-`riscv64-linux-gnu-` is deliberately not probed: its crt and libc conventions
-break bare-metal builds.
+`riscv32-unknown-elf`, `riscv-none-elf`, `riscv64-elf`, `riscv32-elf`, and can
+be overridden with `make PREFIX=...`. `riscv64-linux-gnu-` is not probed.
 
-**libc.**  The library calls no C library function directly and its archives
-reference only libgcc — but `openwch_reset_init()`'s `.data`/`.bss` loops become
-`memcpy`/`memset` calls under GCC 13 (GCC 15 inlines them), so a freestanding
-link has to supply both.  Debian and Ubuntu ship **no newlib** for the `rv32e`
-or `rv32imac` multilibs, so an application has two modes:
-
-| mode | link | chosen when |
-|---|---|---|
-| newlib | `-lc -lgcc -lnosys` | the toolchain has a libc for this multilib |
-| mini-libc | `-nostdlib` + `libopenwch_mini_libc_<family>.a` + `-lgcc` | it does not |
-
-An application does not have to choose: `mk/libc-config.mk` links an empty
-program with `-lc -lnosys` at build time and takes whichever works, so a
-distribution that ships no newlib for the `rv32e` multilib builds with no
-variable set.  `LIBOPENWCH_NOSTDLIB=1` (or `=0`) forces one.
-
-The mini-libc is a per-family archive of `memcpy`, `memmove`, `memset`,
-`memcmp`, `memchr`, `strlen`, `strnlen`, `strcmp`, `strncmp`, `strcpy`,
-`strncpy`, `strchr` — no `printf`, no `malloc`, no floating point.  The API
-smoke tests link the same way, which is what keeps this honest: if the library
-ever grows another libc dependency, `make apitest` stops linking.
+The library archives need only libgcc, but GCC 13 turns `openwch_reset_init()`'s
+`.data`/`.bss` loops into `memcpy`/`memset`. When the toolchain has no newlib for
+the selected multilib, `mk/libc-config.mk` links the bundled per-family
+mini-libc automatically; `LIBOPENWCH_NOSTDLIB=1` forces it. The mini-libc
+provides `mem*` and `str*` only.
 
 ## Building
 
 ```sh
-make                     # every family in TARGETS
+make                     # all families in TARGETS
 make TARGETS=ch32v0      # one family
 make list-targets
 make genlinktests        # validate ld/devices.data (no toolchain needed)
 make apitest             # compile and link every public function
-make stylecheck          # second opinion (scripts/checkpatch.pl)
+make stylecheck          # checkpatch.pl second opinion
 ```
 
-Artifacts land in `lib/`: `libopenwch_<family>.a` and
-`libopenwch_mini_libc_<family>.a`.
-
-**Formatting** is clang-format's job, driven by `.clang-format` and run from
-`.git/hooks/pre-commit` — never in CI.  Committing reformats the staged C
-sources and re-stages them; without clang-format installed the hook does
-nothing and the commit proceeds.
+Artifacts: `lib/libopenwch_<family>.a` and
+`lib/libopenwch_mini_libc_<family>.a`. Formatting is clang-format's job via the
+local pre-commit hook, never CI.
 
 ## Using it
 
@@ -93,144 +66,78 @@ include $(OPENWCH_DIR)/mk/genlink-rules.mk
 include $(OPENWCH_DIR)/mk/gcc-rules.mk
 ```
 
-`genlink-config.mk` reads `ld/devices.data` and, for the selected `DEVICE`,
-sets `-march`/`-mabi`, adds `-D<FAMILY>`, picks the family archive, and arranges
-for `generated.$(DEVICE).ld` to be produced from `ld/linker.ld.S`.  Do not add
-`-march`/`-mabi` by hand: mixing `ilp32` and `ilp32e` objects silently breaks
-the ABI.  `-nostartfiles` is required — the vector table and reset path come
-from this library, not from the toolchain's crt0.
+`genlink-config.mk` selects `-march`/`-mabi`, the family archive, and the
+generated linker script. Never add `-march`/`-mabi` by hand; mixing `ilp32`
+and `ilp32e` breaks the ABI. `-nostartfiles` is required because libopenwch
+supplies `_start` and the vector table.
 
 ```c
 #include <libopenwch/ch32v0/gpio.h>
 #include <libopenwch/ch32v0/rcc.h>
-#include <libopenwch/qingke/nvic.h>
 
 int main(void)
 {
-	/* 48 MHz from the internal RC oscillator and its PLL, in one line. */
-	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
+rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
 
-	rcc_periph_clock_enable(RCC_GPIOA);
-	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_10MHZ,
-	              GPIO_CNF_OUTPUT_PUSHPULL, GPIO1);
-	for (;;) {
-		gpio_toggle(GPIOA, GPIO1);
-	}
+rcc_periph_clock_enable(RCC_GPIOA);
+gpio_set_mode(GPIOA, GPIO_MODE_OUT_PP, GPIO1);
+for (;;) {
+gpio_toggle(GPIOA, GPIO1);
+}
 }
 ```
 
-Clock setup follows libopencm3: the configurations are data
-(`rcc_hsi_configs[]`, `rcc_hse_configs[]`, and `clk_source_t` on the CH58x),
-one call selects one, and the resulting frequencies are left in
+Clock trees are data (`rcc_hsi_configs[]`, `rcc_hse_configs[]`,
+`clk_source_t` on CH58x); one call selects one and publishes
 `rcc_sysclk_frequency`, `rcc_ahb_frequency`, `rcc_apb1_frequency`,
-`rcc_apb2_frequency` and `rcc_adc_frequency` — so a driver or an application
-reads a variable instead of measuring the tree into a temporary of its own.
-The named wrappers (`rcc_clock_setup_hsi_48mhz()` and friends) are one-line
-equivalents for callers that prefer a function name.
+`rcc_apb2_frequency`, `rcc_adc_frequency`.
 
-**Start a new project from
-[libopenwch-template](https://github.com/LrkSeraph/libopenwch-template)**, not
-from here: a `Makefile`, a `src/` and this library wired in as a submodule, and
-nothing else.  **Read worked code in
-[libopenwch-examples](https://github.com/LrkSeraph/libopenwch-examples)**:
-`blink`, `uart_echo`, `ch582_blink`, `ch582_uart_echo` and
-`ch582_ble_advertise`, which are also what this library's CI builds against
-itself.
+For working applications, use
+[libopenwch-template](https://github.com/LrkSeraph/libopenwch-template) and
+[libopenwch-examples](https://github.com/LrkSeraph/libopenwch-examples).
 
 ## Bluetooth LE (CH58x)
 
-The radio is driven by **WCH's closed-source stack**, vendored under
-`lib/ble/wch/` (**Apache-2.0**, not the LGPL that covers the rest — see
-`NOTICE`) and wrapped in a thin lowercase_snake_case layer covering TMOS, GAP
-parameters, the peripheral role, the GATT server and start-up:
+WCH's closed-source stack is vendored under `lib/ble/wch/` (Apache-2.0, not
+LGPL) and wrapped with a thin `ble_*` layer for TMOS, GAP, the peripheral role,
+GATT server, and startup. It is a wrapper, not a stack; central/observer/
+broadcaster, bonding, OTA, and mesh are not covered. Needs about 145 KB flash
+and an application-declared heap.
 
-```c
-BLE_HEAP_DEFINE(ble_heap, BLE_HEAP_SIZE_DEFAULT);
+## API notes
 
-ble_config_default(&config);
-config.heap = ble_heap;
-config.heap_size = sizeof(ble_heap);
-config.mac = device_mac;          /* you supply the address */
-
-if (ble_init(&config) != BLE_INIT_OK) {
-	for (;;) {
-	}
-}
-
-ble_gap_role_peripheral_init();
-app_task = ble_tmos_task_register(app_event_handler);
-ble_gap_role_set_param(BLE_GAP_ROLE_PARAM_ADVERT_DATA, sizeof(data), data);
-ble_gap_role_peripheral_start_device(app_task, 0, &role_cbs);
-
-for (;;) {
-	ble_tmos_process();
-}
-```
-
-It is a **wrapper, not a stack**: WCH's event-driven design is preserved (one
-TMOS task, connection events as messages, `ble_tmos_process()` forever).  The
-central/observer/broadcaster roles, bonding, OTA and mesh are not covered;
-those names remain reachable in the vendor header.  See `lib/ble/README`.
-The stack needs about 145 KB of flash and a heap the application declares.
-
-## API conventions
-
-* `periph_verb_object()` — `gpio_set_mode()`, `usart_set_baudrate()`.
-* Constants `PERIPH_REGISTER_BIT` (`USART_CTLR1_UE`), types lowercase `_t`.
-* The first argument is the peripheral base address, so one function drives
-  every instance: `usart_set_baudrate(USART1, 115200)`.
-* Registers go through `MMIO32(addr)` and are named as close to the WCH manual
-  as the style allows.
-
-WCH's EVT library uses CamelCase (`GPIO_Init`, `GPIOA_ModeCfg`); this library
-deliberately does not.  One intentional deviation from libopencm3:
-`gpio_set_mode(port, mode, pins)` on the CH32V00x takes WCH's full
-`GPIO_Mode_*` token rather than a `(mode, cnf)` pair.  The token carries the
-CNF/MODE nibble plus an output-speed marker; this API fixes output modes at
-10 MHz, which is what WCH's own examples use.
+* Functions `periph_verb_object()`; first argument is the peripheral base.
+* Constants `PERIPH_REGISTER_BIT`; types lowercase `_t`; registers use
+  `MMIO32()` and WCH manual names.
+* CH32V00x `gpio_set_mode(port, mode, pins)` takes WCH's opaque `GPIO_Mode_*`
+  token, not libopencm3's `(mode, cnf)` pair.
 
 ## Documentation
 
-The API reference is generated with Doxygen and the vendored
-[Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css) theme:
-
 ```sh
-make html          # root site + both family sites
+make html      # root site + one API site per family
 ```
 
-This writes a project-wide landing page to `doc/html/index.html` and one
-self-contained API reference per family to `doc/<family>/html/index.html`.
-The Doxygen build needs no RISC-V toolchain: `make html` generates the
-interrupt headers first, and skips cleanly when Doxygen is not installed.
-Warnings are collected under `doc/doxygen-root.log` and
-`doc/<family>/doxygen.log`; see `doc/README.md` for details and for the
-requirements.
+Outputs: `doc/html/index.html`, `doc/<family>/html/index.html`; warning logs in
+`doc/*.log`. Doxygen is required; see `doc/README.md`.
 
 ## Layout
 
 ```
 Makefile            TARGETS-based recursive build
-.clang-format       the formatting authority (.git/hooks/pre-commit)
-mk/                 reusable build modules (also all an application needs)
-scripts/            genlink.py, irq2nvic_h, genlinktest.sh, checkpatch.pl
-ld/                 devices.data + linker.ld.S + tests
-include/libopenwch/ qingke/ (core)  ch32v0/  ch5xx58x/  dispatch/  ble/
-lib/                Makefile.include + per-family sources + mini_libc/ + ble/
-doc/                Doxyfile template, source pages, Doxygen Awesome
-                    theme, per-family HTML output (not committed)
+mk/                 reusable build modules for applications too
+scripts/            genlink.py, irq2nvic_h, checkpatch.pl
+ld/                 devices.data, linker.ld.S, tests
+include/libopenwch/ qingke/, ch32v0/, ch5xx58x/, dispatch/, ble/
+lib/                per-family sources, mini-libc, BLE
+doc/                Doxygen template, prose pages, vendored theme
 tests/              per-family API smoke tests
 ```
 
-## Licence and references
+## Licence
 
-`include/`, `lib/`, `ld/`, `mk/` are **LGPL-3.0-or-later** (`LICENSE`), the same
-split libopencm3 uses, so applications that merely link the library are
-unaffected.  `scripts/checkpatch.pl` is **GPL-2.0** (`COPYING.GPL2`), imported
-from the Linux kernel.  `lib/ble/wch/` is WCH's, **Apache-2.0**.  Full
-provenance is in `NOTICE`.
+`include/`, `lib/`, `ld/`, `mk/` are LGPL-3.0-or-later; `scripts/checkpatch.pl`
+is GPL-2.0; `lib/ble/wch/` is Apache-2.0. See `LICENSE` and `NOTICE`.
 
-Built on [libopencm3](https://github.com/libopencm3/libopencm3) (API style,
-build system, structure) and [ch32fun](https://github.com/cnlohr/ch32fun)
-(toolchain strategy).  WCH's EVT packages for the CH32V003 and CH58x were used
-as the register-level reference, not copied.  Nothing here is affiliated with or
-endorsed by Nanjing Qinheng Microelectronics.
+Built with reference to libopencm3, ch32fun, and WCH EVT packages. Not
+affiliated with Nanjing Qinheng Microelectronics.
