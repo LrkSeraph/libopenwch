@@ -43,14 +43,13 @@ on real silicon:
   multiple flash breakpoints;
 * CH32V003 DMA MEM2MEM self-test: 8-bit and 32-bit SRAM transfers both PASS;
   measured throughput is about 7.09 MB/s and 22.26 MB/s respectively;
-* CH32V003 TIM2 period self-test after the `TIM_INTFR` clear-semantics fix:
-  measured periods are 999998-999999 us and all reports PASS.
+* CH32V003 timer self-test after the `TIM_INTFR` clear-semantics fix: TIM1
+  and TIM2 both measured a 999998 us period and reported PASS.
 
 Still pending:
 
 * blink and UART counter on CH32V003 and CH582;
-* the TIM1 time base and the IWDG/WWDG watchdog self-test on real hardware
-  (the previous TIM2 result was with the single-timer self-test);
+* the IWDG/WWDG watchdog self-test on real hardware;
 * the standalone `wchlink flash`, `unbrick`, and terminal paths on real
   hardware;
 * CH58x flash support, whose ROM-resident routine is not yet implemented.
