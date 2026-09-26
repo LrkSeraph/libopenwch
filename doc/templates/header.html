@@ -26,6 +26,32 @@ $mathjax
 $darkmode
 <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
 $extrastylesheet
+<!--
+  Doxygen Awesome stores the theme in localStorage.  For documentation opened
+  directly from the filesystem, browser behaviour for file:// storage is not
+  consistent across pages, so carry the same choice in window.name as well.
+-->
+<script type="text/javascript">
+(function () {
+    var prefix = "libopenwch-theme=";
+    try {
+        var name = window.name || "";
+        var pos = name.indexOf(prefix);
+        if (pos >= 0) {
+            var value = name.slice(pos + prefix.length).split(";")[0];
+            if (value === "dark" && !localStorage.getItem("prefers-dark-mode-in-light-mode")) {
+                localStorage.setItem("prefers-dark-mode-in-light-mode", "true");
+                localStorage.removeItem("prefers-light-mode-in-dark-mode");
+            } else if (value === "light" && !localStorage.getItem("prefers-light-mode-in-dark-mode")) {
+                localStorage.setItem("prefers-light-mode-in-dark-mode", "true");
+                localStorage.removeItem("prefers-dark-mode-in-light-mode");
+            }
+        }
+    } catch (e) {
+        /* localStorage can be unavailable for file: URLs. */
+    }
+})();
+</script>
 <!-- Doxygen Awesome theme extensions (vendored under doc/awesome). -->
 <script type="text/javascript" src="$relpath^doxygen-awesome-darkmode-toggle.js"></script>
 <script type="text/javascript" src="$relpath^doxygen-awesome-fragment-copy-button.js"></script>
@@ -38,6 +64,32 @@ DoxygenAwesomeFragmentCopyButton.init()
 DoxygenAwesomeParagraphLink.init()
 DoxygenAwesomeInteractiveToc.init()
 DoxygenAwesomeTabs.init()
+
+/* Remember the current theme in window.name so file:// navigation keeps it. */
+(function () {
+    var prefix = "libopenwch-theme=";
+    var current = null;
+
+    function rememberTheme() {
+        var value = document.documentElement.classList.contains("dark-mode") ? "dark" : "light";
+        if (value === current) {
+            return;
+        }
+        current = value;
+        var name = window.name || "";
+        var pos = name.indexOf(prefix);
+        var base = pos >= 0 ? name.slice(0, pos) : name;
+        window.name = base + prefix + value + ";";
+    }
+
+    if (typeof MutationObserver !== "undefined") {
+        new MutationObserver(rememberTheme).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    }
+    rememberTheme();
+})();
 </script>
 </head>
 <body>
