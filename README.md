@@ -184,9 +184,10 @@ The stack needs about 145 KB of flash and a heap the application declares.
 
 WCH's EVT library uses CamelCase (`GPIO_Init`, `GPIOA_ModeCfg`); this library
 deliberately does not.  One intentional deviation from libopencm3:
-`gpio_set_mode(port, nibble, pins)` on the CH32V00x takes a single opaque
-CNF/MODE nibble rather than a `(mode, cnf)` pair, because that nibble is not a
-bitfield decomposition.
+`gpio_set_mode(port, mode, pins)` on the CH32V00x takes WCH's full
+`GPIO_Mode_*` token rather than a `(mode, cnf)` pair.  The token carries the
+CNF/MODE nibble plus an output-speed marker; this API fixes output modes at
+10 MHz, which is what WCH's own examples use.
 
 ## Documentation
 

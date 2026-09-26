@@ -51,9 +51,11 @@ specific memorymap.h header before including this header file.*/
  * 32-bit configuration register.  The ports are only 8 bits wide, so there is
  * no CFGHR -- pins 0..7 live in CFGLR.
  *
- * A pin's nibble is at bit (pin * 4).  MODE selects the direction and output
- * speed, CNF the input/output flavour; the two fields are only meaningful
- * together, which is why gpio_set_mode() takes both.
+ * A pin's four bits are at bit (pin * 4): the low two are MODE and the high
+ * two are CNF.  gpio_set_mode() takes WCH's full GPIO_Mode_* token, not a
+ * libopencm3 (mode, cnf) pair: the token's low four bits are the CNF/MODE
+ * nibble, and its 0x10 bit marks an output/alternate mode whose speed is
+ * fixed at 10 MHz by this API.
  */
 
 /* --- Register accessors -------------------------------------------------- */
@@ -131,10 +133,10 @@ specific memorymap.h header before including this header file.*/
  *	GPIO_MODE_AF_OD		0x1c
  *	GPIO_MODE_AF_PP		0x18
  *
- * The nibbles are therefore treated as opaque values, exactly as the
- * reference manual presents them, rather than being re-derived from field
- * positions.  This also means a value copied out of WCH's EVT or the manual
- * can be passed to gpio_set_mode() unchanged.
+ * The tokens are therefore treated as opaque values, exactly as WCH's own
+ * GPIO_Mode_* enumeration presents them, rather than being re-derived from
+ * field positions.  A token copied out of WCH's EVT or the manual can be
+ * passed to gpio_set_mode() unchanged.
  *
  * Pull direction is not part of the nibble: GPIO_MODE_IPD and GPIO_MODE_IPU
  * encode the same "input with pull" configuration, and the output data

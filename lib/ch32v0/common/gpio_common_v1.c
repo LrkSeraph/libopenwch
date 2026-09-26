@@ -41,22 +41,32 @@
 #include <libopenwch/qingke/assert.h>
 
 /*
- * Apply `nibble` to the pin-packing register `reg` for every pin set in
- * `gpios`.  The MODE/CNF fields are 2 bits each, so one pin occupies a nibble
- * and the register is 32 bits wide -- which is exactly 8 pins, the width of a
- * CH32V00x port.
+ * Apply a WCH GPIO_Mode_* token to the pin-packing register `reg` for every
+ * pin set in `gpios`.
+ *
+ * A pin occupies four CFGLR bits: two MODE bits and two CNF bits.  The WCH
+ * token carries the CNF/MODE nibble in its low four bits and a fifth bit that
+ * says "this is an output or alternate-function mode"; when that bit is set,
+ * WCH's GPIO_Init() ORs in the selected speed.  This library's API has no
+ * separate speed argument, so output modes use the 10 MHz selector (value 1),
+ * which is what the documented WCH examples use.
  */
 static void
-gpio_nibble_apply(volatile uint32_t *reg, uint8_t nibble, uint16_t gpios) {
+gpio_nibble_apply(volatile uint32_t *reg, uint8_t mode, uint16_t gpios) {
+	uint32_t nibble = (uint32_t)(mode & 0x0fu);
 	uint32_t value = *reg;
 	unsigned pin;
+
+	if ((mode & 0x10u) != 0u) {
+		nibble |= 1u; /* GPIO_Speed_10MHz */
+	}
 
 	for (pin = 0; pin < GPIO_PIN_COUNT; pin++) {
 		if (gpios & (1 << pin)) {
 			uint32_t shift = pin * 4;
 
 			value &= ~(0xfu << shift);
-			value |= ((uint32_t)nibble & 0xfu) << shift;
+			value |= (nibble & 0xfu) << shift;
 		}
 	}
 
@@ -64,7 +74,8 @@ gpio_nibble_apply(volatile uint32_t *reg, uint8_t nibble, uint16_t gpios) {
 }
 
 void gpio_set_mode(uint32_t gpioport, uint8_t mode, uint16_t gpios) {
-	openwch_assert((mode & ~GPIO_CFGLR_NIBBLE_MASK) == 0);
+	/* The known WCH tokens are all at or below GPIO_MODE_IPU (0x48). */
+	openwch_assert(mode <= GPIO_MODE_IPU);
 	openwch_assert((gpios & ~GPIO_ALL) == 0);
 
 	/*
