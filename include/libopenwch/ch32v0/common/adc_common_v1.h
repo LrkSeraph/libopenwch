@@ -40,8 +40,9 @@ specific memorymap.h header before including this header file. */
 /**@{*/
 
 /*
- * The CH32V00x has a single 12-bit successive-approximation ADC, ADC1, on
- * APB2.  Unlike the USART/I2C/TIM blocks it is a full 32-bit peripheral: the
+ * The CH32V00x has a single successive-approximation ADC, ADC1, on APB2.
+ * Resolution is part-specific (CH32V003: 10-bit; some siblings use 12-bit).
+ * Unlike the USART/I2C/TIM blocks it is a full 32-bit peripheral: the
  * registers sit on 4-byte boundaries and are accessed as MMIO32.
  *
  * The block is the classic STM32-style ADC (status, two control registers,
@@ -193,7 +194,8 @@ specific memorymap.h header before including this header file. */
 
 /* --- IDATAR1..IDATAR4 and RDATAR ----------------------------------------- */
 
-/** 12-bit conversion result, in whichever alignment is selected. */
+/** ADC conversion result, in whichever alignment is selected.  The
+ * CH32V003 is 10-bit; wider parts use up to 12 bits. */
 #define ADC_IDATAR_JDATA_MASK 0x0000ffffu
 #define ADC_RDATAR_DATA_MASK 0x0000ffffu
 

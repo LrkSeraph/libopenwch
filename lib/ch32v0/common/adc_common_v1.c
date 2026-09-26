@@ -27,7 +27,9 @@
  *
  * @date 1 January 2025
  *
- * The ADC1 block is a 12-bit switched-capacitor converter driven from APB2.
+ * The ADC1 block is a switched-capacitor converter driven from APB2.  Its
+ * resolution is part-specific: the CH32V003 is 10-bit, while some siblings
+ * are 12-bit.
  * A conversion is started either in software (EXTTRIG + SWSTART/JSWSTART for
  * the regular group, JEXTTRIG + JSWSTART for the injected group) or by one of
  * the timer/external events selected through EXTSEL/JEXTSEL.

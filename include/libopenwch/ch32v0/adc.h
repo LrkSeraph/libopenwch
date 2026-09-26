@@ -38,8 +38,10 @@ LGPL License Terms @ref lgpl_license
 #include <libopenwch/ch32v0/memorymap.h>
 
 /*
- * The CH32V00x family has a single 12-bit ADC, ADC1, on APB2.  There is no
- * dual mode and no ADC2.
+ * The CH32V00x family has a single successive-approximation ADC, ADC1, on
+ * APB2.  The CH32V003 is 10-bit; other parts in the family can be 12-bit, so
+ * scale raw counts from the part's own datasheet.  There is no dual mode and
+ * no ADC2.
  *
  * There is no separate "independent mode" selection: the block is always
  * independent.  The analog inputs are alternate functions, so the pin has to
