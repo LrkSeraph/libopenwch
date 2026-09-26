@@ -293,7 +293,7 @@ jobs:
       - name: Build every example against this checkout
         if: steps.examples.outputs.found == 'true'
         run: |
-          for d in "$RUNNER_TEMP"/examples/examples/*/; do
+          for d in "$RUNNER_TEMP"/examples/examples/*/*/; do
             echo "== $(basename "$d")"
             make -C "$d" OPENWCH_DIR="$GITHUB_WORKSPACE" 2>&1 | tee -a "$BUILD_LOG"
             make -C "$d" OPENWCH_DIR="$GITHUB_WORKSPACE" clean
