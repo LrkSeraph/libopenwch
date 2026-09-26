@@ -116,7 +116,7 @@ site supplies the cross-family overview and the module map.
 <tr><td>mini-libc</td><td>optional freestanding string/memory archive per family</td></tr>
 <tr><td>BLE</td><td>peripheral-role wrapper over WCH's Apache-2.0 binary stack</td></tr>
 <tr><td>Documentation</td><td>per-family API sites plus this root site, with Chinese root pages</td></tr>
-<tr><td>Hardware-in-the-loop</td><td>partial: CH32V003 SPI NOR CRC, <code>wchlink</code> GDB software breakpoints, and DMA MEM2MEM self-test verified; blink/UART, TIM2 self-test re-run, full flashing, and CH58x remain pending</td></tr>
+<tr><td>Hardware-in-the-loop</td><td>partial: CH32V003 SPI NOR CRC, <code>wchlink</code> GDB software breakpoints, DMA MEM2MEM self-test, and TIM2 period self-test verified; blink/UART, full flashing, and CH58x remain pending</td></tr>
 </table>
 
 @section home_doc_build Building this documentation
