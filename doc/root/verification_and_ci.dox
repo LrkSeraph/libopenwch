@@ -25,7 +25,7 @@ or headers leaking into the shared build:
 * 3 toolchains × 2 families;
 * both families in a single `make` invocation;
 * a freestanding/without-newlib job;
-* an examples job that clones `libopenwch-examples` and builds all six examples
+* an examples job that clones `libopenwch-examples` and builds all seven examples
   against the current checkout.
 
 The satellite repositories have their own CI for the application skeleton,
