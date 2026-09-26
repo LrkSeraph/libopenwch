@@ -48,8 +48,6 @@ LGPL License Terms @ref lgpl_license
 #define AFIO_PCFR1 MMIO32(AFIO_BASE + 0x04)
 /* External interrupt configuration register (AFIO_EXTICR) */
 #define AFIO_EXTICR MMIO32(AFIO_BASE + 0x08)
-/* Event output control register (AFIO_ECR) */
-#define AFIO_ECR MMIO32(AFIO_BASE + 0x14)
 
 /*
  * AFIO_PCFR1 bits.
@@ -87,10 +85,14 @@ LGPL License Terms @ref lgpl_license
 #define AFIO_PCFR1_SWCFG_SHIFT 24
 #define AFIO_PCFR1_SWCFG_MASK (0x7u << 24)
 
-/* Debug-interface (SWD/SDI) disable, per WCH's EVT (not in the SVD). */
-#define AFIO_PCFR1_SDI_DISABLE (1 << 10)
-/* LSI clock calibration output, per WCH's EVT (not in the SVD). */
-#define AFIO_PCFR1_LSI_CAL (1 << 7)
+/*
+ * Debug-interface (SWD/SDI) disable and LSI calibration output.  The SVD
+ * does not name these as separate fields: WCH's EVT maps SDI disable to
+ * SWCFG = 0b100 (bit 26) and LSI calibration to bit 23.  They are kept as
+ * aliases so callers can use the EVT names without duplicating token magic.
+ */
+#define AFIO_PCFR1_SDI_DISABLE (1u << 26)
+#define AFIO_PCFR1_LSI_CAL AFIO_PCFR1_TIM1_1_RM
 
 /* AFIO_EXTICR: two bits per EXTI line selecting the port. */
 #define AFIO_EXTICR_PORTA 0x0

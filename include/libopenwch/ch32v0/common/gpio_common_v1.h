@@ -184,14 +184,16 @@ specific memorymap.h header before including this header file.*/
 /** @defgroup gpio_remap_id GPIO Remap Identifiers
 @ingroup gpio_defines
 
-Single-bit remap flags for gpio_primary_remap() / gpio_secondary_remap(),
-derived from the CH32V003 SVD.  For the peripherals whose remap is a two-bit
-code (USART1, I2C1, TIM1, TIM2) prefer the dedicated gpio_<periph>_remap()
-helpers, which clear and set the field in one step.
+Raw AFIO_PCFR1 bit masks for gpio_primary_remap() / gpio_secondary_remap().
+For the peripherals whose remap is a two-bit code (USART1, I2C1, TIM1,
+TIM2) prefer the dedicated gpio_<periph>_remap() helpers, which clear and
+set the field in one step.  For I2C1 only the documented codes 0x1
+(partial) and 0x3 (full) are exposed; those two codes are not single-bit
+masks.
 
 @{*/
-#define GPIO_REMAP_SPI1 0x1u
-#define GPIO_REMAP_I2C1_PARTIAL 0x2u
+#define GPIO_REMAP_SPI1 AFIO_PCFR1_SPI1_RM
+#define GPIO_REMAP_I2C1_PARTIAL 0x1u
 #define GPIO_REMAP_I2C1_FULL 0x3u
 #define GPIO_REMAP_USART1_PARTIAL1 0x1u
 #define GPIO_REMAP_USART1_PARTIAL2 0x2u
@@ -204,11 +206,11 @@ helpers, which clear and set the field in one step.
 #define GPIO_REMAP_TIM2_PARTIAL1 0x1u
 #define GPIO_REMAP_TIM2_PARTIAL2 0x2u
 #define GPIO_REMAP_TIM2_FULL 0x3u
-#define GPIO_REMAP_PA12_ON_OSC 0x1u
-#define GPIO_REMAP_ADC1_ETRGINJ 0x1u
-#define GPIO_REMAP_ADC1_ETRGREG 0x1u
-#define GPIO_REMAP_SDI_DISABLE 0x1u
-#define GPIO_REMAP_LSI_CAL 0x1u
+#define GPIO_REMAP_PA12_ON_OSC AFIO_PCFR1_PA12_RM
+#define GPIO_REMAP_ADC1_ETRGINJ AFIO_PCFR1_ADC1_ETRGINJ_RM
+#define GPIO_REMAP_ADC1_ETRGREG AFIO_PCFR1_ADC1_ETRGREG_RM
+#define GPIO_REMAP_SDI_DISABLE AFIO_PCFR1_SDI_DISABLE
+#define GPIO_REMAP_LSI_CAL AFIO_PCFR1_LSI_CAL
 /**@}*/
 
 BEGIN_DECLS

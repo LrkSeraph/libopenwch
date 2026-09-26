@@ -60,16 +60,16 @@ typedef struct {
 #define SYSTICK ((systick_reg_t *)SYS_TICK_BASE)
 
 /* ctlr bits */
-#define SYSTICK_CTLR_EN (1 << 0)	 /**< counter enable */
-#define SYSTICK_CTLR_IE (1 << 1)	 /**< interrupt enable */
-#define SYSTICK_CTLR_CLKSRC (1 << 2)	 /**< 0 = HCLK/8, 1 = HCLK */
-#define SYSTICK_CTLR_AUTORELOAD (1 << 3) /**< auto reload on compare */
-#define SYSTICK_CTLR_INIT (1 << 5)	 /**< initialise / reload */
-#define SYSTICK_CTLR_MODE (1 << 31)	 /**< 1 = one-shot */
+#define SYSTICK_CTLR_EN (1 << 0)	 /**< counter enable (STE) */
+#define SYSTICK_CTLR_IE (1 << 1)	 /**< interrupt enable (STIE) */
+#define SYSTICK_CTLR_CLKSRC (1 << 2)	 /**< 0 = HCLK/8, 1 = HCLK (STCLK) */
+#define SYSTICK_CTLR_AUTORELOAD (1 << 3) /**< reload on compare (STRE) */
+#define SYSTICK_CTLR_MODE (1 << 4)	 /**< counter mode (MODE) */
+#define SYSTICK_CTLR_INIT (1 << 5)	 /**< initialise / reload (INIT) */
+#define SYSTICK_CTLR_SWIE (1 << 31) /**< software-triggered interrupt enable */
 
 /* sr bits */
-#define SYSTICK_SR_CMP (1 << 0) /**< compare match */
-#define SYSTICK_SR_OV (1 << 1)	/**< counter overflow */
+#define SYSTICK_SR_CMP (1 << 0) /**< compare match (CNTIF) */
 
 BEGIN_DECLS
 

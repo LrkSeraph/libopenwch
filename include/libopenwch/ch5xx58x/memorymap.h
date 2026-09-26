@@ -160,11 +160,12 @@ LGPL License Terms @ref lgpl_license
 #define BLE_BASE (SFR_BASE + 0xc000)
 
 /* --- Factory information ------------------------------------------------- */
-#define INFO_BASE (0x00000000U)
+/* InfoFlash/bootloader configuration window: 0x0007e000-0x0007ffff. */
+#define INFO_BASE (0x0007e000U)
 #define ROM_CFG_BASE (0x0007f000U)
 #define ROM_CFG_MAC_ADDR (ROM_CFG_BASE + 0x018)
 #define ROM_CFG_TMP_25C (ROM_CFG_BASE + 0x014)
-#define BOOT_LOAD_CFG (0x0007e000U)
+#define BOOT_LOAD_CFG INFO_BASE
 
 /* Data flash (EEPROM emulation) */
 #define DATA_FLASH_ADDR (0x00070000U)

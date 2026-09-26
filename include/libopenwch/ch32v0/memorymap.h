@@ -39,14 +39,21 @@ LGPL License Terms @ref lgpl_license
 /* --- CH32V00x specific peripheral definitions ---------------------------- */
 
 /* The CH32V00x keeps the STM32-style three-bus memory map. */
-#define FLASH_BASE (0x00000000U)
-#define INFO_BASE (0x1ffff000U)
+/* WCH documents the flash programming alias at 0x08000000; code executes
+ * from the 0x00000000 alias after reset. */
+#define FLASH_BASE (0x08000000U)
+#define CODE_BASE (0x00000000U)
 #define PERIPH_BASE (0x40000000U)
 #define PERIPH_BASE_APB1 (PERIPH_BASE + 0x00000)
 #define PERIPH_BASE_APB2 (PERIPH_BASE + 0x10000)
 #define PERIPH_BASE_AHB (PERIPH_BASE + 0x20000)
 
-/* Factory-programmed information blocks. */
+/*
+ * Factory-programmed information blocks.  The chip ID word is at
+ * DBGMCU_ID_BASE (0x1ffff7c4), immediately before ESIG_BASE.  The
+ * 0x1ffff000 region is the optional 1920-byte bootloader, not a generic
+ * factory-information block.
+ */
 #define ESIG_BASE (0x1ffff7e0U)
 #define OB_BASE (0x1ffff800U)
 #define VENDOR_CFG0_BASE (0x1ffff7d4U)
@@ -83,10 +90,10 @@ LGPL License Terms @ref lgpl_license
 #define FLASH_R_BASE (PERIPH_BASE_AHB + 0x2000)
 #define EXTEN_BASE (PERIPH_BASE_AHB + 0x3800)
 /*
- * There is no memory-mapped DBGMCU block on this family: the debug control
- * register (which WCH's EVT calls CFGR0) lives in CSR 0x7c0 and is reached
- * with csrr/csrw, and the chip revision/device id live in the factory block
- * at 0x1ffff7c4.  See include/libopenwch/ch32v0/dbgmcu.h.
+ * WCH's CH32V003 EVT reaches the debug control register (CFGR0) through CSR
+ * 0x7c0, not through the DBG block printed in some SVDs, and reads the chip
+ * revision/device ID from the factory word at 0x1ffff7c4.  This library
+ * follows the EVT.  See include/libopenwch/ch32v0/dbgmcu.h.
  */
 #define DBGMCU_ID_BASE (0x1ffff7c4U)
 

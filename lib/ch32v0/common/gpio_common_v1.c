@@ -193,11 +193,19 @@ void gpio_i2c1_remap(uint32_t remap) {
 	uint32_t reg = AFIO_PCFR1;
 
 	reg &= ~(AFIO_PCFR1_I2C1_RM | AFIO_PCFR1_I2C1_REMAP1);
-	if (remap & GPIO_REMAP_I2C1_PARTIAL) {
+	/*
+	 * I2C1 exposes only the 0b01 (partial) and 0b11 (full) codes.  Treat
+	 * them as complete codes rather than independent bits: testing the
+	 * full code with `remap & GPIO_REMAP_I2C1_FULL` would also match the
+	 * partial code because 0x3 includes 0x1.
+	 */
+	if (remap == GPIO_REMAP_I2C1_PARTIAL) {
 		reg |= AFIO_PCFR1_I2C1_RM;
-	}
-	if (remap & GPIO_REMAP_I2C1_FULL) {
-		reg |= AFIO_PCFR1_I2C1_REMAP1;
+	} else if (remap == GPIO_REMAP_I2C1_FULL) {
+		reg |= AFIO_PCFR1_I2C1_RM | AFIO_PCFR1_I2C1_REMAP1;
+	} else {
+		openwch_assert(0);
+		return;
 	}
 	AFIO_PCFR1 = reg;
 }
