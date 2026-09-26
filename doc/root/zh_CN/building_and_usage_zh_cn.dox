@@ -70,8 +70,9 @@ LIBOPENWCH_NOSTDLIB=1 make
 * <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a>
   是应用骨架：`Makefile`、`src/main.c`，以及库和烧录器的 submodule。
 * <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a>
-  包含按族分组的七个完整示例：CH32V003 blink、UART counter、ADC+DMA+UART、
-  SPI NOR CRC；CH582 blink、UART counter、BLE advertiser。
+  包含按族分组的九个完整示例：CH32V003 blink、UART counter、ADC+DMA+UART、
+  SPI NOR CRC、DMA memory-to-memory 自测、TIM2 周期自测；CH582 blink、
+  UART counter、BLE advertiser。
 * <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a>
   提供 `wchlink`，宿主侧 WCH-LinkE 烧录/调试工具。
 

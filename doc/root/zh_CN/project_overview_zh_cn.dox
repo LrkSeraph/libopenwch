@@ -49,7 +49,7 @@ gpio_toggle(GPIOC, GPIO1 | GPIO2);
 | --- | --- | --- |
 | <a href="https://github.com/LrkSeraph/libopenwch">libopenwch</a> | 驱动库 | 本文档集 |
 | <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a> | 应用骨架 | submodule：库和烧录器 |
-| <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> | 七个完整示例和 CI 集成测试 | submodule：库 |
+| <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> | 九个完整示例和 CI 集成测试 | submodule：库 |
 | <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a> | <code>wchlink</code>，WCH-LinkE 烧录/调试工具 | 由模板引用 |
 
 四个仓库可以独立克隆和构建。库仓库本身没有 submodule，只需要 RISC-V 工具链。

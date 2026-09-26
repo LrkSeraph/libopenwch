@@ -25,7 +25,7 @@
 * 单次 `make` 同时构建两个系列；
 * 一个 freestanding/无 newlib 作业；
 * 一个示例作业：克隆 `libopenwch-examples`，并用当前 checkout 构建全部
-  七个示例。
+  九个示例。
 
 另外三个外围仓库各自运行应用骨架、示例和宿主烧录器的 CI。
 

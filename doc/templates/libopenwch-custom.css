@@ -71,3 +71,87 @@ border-bottom: 2px solid var(--primary-color);
 .memitem .memproto {
 border-left: 3px solid var(--primary-light-color);
 }
+
+/*
+ * Home-page hero, badges, and grouped card grids.  These are opt-in classes:
+ * existing prose pages keep the plain Doxygen Awesome presentation.
+ */
+.libopenwch-hero {
+border: 1px solid var(--separator-color);
+border-left: 4px solid var(--primary-color);
+border-radius: var(--border-radius-large);
+padding: var(--spacing-large);
+margin: var(--spacing-large) 0;
+background: linear-gradient(135deg, var(--code-background), var(--fragment-background));
+}
+
+.libopenwch-hero p {
+margin-top: 0;
+}
+
+.libopenwch-hero-title {
+font-size: 1.25rem;
+font-weight: 600;
+color: var(--primary-dark-color);
+margin-bottom: var(--spacing-small);
+}
+
+html.dark-mode .libopenwch-hero-title {
+color: var(--primary-light-color);
+}
+
+.libopenwch-badges {
+display: flex;
+flex-wrap: wrap;
+gap: 0.5rem;
+margin-top: var(--spacing-medium);
+}
+
+.libopenwch-badge {
+display: inline-block;
+padding: 0.2rem 0.65rem;
+border: 1px solid var(--separator-color);
+border-radius: 999px;
+background: var(--page-background-color);
+color: var(--side-nav-foreground);
+font-size: 0.85em;
+}
+
+.libopenwch-card-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+gap: var(--spacing-medium);
+margin: var(--spacing-medium) 0 var(--spacing-large);
+}
+
+.libopenwch-card {
+border: 1px solid var(--separator-color);
+border-radius: var(--border-radius-medium);
+padding: var(--spacing-medium);
+background: var(--code-background);
+transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.libopenwch-card:hover {
+border-color: var(--primary-color);
+transform: translateY(-1px);
+}
+
+.libopenwch-card h3 {
+margin-top: 0;
+margin-bottom: var(--spacing-small);
+}
+
+.libopenwch-card p:last-child {
+margin-bottom: 0;
+}
+
+@media (max-width: 45em) {
+.libopenwch-hero {
+padding: var(--spacing-medium);
+}
+
+.libopenwch-card-grid {
+grid-template-columns: 1fr;
+}
+}
