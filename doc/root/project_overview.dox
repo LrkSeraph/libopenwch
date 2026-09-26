@@ -53,7 +53,7 @@ peripheral base address.
 | --- | --- | --- |
 | <a href="https://github.com/LrkSeraph/libopenwch">libopenwch</a> | the driver library | this documentation set |
 | <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a> | application skeleton | submodules: library and flasher |
-| <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> | ten worked examples and CI integration tests | submodule: library |
+| <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> | eleven worked examples and CI integration tests | submodule: library |
 | <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a> | <code>wchlink</code>, the WCH-LinkE flasher | referenced by the template |
 
 The four repositories can be cloned and built independently.  The library
