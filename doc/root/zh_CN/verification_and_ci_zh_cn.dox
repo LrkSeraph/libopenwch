@@ -25,7 +25,7 @@
 * 单次 `make` 同时构建两个系列；
 * 一个 freestanding/无 newlib 作业；
 * 一个示例作业：克隆 `libopenwch-examples`，并用当前 checkout 构建全部
-  九个示例。
+  十个示例。
 
 另外三个外围仓库各自运行应用骨架、示例和宿主烧录器的 CI。
 
@@ -45,6 +45,7 @@
 仍待验证：
 
 * CH32V003 和 CH582 上的 blink、UART counter；
+* TIM1 时基和 IWDG/WWDG 看门狗自测（此前的 TIM2 结果来自单定时器版本）；
 * 真实硬件上的独立 `wchlink flash`、`unbrick` 和 terminal 路径；
 * CH58x 烧录，其 ROM 例程尚未实现。
 

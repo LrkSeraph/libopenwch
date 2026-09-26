@@ -25,7 +25,7 @@ or headers leaking into the shared build:
 * 3 toolchains × 2 families;
 * both families in a single `make` invocation;
 * a freestanding/without-newlib job;
-* an examples job that clones `libopenwch-examples` and builds all nine
+* an examples job that clones `libopenwch-examples` and builds all ten
   examples against the current checkout.
 
 The satellite repositories have their own CI for the application skeleton,
@@ -49,6 +49,8 @@ on real silicon:
 Still pending:
 
 * blink and UART counter on CH32V003 and CH582;
+* the TIM1 time base and the IWDG/WWDG watchdog self-test on real hardware
+  (the previous TIM2 result was with the single-timer self-test);
 * the standalone `wchlink flash`, `unbrick`, and terminal paths on real
   hardware;
 * CH58x flash support, whose ROM-resident routine is not yet implemented.
