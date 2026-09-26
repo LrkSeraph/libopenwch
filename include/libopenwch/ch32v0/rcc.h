@@ -146,8 +146,9 @@ LGPL License Terms @ref lgpl_license
  * Peripheral clock identifiers.
  *
  * The three enable registers are separate, so a peripheral identifier has to
- * say which bus it belongs to as well as which bit to set.  The bit position
- * lives in bits [4:0] and the bus in bits [9:8], which lets
+ * say which bus it belongs to as well as which bit to set.  WCH uses bit
+ * positions up to 28 (PWR, for example), so the bus selector lives in the top
+ * two bits [31:30] and the bit position in bits [29:0].  That lets
  * rcc_periph_clock_enable() pick the register from the value itself while a
  * plain `RCC_APB2_GPIOA`-style mask stays available to callers that already
  * know the bus.
@@ -157,11 +158,12 @@ LGPL License Terms @ref lgpl_license
 @ingroup rcc_defines
 
 @{*/
-#define RCC_PERIPH_BUS_AHB (0x0u << 8)
-#define RCC_PERIPH_BUS_APB1 (0x1u << 8)
-#define RCC_PERIPH_BUS_APB2 (0x2u << 8)
-#define RCC_PERIPH_BUS_MASK (0x3u << 8)
-#define RCC_PERIPH_BIT_MASK (0x1fu)
+#define RCC_PERIPH_BUS_SHIFT 30u
+#define RCC_PERIPH_BUS_AHB (0x0u << RCC_PERIPH_BUS_SHIFT)
+#define RCC_PERIPH_BUS_APB1 (0x1u << RCC_PERIPH_BUS_SHIFT)
+#define RCC_PERIPH_BUS_APB2 (0x2u << RCC_PERIPH_BUS_SHIFT)
+#define RCC_PERIPH_BUS_MASK (0x3u << RCC_PERIPH_BUS_SHIFT)
+#define RCC_PERIPH_BIT_MASK (0x3fffffffu)
 /**@}*/
 
 /** @defgroup rcc_ahb_periph AHB Peripheral Identifiers
