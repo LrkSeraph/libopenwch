@@ -45,7 +45,7 @@ LGPL License Terms @ref lgpl_license
 #define GPIOD GPIOD_BASE
 
 /* GPIO alternate-function / remap register (AFIO_PCFR1) */
-#define AFIO_PCFR1 MMIO32(AFIO_BASE + 0x00)
+#define AFIO_PCFR1 MMIO32(AFIO_BASE + 0x04)
 /* External interrupt configuration register (AFIO_EXTICR) */
 #define AFIO_EXTICR MMIO32(AFIO_BASE + 0x08)
 /* Event output control register (AFIO_ECR) */
