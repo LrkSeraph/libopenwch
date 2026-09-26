@@ -29,7 +29,7 @@
  * The table is split across two object files and two input section names so
  * that the linker script can place the two halves unambiguously:
  *
- *   .init         _start: `j _reset_entry`  (the ELF entry point)
+ *   .init         _start: set gp/sp, then jump to _reset_entry (ELF entry)
  *   .vector_exc   slots 0..15   (this file)
  *   .vector       slots 16..    (generated vector_handlers.c)
  *
@@ -48,6 +48,21 @@
 	.type _start, @function
 	.align 2
 _start:
+	/*
+	 * Set up the global pointer and the user stack before the first C
+	 * instruction.  The WCH boot ROM jumps to offset 0 without
+	 * establishing either, and both .data/global-offset code and the C
+	 * reset path assume they are valid.
+	 *
+	 * .option norelax is required for the gp load: without it the
+	 * assembler/linker may try to address __global_pointer$ relative to
+	 * the gp value that does not exist yet.
+	 */
+	.option push
+	.option norelax
+	la gp, __global_pointer$
+	.option pop
+	la sp, _stack
 	j _reset_entry
 	.size _start, . - _start
 
