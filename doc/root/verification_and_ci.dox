@@ -51,6 +51,7 @@ on real silicon:
 Still pending:
 
 * blink and UART counter on CH32V003 and CH582;
+* the PC2 PWM example on real hardware;
 * the standalone `wchlink flash`, `unbrick`, and terminal paths on real
   hardware;
 * CH58x flash support, whose ROM-resident routine is not yet implemented.

@@ -47,6 +47,7 @@
 仍待验证：
 
 * CH32V003 和 CH582 上的 blink、UART counter；
+* PC2 PWM 示例实机验证；
 * 真实硬件上的独立 `wchlink flash`、`unbrick` 和 terminal 路径；
 * CH58x 烧录，其 ROM 例程尚未实现。
 
