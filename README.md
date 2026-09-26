@@ -1,13 +1,17 @@
 # libopenwch
 
+[中文文档](README.zh-CN.md)
+
 Open-source peripheral driver library for **WCH RISC-V microcontrollers**,
 modeled on [libopencm3](https://github.com/libopencm3/libopencm3):
 lowercase_snake_case API, family directories, and a Makefile that derives the
 ISA and linker script from the part number.
 
-> **Incubating — not production-ready, not silicon-validated.** The public API
-> compiles and links, and the register descriptions follow WCH's manual. That is
-> not the same as having run on hardware.
+> **Incubating — not production-ready, and hardware validation is partial.**
+> The public API compiles and links, and the register descriptions follow WCH's
+> manual.  Some integration components have been validated on real CH32V003
+> hardware (the SPI NOR CRC example and the `wchlink` GDB server with software
+> breakpoints); the library as a whole still has not.
 
 | Family | Parts | Core / ISA | State |
 |---|---|---|---|

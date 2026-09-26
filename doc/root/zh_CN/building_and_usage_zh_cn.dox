@@ -1,0 +1,99 @@
+/**
+@page zh_cn_building_and_usage 构建与使用
+
+@tableofcontents
+
+@section zh_cn_build_library 构建库
+
+在仓库根目录执行：
+
+@code
+make                       # 两个系列
+make TARGETS=ch32v0        # 单个系列
+make clean
+@endcode
+
+构建产物包括：
+
+@code
+lib/libopenwch_ch32v0.a
+lib/libopenwch_ch5xx58x.a
+lib/libopenwch_mini_libc_ch32v0.a
+lib/libopenwch_mini_libc_ch5xx58x.a
+@endcode
+
+生成的中断文件位于
+<code>include/libopenwch/&lt;family&gt;/nvic.h</code> 和
+<code>lib/&lt;family&gt;/vector_*.c</code>。它们是未跟踪的构建产物；请修改
+<code>irq.json</code> 或生成器，不要手工编辑生成文件。
+<code>make irq</code> 不需要 RISC-V 工具链即可重新生成。
+
+@section zh_cn_build_application 应用 Makefile
+
+库通过一组与 libopencm3 相同的小型 make 模块使用：
+
+@code
+OPENWCH_DIR ?= ../libopenwch
+DEVICE      ?= ch32v003f4p6
+
+include $(OPENWCH_DIR)/mk/genlink-config.mk
+include $(OPENWCH_DIR)/mk/gcc-config.mk
+include $(OPENWCH_DIR)/mk/genlink-rules.mk
+include $(OPENWCH_DIR)/mk/gcc-rules.mk
+
+all: $(BINARY).elf
+@endcode
+
+`DEVICE` 会从 `ld/devices.data` 选择内存布局、ISA、归档和链接脚本。应用
+不得自行添加 `-march` 或 `-mabi`：混用 `ilp32` 和 `ilp32e` 会静默破坏 ABI。
+
+应用侧约定见 `mk/README`：
+
+* `CPPFLAGS`、`LDLIBS`、`LDFLAGS`、`LIBDEPS` 只允许追加；
+* `ARCH_FLAGS` 和 `LDSCRIPT` 由 genlink 替换；
+* 必须使用 `-nostartfiles`：复位路径和向量表来自库，而不是工具链的 crt0。
+
+@section zh_cn_build_nostdlib freestanding 应用
+
+库本身不需要 C 库，但应用经常调用 `memcpy()` 或 `memset()`。如果工具链没有
+合适的 newlib multilib，可以设置：
+
+@code
+LIBOPENWCH_NOSTDLIB=1 make
+@endcode
+
+这会链接按族的 mini-libc 归档并忽略工具链 C 库。未设置该变量时，使用工具链
+库，并且不会链接 mini-libc，从而避免两者意外互相覆盖。
+
+@section zh_cn_build_examples 从可运行工程开始
+
+* <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a>
+  是应用骨架：`Makefile`、`src/main.c`，以及库和烧录器的 submodule。
+* <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a>
+  包含按族分组的七个完整示例：CH32V003 blink、UART counter、ADC+DMA+UART、
+  SPI NOR CRC；CH582 blink、UART counter、BLE advertiser。
+* <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a>
+  提供 `wchlink`，宿主侧 WCH-LinkE 烧录/调试工具。
+
+@section zh_cn_build_docs 构建本文档
+
+`make html` 会构建根站点和两个族的 API 参考：
+
+@code
+make html
+@endcode
+
+输出位置：
+
+| 站点 | 路径 |
+| --- | --- |
+| 项目根 | `doc/html/index.html` |
+| CH32V00x API | `doc/ch32v0/html/index.html` |
+| CH58x API | `doc/ch5xx58x/html/index.html` |
+
+构建使用 Doxygen 和随仓库附带的 Doxygen Awesome 主题。如果未安装 Doxygen，
+构建会干净地跳过；如果 Doxygen 安装在非标准位置，可设置
+`DOXYGEN=/path/to/doxygen`。
+
+英文原文：@ref building_and_usage "Building and using libopenwch"。
+*/

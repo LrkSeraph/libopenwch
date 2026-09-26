@@ -1,0 +1,51 @@
+/**
+@page zh_cn_verification_and_ci 验证与 CI
+
+@tableofcontents
+
+@section zh_cn_verify_commands 可复现的本地检查
+
+在库根目录执行：
+
+| 检查 | 命令 | 证明了什么 |
+| --- | --- | --- |
+| 库构建 | `make` | 两个系列均无警告地生成四个归档。 |
+| 空目标集 | `make TARGETS=` | 递归构建允许不选择任何系列。 |
+| 器件数据库 | `make genlinktests` | `ld/tests/` 中六个链接脚本用例正确生成。 |
+| 公开 API | `make apitest` | 每个公开原型都以 `-Werror` 编译并链接。 |
+| 风格第二意见 | `make stylecheck` | checkpatch 结果干净，仅保留格式器例外。 |
+| 格式化 | `clang-format --dry-run -Werror` | 已跟踪 C 源文件符合格式权威。 |
+| 文档 | `make html` | 根站点和两个族 Doxygen 站点生成，警告日志为空。 |
+
+@section zh_cn_verify_ci CI 矩阵
+
+库 CI 覆盖最容易发现系列特定标志或头文件泄漏到共享构建的组合：
+
+* 3 种工具链 × 2 个系列；
+* 单次 `make` 同时构建两个系列；
+* 一个 freestanding/无 newlib 作业；
+* 一个示例作业：克隆 `libopenwch-examples`，并用当前 checkout 构建全部
+  七个示例。
+
+另外三个外围仓库各自运行应用骨架、示例和宿主烧录器的 CI。
+
+@section zh_cn_verify_hardware 硬件在环
+
+目前硬件验证仍是部分的。以下内容已在真实芯片上运行：
+
+* CH32V003 SPI NOR CRC 示例，搭配 Winbond 8 MiB SPI NOR：识别、SFDP/状态
+  寄存器读取，以及按页 CRC32 输出；
+* CH32V003 上的 `wchlink` GDB server：halt/resume、寄存器和内存访问、
+  continue、软件断点（`Z0`），包括跨多个 flash 断点继续运行。
+
+仍待验证：
+
+* CH32V003 和 CH582 上的 blink、UART counter；
+* 真实硬件上的独立 `wchlink flash`、`unbrick` 和 terminal 路径；
+* CH58x 烧录，其 ROM 例程尚未实现。
+
+只有上面列出的项目才应描述为“已硬件验证”；其余内容仍只是构建、链接、模拟
+或静态分析层面的验证。
+
+英文原文：@ref verification_and_ci "Verification and CI"。
+*/

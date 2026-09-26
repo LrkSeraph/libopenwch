@@ -75,8 +75,9 @@ archive is not linked, so the two never shadow each other accidentally.
   is the application skeleton: `Makefile`, `src/main.c`, and submodules for
   the library and the flasher.
 * <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a>
-  contains five complete examples, including CH32V003 blink, CH32V003 UART
-  echo, CH582 blink, CH582 UART echo, and a CH582 BLE advertiser.
+  contains seven complete examples grouped by family: CH32V003 blink, UART
+  counter, ADC+DMA+UART, and SPI NOR CRC; CH582 blink, UART counter, and BLE
+  advertiser.
 * <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a>
   provides `wchlink`, the host-side WCH-LinkE flasher.
 

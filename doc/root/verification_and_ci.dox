@@ -33,16 +33,24 @@ examples, and host-side flasher.
 
 @section verify_hardware Hardware-in-the-loop
 
-There is an explicit gap in the current verification: the code has been built,
-linked, and statically checked, but not exercised on real silicon.  A
-WCH-LinkE and target boards are required to verify:
+Hardware validation is currently partial.  The following have been exercised
+on real silicon:
 
-* blink and UART echo on CH32V003 and CH582;
-* the complete `wchlink` flash sequence on a real CH32V003;
+* CH32V003 SPI NOR CRC example with a Winbond 8 MiB SPI NOR: identification,
+  SFDP/status reads, and per-page CRC32 output;
+* `wchlink` GDB server on CH32V003: halt/resume, register and memory access,
+  continue, and software breakpoints (`Z0`), including continuing past
+  multiple flash breakpoints.
+
+Still pending:
+
+* blink and UART counter on CH32V003 and CH582;
+* the standalone `wchlink flash`, `unbrick`, and terminal paths on real
+  hardware;
 * CH58x flash support, whose ROM-resident routine is not yet implemented.
 
-Until those runs are done, the documentation should not describe hardware
-behaviour as verified.
+Only the listed items should be described as hardware-verified; everything else
+remains build-, link-, simulation-, or static-analysis-validated only.
 
 @section verify_generated_files Generated files
 

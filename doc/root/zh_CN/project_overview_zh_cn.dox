@@ -1,0 +1,65 @@
+/**
+@page zh_cn_project_overview 项目概览
+
+@tableofcontents
+
+@section zh_cn_overview_identity libopenwch 是什么
+
+libopenwch 是面向 WCH RISC-V 单片机的驱动库，在四个方面刻意对齐
+libopencm3：
+
+<table>
+<tr><th>维度</th><th>含义</th></tr>
+<tr><td>API 风格</td><td>小写 <code>periph_verb_noun()</code> 函数；外设基地址作为
+第一个参数；常量命名为 <code>PERIPH_REGISTER_BIT</code>；类型以
+<code>_t</code> 结尾。</td></tr>
+<tr><td>目录布局</td><td><code>include/libopenwch/&lt;family&gt;/</code>、
+<code>lib/&lt;family&gt;/</code>、类似 <code>cm3/</code> 的
+<code>qingke/</code> 核心层，以及 <code>dispatch/</code> 头文件层。</td></tr>
+<tr><td>构建系统</td><td>递归 <code>TARGETS</code>、可复用 <code>mk/</code>
+模块、<code>ld/devices.data</code> + <code>genlink.py</code>，以及由
+<code>irq.json</code> 生成的 <code>nvic.h</code>。</td></tr>
+<tr><td>代码约定</td><td>clang-format 是格式权威；<code>checkpatch.pl</code>
+是第二意见；生成文件绝不手工修改。</td></tr>
+</table>
+
+库的最终产物是按族划分的静态归档，以及可选的 mini-libc 归档。应用通过可
+复用的 <code>mk/</code> 模块选择器件并链接对应归档。
+
+@section zh_cn_overview_example 第一个调用
+
+@code
+#include <libopenwch/ch32v0/gpio.h>
+#include <libopenwch/ch32v0/rcc.h>
+
+int main(void)
+{
+gpio_set_mode(GPIOC, GPIO_MODE_OUT_PP, GPIO1 | GPIO2);
+for (;;) {
+gpio_toggle(GPIOC, GPIO1 | GPIO2);
+}
+}
+@endcode
+
+所有驱动都使用相同的调用形状：第一个参数总是外设基地址。
+
+@section zh_cn_overview_ecosystem 四个仓库
+
+| 仓库 | 角色 | 关系 |
+| --- | --- | --- |
+| <a href="https://github.com/LrkSeraph/libopenwch">libopenwch</a> | 驱动库 | 本文档集 |
+| <a href="https://github.com/LrkSeraph/libopenwch-template">libopenwch-template</a> | 应用骨架 | submodule：库和烧录器 |
+| <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a> | 七个完整示例和 CI 集成测试 | submodule：库 |
+| <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a> | <code>wchlink</code>，WCH-LinkE 烧录/调试工具 | 由模板引用 |
+
+四个仓库可以独立克隆和构建。库仓库本身没有 submodule，只需要 RISC-V 工具链。
+
+@section zh_cn_overview_api_style 一处有意的 API 偏离
+
+在 CH32V00x 上，`gpio_set_mode(port, nibble, pins)` 接收一个不透明的四位
+CNF/MODE nibble，而不是 libopencm3 的 `(mode, cnf)` 对。该 nibble 不是位域
+分解：对所有两位字段位置进行穷举后，无法找到能重现 WCH 文档值的映射。因此
+文档中的编码被保留为不透明值。
+
+英文原文：@ref project_overview "Project overview"。
+*/

@@ -39,6 +39,10 @@ script through the device database.</p>
 <h3><a href="verification_and_ci.html">Verification and CI</a></h3>
 <p>The reproducible build, link, style, example, and documentation checks.</p>
 </div>
+<div>
+<h3><a href="zh_cn_index.html">中文文档</a></h3>
+<p>项目概览、构建使用和验证状态的中文翻译。</p>
+</div>
 </div>
 
 @section home_family_apis Family API references

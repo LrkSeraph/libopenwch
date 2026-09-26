@@ -1,0 +1,58 @@
+/**
+@page zh_cn_index 中文文档
+
+@tableofcontents
+
+@brief 面向 WCH（沁恒）RISC-V 单片机的 libopencm3 风格外设驱动库。
+
+libopenwch 是一个结构化、freestanding 的驱动库，面向 WCH QingKe RISC-V
+单片机系列。它在 API 风格、目录布局、构建系统和代码约定上对齐
+libopencm3，同时把工具链和启动路径适配到裸机 `riscv64-unknown-elf` 环境。
+
+本页面是英文根文档关键部分的中文翻译。英文原文和完整 API 参考仍以英文
+Doxygen 站点为准。
+
+@section zh_cn_quick_links 快速入口
+
+<table>
+<tr><th>页面</th><th>内容</th></tr>
+<tr>
+<td>@ref zh_cn_project_overview "项目概览"</td>
+<td>库的定位、四个仓库之间的关系，以及 API 风格。</td>
+</tr>
+<tr>
+<td>@ref zh_cn_building_and_usage "构建与使用"</td>
+<td>构建库、编写应用 Makefile、选择链接脚本。</td>
+</tr>
+<tr>
+<td>@ref zh_cn_verification_and_ci "验证与 CI"</td>
+<td>可复现构建、链接、风格检查，以及当前硬件验证状态。</td>
+</tr>
+<tr>
+<td>@ref api_index "API 索引"（英文）</td>
+<td>CH32V00x 和 CH58x 完整 API 参考的入口。</td>
+</tr>
+</table>
+
+@section zh_cn_family_apis 族 API 参考
+
+每个系列都有独立的完整 Doxygen 参考：
+
+<table>
+<tr><th>系列</th><th>ISA / 内核</th><th>归档</th><th>API 参考</th></tr>
+<tr>
+<td>CH32V002 / 003 / 004 / 005 / 006 / 007</td>
+<td>RV32EC，QingKe V2</td>
+<td><code>libopenwch_ch32v0.a</code></td>
+<td><a href="../ch32v0/html/index.html">CH32V00x API</a></td>
+</tr>
+<tr>
+<td>CH582 / 583 / 584 / 585</td>
+<td>RV32IMAC，QingKe V4</td>
+<td><code>libopenwch_ch5xx58x.a</code></td>
+<td><a href="../ch5xx58x/html/index.html">CH58x API</a></td>
+</tr>
+</table>
+
+英文完整站点：@ref index "libopenwch English documentation"。
+*/
