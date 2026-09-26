@@ -56,7 +56,7 @@ LGPL License Terms @ref lgpl_license
 /* APB1 peripheral clock enable register */
 #define RCC_APB1PCENR MMIO32(RCC_BASE + 0x1c)
 /* Control/status register */
-#define RCC_RSTSCKR MMIO32(RCC_BASE + 0x20)
+#define RCC_RSTSCKR MMIO32(RCC_BASE + 0x24)
 
 /* --- Flash access control register --------------------------------------- */
 /*
