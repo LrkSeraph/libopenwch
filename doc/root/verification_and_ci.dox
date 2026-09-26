@@ -40,11 +40,14 @@ on real silicon:
   SFDP/status reads, and per-page CRC32 output;
 * `wchlink` GDB server on CH32V003: halt/resume, register and memory access,
   continue, and software breakpoints (`Z0`), including continuing past
-  multiple flash breakpoints.
+  multiple flash breakpoints;
+* CH32V003 DMA MEM2MEM self-test: 8-bit and 32-bit SRAM transfers both PASS;
+  measured throughput is about 7.09 MB/s and 22.26 MB/s respectively.
 
 Still pending:
 
 * blink and UART counter on CH32V003 and CH582;
+* the TIM2 period self-test re-run after the `TIM_INTFR` clear-semantics fix;
 * the standalone `wchlink flash`, `unbrick`, and terminal paths on real
   hardware;
 * CH58x flash support, whose ROM-resident routine is not yet implemented.

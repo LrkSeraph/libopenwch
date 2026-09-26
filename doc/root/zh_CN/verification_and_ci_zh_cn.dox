@@ -36,11 +36,14 @@
 * CH32V003 SPI NOR CRC 示例，搭配 Winbond 8 MiB SPI NOR：识别、SFDP/状态
   寄存器读取，以及按页 CRC32 输出；
 * CH32V003 上的 `wchlink` GDB server：halt/resume、寄存器和内存访问、
-  continue、软件断点（`Z0`），包括跨多个 flash 断点继续运行。
+  continue、软件断点（`Z0`），包括跨多个 flash 断点继续运行；
+* CH32V003 DMA MEM2MEM 自测：8-bit 和 32-bit SRAM 搬运均 PASS；实测吞吐率
+  分别约为 7.09 MB/s 和 22.26 MB/s。
 
 仍待验证：
 
 * CH32V003 和 CH582 上的 blink、UART counter；
+* 修复 `TIM_INTFR` 清零语义后，TIM2 周期自测需要重新上机复测；
 * 真实硬件上的独立 `wchlink flash`、`unbrick` 和 terminal 路径；
 * CH58x 烧录，其 ROM 例程尚未实现。
 
