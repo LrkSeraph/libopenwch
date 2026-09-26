@@ -76,8 +76,9 @@ archive is not linked, so the two never shadow each other accidentally.
   the library and the flasher.
 * <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a>
   contains nine complete examples grouped by family: CH32V003 blink, UART
-  counter, ADC+DMA+UART, SPI NOR CRC, DMA memory-to-memory self-test, and TIM2
-  period self-test; CH582 blink, UART counter, and BLE advertiser.
+  counter, ADC+DMA+UART, SPI NOR CRC, and DMA/TIM2 self-tests (grouped under
+  <code>examples/ch32v0/selftest/</code>); CH582 blink, UART counter, and BLE
+  advertiser.
 * <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a>
   provides `wchlink`, the host-side WCH-LinkE flasher.
 
