@@ -25,7 +25,7 @@ or headers leaking into the shared build:
 * 3 toolchains × 2 families;
 * both families in a single `make` invocation;
 * a freestanding/without-newlib job;
-* an examples job that clones `libopenwch-examples` and builds all eleven
+* an examples job that clones `libopenwch-examples` and builds all ten
   examples against the current checkout.
 
 The satellite repositories have their own CI for the application skeleton,
@@ -45,8 +45,17 @@ on real silicon:
   measured throughput is about 7.09 MB/s and 22.26 MB/s respectively;
 * CH32V003 timer self-test after the `TIM_INTFR` clear-semantics fix: TIM1
   and TIM2 both measured a 999998 us period and reported PASS;
-* CH32V003 IWDG/WWDG self-test after the `RCC_RSTSCKR` offset fix: IWDG reset
-  reported `IWDGRSTF`, WWDG reset reported `WWDGRSTF`, and both stages PASS.
+* CH32V003 integrated `examples/ch32v0/selftest`: all 12 normal module cases
+  PASS, then IWDG reset reports `IWDGRSTF` and WWDG reset reports
+  `WWDGRSTF`; the final summary is `pass=12 fail=0 skip=0`.
+* CH32V003 SSD1315 128x64 I2C OLED with `examples/ch32v0/ssd1315_i2c`:
+  initialization, the A5h all-on diagnostic, and the normal animated
+  framebuffer image all run on real hardware.  The tested module has no
+  external I2C pull-ups, so the example defaults to software I2C with the
+  MCU internal pull-ups; hardware I2C1 is selected by `SSD1315_USE_BITBANG=0`
+  when external 4.7 kOhm pull-ups are fitted.
+* The earlier DMA MEM2MEM, TIM1/TIM2 period, and IWDG/WWDG cases are now
+  sub-cases of that integrated image.
 
 Still pending:
 

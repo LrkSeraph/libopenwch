@@ -30,7 +30,8 @@ variable.  Applications must not supply their own <code>-march</code> or
   handled as an opaque value; see @ref project_overview.
 * There is no <code>.highcode</code> section requirement: the flash controller
   is not reconfigured after boot.
-* Public API: 316 functions in the current tree.
+* Public API: 325 functions in the current tree, including the
+  ESIG electronic-signature and EXTEN extended-configuration blocks.
 * Reference: <a href="../ch32v0/html/index.html">CH32V00x API documentation</a>.
 
 @section families_ch58x CH58x
@@ -49,7 +50,7 @@ variable.  Applications must not supply their own <code>-march</code> or
   linked separately, opt-in through <code>LIBOPENWCH_BLE=1</code> in the
   application template.  See @ref project_architecture and the
   <a href="../ch5xx58x/html/group__ble__file.html">CH58x BLE API</a>.
-* Public API: 230 functions in the current tree (including 28 BLE-layer
+* Public API: 234 functions in the current tree (including 28 BLE-layer
   functions).
 * Reference: <a href="../ch5xx58x/html/index.html">CH58x API documentation</a>.
 

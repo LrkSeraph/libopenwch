@@ -25,7 +25,7 @@
 * 单次 `make` 同时构建两个系列；
 * 一个 freestanding/无 newlib 作业；
 * 一个示例作业：克隆 `libopenwch-examples`，并用当前 checkout 构建全部
-  十一个示例。
+  十个示例。
 
 另外三个外围仓库各自运行应用骨架、示例和宿主烧录器的 CI。
 
@@ -41,8 +41,14 @@
   分别约为 7.09 MB/s 和 22.26 MB/s；
 * 修复 `TIM_INTFR` 清零语义后的 CH32V003 定时器自测：TIM1 和 TIM2 实测
   周期均为 999998 us，全部 PASS；
-* 修复 `RCC_RSTSCKR` 偏移后的 CH32V003 IWDG/WWDG 自测：IWDG 复位报告
-  `IWDGRSTF`，WWDG 复位报告 `WWDGRSTF`，两级均 PASS。
+* CH32V003 集成 `examples/ch32v0/selftest`：12 个普通模块用例全部 PASS，
+  随后 IWDG 复位报告 `IWDGRSTF`，WWDG 复位报告 `WWDGRSTF`，最终输出
+  `pass=12 fail=0 skip=0`。
+* CH32V003 + SSD1315 128x64 I2C OLED：`examples/ch32v0/ssd1315_i2c` 的初始化、
+  A5h 全屏点亮诊断和正常 framebuffer 动画均已在实机运行。被测模块没有外部
+  I2C 上拉，因此示例默认使用 MCU 内部上拉的软件 I2C；加装 4.7 kΩ 外部上拉后
+  可用 `SSD1315_USE_BITBANG=0` 切回硬件 I2C1。
+* 原有的 DMA MEM2MEM、TIM1/TIM2 周期、IWDG/WWDG 用例现已并入该集成镜像。
 
 仍待验证：
 

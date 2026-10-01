@@ -65,6 +65,12 @@ means the module is not present in that family.
 <tr><td>FLASH</td>
 <td><a href="../ch32v0/html/group__flash__file.html">open</a></td>
 <td><a href="../ch5xx58x/html/group__flash__file.html">open</a></td></tr>
+<tr><td>ESIG / factory info</td>
+<td><a href="../ch32v0/html/group__esig__file.html">open</a></td>
+<td><a href="../ch5xx58x/html/group__esig__file.html">open</a></td></tr>
+<tr><td>EXTEN extended configuration</td>
+<td><a href="../ch32v0/html/group__exten__file.html">open</a></td>
+<td>&mdash;</td></tr>
 <tr><td>PWR</td>
 <td><a href="../ch32v0/html/group__pwr__file.html">open</a></td>
 <td><a href="../ch5xx58x/html/group__pwr__file.html">open</a></td></tr>

@@ -110,13 +110,13 @@ site supplies the cross-family overview and the module map.
 
 <table>
 <tr><th>Area</th><th>Status</th></tr>
-<tr><td>CH32V00x drivers</td><td>15 peripherals, full public API, API smoke link</td></tr>
-<tr><td>CH58x drivers</td><td>12 peripherals, RWA-safe access, API smoke link</td></tr>
+<tr><td>CH32V00x drivers</td><td>17 peripheral/module groups, full public API, ESIG/EXTEN, API smoke link</td></tr>
+<tr><td>CH58x drivers</td><td>13 peripheral/module groups, RWA-safe access, ESIG factory info, API smoke link</td></tr>
 <tr><td>QingKe core</td><td>vectors, reset path, PFIC/NVIC, SysTick, DWT, CSR, assertions</td></tr>
 <tr><td>mini-libc</td><td>optional freestanding string/memory archive per family</td></tr>
 <tr><td>BLE</td><td>peripheral-role wrapper over WCH's Apache-2.0 binary stack</td></tr>
 <tr><td>Documentation</td><td>per-family API sites plus this root site, with Chinese root pages</td></tr>
-<tr><td>Hardware-in-the-loop</td><td>partial: CH32V003 SPI NOR CRC, <code>wchlink</code> GDB software breakpoints, DMA MEM2MEM self-test, TIM1/TIM2 period self-tests, and IWDG/WWDG self-test verified; PC2 PWM, blink/UART, full flashing, and CH58x remain pending</td></tr>
+<tr><td>Hardware-in-the-loop</td><td>partial: CH32V003 SPI NOR CRC, SSD1315 I2C OLED (<code>ssd1315_i2c</code>), <code>wchlink</code> GDB software breakpoints, and the full integrated self-test (12/12 cases PASS, including IWDG/WWDG reset phases) are verified on real CH32V003; PC2 PWM, blink/UART, full flashing, and CH58x remain pending</td></tr>
 </table>
 
 @section home_doc_build Building this documentation
