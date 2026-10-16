@@ -87,9 +87,12 @@ qingke_systick_setup_hclk(rcc_sysclk_frequency);
 ## BLE (CH58x)
 
 WCH's Apache-2.0 stack is vendored in `lib/ble/wch/` and wrapped by a thin
-`ble_*` layer for TMOS, GAP, peripheral role, GATT server and startup. It is a
-wrapper, not a full stack: central/observer, pairing, OTA and mesh are not
-covered. Needs about 145 KB flash and an application-declared heap.
+`ble_*` layer for TMOS, GAP, peripheral role, GATT server and startup.  The
+common advertising-data fields have a typed builder in `ble/adv.h`
+(`ble_adv_data_add_flags()`, `ble_adv_data_add_name()`, ...) so applications do
+not have to carry hand-written AD byte arrays.  It is a wrapper, not a full
+stack: central/observer, pairing, OTA and mesh are not covered.  Needs about
+145 KB flash and an application-declared heap.
 
 ## API notes
 

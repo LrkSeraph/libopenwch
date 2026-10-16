@@ -91,7 +91,7 @@ OBJS += sys.o sys_common_v1.o
 ## CH58x-only, and they cost nothing to an application that never references
 ## them -- an archive member is only pulled in to satisfy an undefined symbol.
 ##
-OBJS += ble.o ble_tmos.o ble_gap.o ble_gatt.o
+OBJS += ble.o ble_tmos.o ble_adv.o ble_gap.o ble_gatt.o
 
 ##
 ## Compile flags: RV32IMAC, no float ABI.

@@ -103,6 +103,7 @@
 #include <libopenwch/qingke/common.h>
 #include <libopenwch/ble/common.h>
 #include <libopenwch/ble/tmos.h>
+#include <libopenwch/ble/adv.h>
 #include <libopenwch/ble/gap.h>
 #include <libopenwch/ble/gatt.h>
 

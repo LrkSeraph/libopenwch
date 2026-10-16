@@ -23,10 +23,12 @@ Layout
   include/libopenwch/ble/common.h      shared types and status codes
   include/libopenwch/ble/tmos.h        the task/message scheduler
   include/libopenwch/ble/gap.h         advertising and the peripheral role
+  include/libopenwch/ble/adv.h         advertising-data builder
   include/libopenwch/ble/gatt.h        the GATT server
   include/libopenwch/ble/ble.h         start-up; includes the rest
   lib/ble/ble.c                        ble_init() and friends
   lib/ble/ble_tmos.c                   scheduler forwarders
+  lib/ble/ble_adv.c                    advertising-data builder
   lib/ble/ble_gap.c                    GAP and peripheral-role forwarders
   lib/ble/ble_gatt.c                   GATT server forwarders
 
@@ -82,11 +84,26 @@ binary this project does not vendor -- the same ROM-resident ISP code that
 makes flash erase and program unimplemented for this family (see
 `flash_common_v1.h`).
 
-Not wrapped on purpose
-----------------------
+Layered API
+-----------
 
-`ble_gap_role_set_param()` takes a `void *` and a length, exactly as WCH's
-does, because one call carries a one-byte flag, a two-byte interval and a
-31-byte advertising payload, and the parameter id is what says which.  Typed
-convenience wrappers would be a nicer API and are exactly the kind of
-opinionated layer this wrapper exists to avoid; put them in the application.
+`ble_gap_role_set_param()` still takes a `void *` and a length, exactly as
+WCH's does, because one call carries a one-byte flag, a two-byte interval and
+a 31-byte advertising payload, and the parameter id is what says which.  That
+low-level call remains available for any AD type the typed helper does not
+cover.
+
+For the common case, `adv.h` provides a small builder for legacy advertising
+and scan-response data:
+
+  ble_adv_data_reset()
+  ble_adv_data_add_flags()
+  ble_adv_data_add_name()
+  ble_adv_data_add_uuid16()
+  ble_adv_data_add_manufacturer()
+  ble_adv_data_set_advert()
+  ble_adv_data_set_scan_rsp()
+
+It keeps the AD length-byte rules, little-endian UUIDs and the 31-byte limit
+in one place, so an application can describe what it wants to advertise
+instead of carrying a hand-written static byte array.

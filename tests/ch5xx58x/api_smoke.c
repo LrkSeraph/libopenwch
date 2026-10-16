@@ -297,6 +297,7 @@ void api_smoke(void) {
 		static gattServiceCBs_t svc_cbs;
 		static gattCharCfg_t char_cfg[1];
 		ble_config_t cfg;
+		ble_adv_data_t adv;
 
 		ble_config_default(&cfg);
 		cfg.heap = ble_heap;
@@ -305,6 +306,17 @@ void api_smoke(void) {
 
 		(void)ble_init(&cfg);
 		(void)ble_version();
+
+		/* advertising-data builder */
+		ble_adv_data_reset(&adv);
+		(void)ble_adv_data_add_flags(
+		    &adv, BLE_ADV_FLAG_LE_GENERAL_DISCOVERABLE |
+			      BLE_ADV_FLAG_BR_EDR_NOT_SUPPORTED);
+		(void)ble_adv_data_add_name(&adv, "libopenwch", true);
+		(void)ble_adv_data_add_uuid16(&adv, 0x1800u, true);
+		(void)ble_adv_data_add_manufacturer(&adv, 0x1234u, ble_mac, 2u);
+		(void)ble_adv_data_set_advert(&adv);
+		(void)ble_adv_data_set_scan_rsp(&adv);
 
 		/* tmos */
 		(void)ble_tmos_task_register(0);

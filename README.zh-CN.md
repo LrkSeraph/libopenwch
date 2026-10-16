@@ -81,8 +81,10 @@ qingke_systick_setup_hclk(rcc_sysclk_frequency);
 ## BLE（CH58x）
 
 WCH 的 Apache-2.0 协议栈内置在 `lib/ble/wch/`，用薄 `ble_*` 层封装 TMOS、
-GAP、peripheral、GATT server 和启动。它只是封装：central/observer、配对、
-OTA、mesh 未覆盖；约需 145 KB flash，堆由应用声明。
+GAP、peripheral、GATT server 和启动。常用广播字段提供 `ble/adv.h` 类型化
+构造器（`ble_adv_data_add_flags()`、`ble_adv_data_add_name()` 等），应用不
+需要手写 AD 字节数组。它只是封装：central/observer、配对、OTA、mesh 未覆
+盖；约需 145 KB flash，堆由应用声明。
 
 ## API 说明
 
