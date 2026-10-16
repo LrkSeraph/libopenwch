@@ -35,24 +35,17 @@ LGPL License Terms @ref lgpl_license
 #define LIBOPENWCH_OPA_H
 
 #include <libopenwch/qingke/common.h>
-#include <libopenwch/ch32v0/memorymap.h>
+#include <libopenwch/ch32v0/exten.h>
 
 /*
  * The CH32V00x has one operational amplifier.  It has no register block of its
  * own: the enable and input-selection bits live in the EXTEN "enhanced
  * function" register at 0x40023800, which is also where the LDO trim and the
- * lockup-reset bits are.
+ * lockup-reset bits are.  exten.h owns the unit and the non-OPA fields.
  */
-#define EXTEN EXTEN_BASE
-#define EXTEN_CTR(exten) MMIO32((exten) + 0x00)
-
-/* EXTEN_CTR bits */
-#define EXTEN_CTR_LOCKUP_EN (1 << 6)   /**< lockup reset enable */
-#define EXTEN_CTR_LOCKUP_RSTF (1 << 7) /**< lockup reset flag */
-#define EXTEN_CTR_LDO_TRIM (1 << 10)   /**< LDO trim */
-#define EXTEN_CTR_OPA_EN (1 << 16)     /**< op-amp enable */
-#define EXTEN_CTR_OPA_NSEL (1 << 17)   /**< negative input select */
-#define EXTEN_CTR_OPA_PSEL (1 << 18)   /**< positive input select */
+#define EXTEN_CTR_OPA_EN (1 << 16)   /**< op-amp enable */
+#define EXTEN_CTR_OPA_NSEL (1 << 17) /**< negative input select */
+#define EXTEN_CTR_OPA_PSEL (1 << 18) /**< positive input select */
 
 /* Only the OPA control bits are covered by opa_reset(). */
 #define EXTEN_CTR_OPA_MASK                                                     \

@@ -39,6 +39,7 @@
 /**@{*/
 
 #include <libopenwch/ch5xx58x/clk.h>
+#include <libopenwch/ch5xx58x/rcc.h>
 #include <libopenwch/ch5xx58x/rwa.h>
 #include <libopenwch/qingke/assert.h>
 
@@ -154,7 +155,7 @@ void clk_32k_select(uint32_t source) {
  */
 uint32_t rcc_sysclk_frequency;
 
-void clk_set_sys_clock(clk_source_t source) {
+static void clk_apply_source(clk_source_t source) {
 	uint8_t cfg = (uint8_t)source;
 
 	/*
@@ -206,6 +207,66 @@ void clk_set_sys_clock(clk_source_t source) {
 
 	/* Publish what the tree now is, so nobody has to measure it. */
 	rcc_sysclk_frequency = clk_get_sys_clock();
+}
+
+void clk_set_sys_clock(clk_source_t source) {
+	clk_apply_source(source);
+}
+
+/*
+ * The table-driven view.  Keep the data in one place so that callers can use
+ * the same style as the CH32V0 family:
+ *
+ *	rcc_clock_setup_pll(&rcc_sysclk_configs[RCC_SYSCLK_PLL_60MHZ]);
+ */
+const struct rcc_clock_scale rcc_sysclk_configs[RCC_SYSCLK_END] = {
+    [RCC_SYSCLK_LSI] = {CLK_SOURCE_LSI, CLK_LSI_FREQUENCY},
+    [RCC_SYSCLK_LSE] = {CLK_SOURCE_LSE, CLK_LSE_FREQUENCY},
+    [RCC_SYSCLK_HSE_16MHZ] = {CLK_SOURCE_HSE_16MHZ, CLK_XT32M_FREQUENCY / 2u},
+    [RCC_SYSCLK_HSE_8MHZ] = {CLK_SOURCE_HSE_8MHZ, CLK_XT32M_FREQUENCY / 4u},
+    [RCC_SYSCLK_HSE_6_4MHZ] = {CLK_SOURCE_HSE_6_4MHZ, CLK_XT32M_FREQUENCY / 5u},
+    [RCC_SYSCLK_HSE_4MHZ] = {CLK_SOURCE_HSE_4MHZ, CLK_XT32M_FREQUENCY / 8u},
+    [RCC_SYSCLK_HSE_2MHZ] = {CLK_SOURCE_HSE_2MHZ, CLK_XT32M_FREQUENCY / 16u},
+    [RCC_SYSCLK_HSE_1MHZ] = {CLK_SOURCE_HSE_1MHZ, CLK_XT32M_FREQUENCY / 32u},
+    [RCC_SYSCLK_PLL_80MHZ] = {CLK_SOURCE_PLL_80MHZ, CLK_PLL_FREQUENCY / 6u},
+    [RCC_SYSCLK_PLL_60MHZ] = {CLK_SOURCE_PLL_60MHZ, CLK_PLL_FREQUENCY / 8u},
+    [RCC_SYSCLK_PLL_48MHZ] = {CLK_SOURCE_PLL_48MHZ, CLK_PLL_FREQUENCY / 10u},
+    [RCC_SYSCLK_PLL_40MHZ] = {CLK_SOURCE_PLL_40MHZ, CLK_PLL_FREQUENCY / 12u},
+    [RCC_SYSCLK_PLL_36_9MHZ] = {CLK_SOURCE_PLL_36_9MHZ,
+				CLK_PLL_FREQUENCY / 13u},
+    [RCC_SYSCLK_PLL_32MHZ] = {CLK_SOURCE_PLL_32MHZ, CLK_PLL_FREQUENCY / 15u},
+    [RCC_SYSCLK_PLL_30MHZ] = {CLK_SOURCE_PLL_30MHZ, CLK_PLL_FREQUENCY / 16u},
+    [RCC_SYSCLK_PLL_24MHZ] = {CLK_SOURCE_PLL_24MHZ, CLK_PLL_FREQUENCY / 20u},
+    [RCC_SYSCLK_PLL_20MHZ] = {CLK_SOURCE_PLL_20MHZ, CLK_PLL_FREQUENCY / 24u},
+    [RCC_SYSCLK_PLL_15MHZ] = {CLK_SOURCE_PLL_15MHZ, CLK_PLL_FREQUENCY / 32u},
+};
+
+void rcc_clock_setup(const struct rcc_clock_scale *clock) {
+	openwch_assert(clock != NULL);
+
+	clk_apply_source(clock->source);
+
+	/* The descriptor carries the intended frequency; keep it authoritative
+	 * the way the CH32V0 family does. */
+	rcc_sysclk_frequency = clock->sysclk_frequency;
+}
+
+void rcc_clock_setup_pll(const struct rcc_clock_scale *clock) {
+	rcc_clock_setup(clock);
+}
+
+void rcc_clock_setup_sysclk(enum rcc_sysclk source) {
+	openwch_assert((unsigned)source < (unsigned)RCC_SYSCLK_END);
+
+	rcc_clock_setup(&rcc_sysclk_configs[source]);
+}
+
+void rcc_clock_setup_pll_60mhz(void) {
+	rcc_clock_setup_sysclk(RCC_SYSCLK_PLL_60MHZ);
+}
+
+void rcc_clock_setup_pll_48mhz(void) {
+	rcc_clock_setup_sysclk(RCC_SYSCLK_PLL_48MHZ);
 }
 
 uint32_t clk_get_sys_clock(void) {

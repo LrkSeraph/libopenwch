@@ -64,11 +64,8 @@ specific memorymap.h header before including this header file. */
  * 0x1ffff7c4.  The CH32V003 SVD confirms this: it contains no DBGMCU
  * peripheral at all.
  *
- * NOTE on the bit layout: ch32fun's ch32v003hw.h carries a
- * DBGMCU_IWDG_STOP/TIM1_STOP set at bits 8..13, but those defines are dead
- * code copied from the memory-mapped CH32V20x/V30x DBGMCU_CR and are never
- * referenced.  The values used here are the ones WCH's EVT documents for
- * CSR 0x7c0, and they have not been confirmed on silicon.
+ * The CH32V003 reference manual (CH32V003RM, section 18.2.1) documents
+ * DBGMCU_CR at CSR 0x7c0, with the stop bits at positions 8, 9, 12 and 13.
  */
 
 /** Factory chip id word: [15:0] device id, [31:16] revision id. */
@@ -81,10 +78,10 @@ specific memorymap.h header before including this header file. */
  * These are the values WCH's EVT passes straight to the CSR.  Pass them to
  * dbgmcu_stop_peripheral() rather than writing the register by hand.
  */
-#define DBGMCU_IWDG_STOP (1 << 0) /**< IWDG stopped when halted */
-#define DBGMCU_WWDG_STOP (1 << 1) /**< WWDG stopped when halted */
-#define DBGMCU_TIM1_STOP (1 << 4) /**< TIM1 stopped when halted */
-#define DBGMCU_TIM2_STOP (1 << 5) /**< TIM2 stopped when halted */
+#define DBGMCU_IWDG_STOP (1 << 8)  /**< IWDG stopped when halted */
+#define DBGMCU_WWDG_STOP (1 << 9)  /**< WWDG stopped when halted */
+#define DBGMCU_TIM1_STOP (1 << 12) /**< TIM1 stopped when halted */
+#define DBGMCU_TIM2_STOP (1 << 13) /**< TIM2 stopped when halted */
 
 BEGIN_DECLS
 

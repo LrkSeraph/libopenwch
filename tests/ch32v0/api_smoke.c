@@ -36,6 +36,8 @@
 #include <libopenwch/ch32v0/adc.h>
 #include <libopenwch/ch32v0/dbgmcu.h>
 #include <libopenwch/ch32v0/dma.h>
+#include <libopenwch/ch32v0/esig.h>
+#include <libopenwch/ch32v0/exten.h>
 #include <libopenwch/ch32v0/exti.h>
 #include <libopenwch/ch32v0/flash.h>
 #include <libopenwch/ch32v0/gpio.h>
@@ -72,6 +74,19 @@ int main(void) {
 }
 
 void api_smoke(void) {
+	uint8_t idbuf[12];
+
+	/* --- esig / exten --- */
+	(void)esig_get_flash_size_kb();
+	(void)esig_get_unique_id_word(0);
+	esig_get_unique_id(idbuf);
+	exten_enable_lockup_reset(EXTEN);
+	exten_disable_lockup_reset(EXTEN);
+	(void)exten_get_lockup_reset_flag(EXTEN);
+	exten_clear_lockup_reset_flag(EXTEN);
+	exten_set_ldo_mode(EXTEN, EXTEN_LDO_MODE_NORMAL);
+	(void)exten_get_ldo_mode(EXTEN);
+
 	/* --- gpio / afio --- */
 	gpio_set_mode(GPIOA, GPIO_MODE_OUT_PP, GPIO1);
 	gpio_set(GPIOA, GPIO1);
@@ -112,6 +127,7 @@ void api_smoke(void) {
 	(void)rcc_get_reset_flags();
 	/* The one-call form, and the frequencies it publishes. */
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
+	rcc_clock_setup(&rcc_hsi_configs[RCC_CLOCK_HSI_24MHZ]);
 	(void)rcc_get_sysclk_frequency();
 	(void)rcc_ahb_frequency;
 	(void)rcc_apb1_frequency;

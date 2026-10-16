@@ -159,7 +159,9 @@ specific memorymap.h header before including this header file. */
 #define ADC_CTLR2_EXTTRIG (1 << 20)	   /**< regular ext trigger en */
 #define ADC_CTLR2_JSWSTART (1 << 21)	   /**< start injected conversion */
 #define ADC_CTLR2_SWSTART (1 << 22)	   /**< start regular conversion */
-#define ADC_CTLR2_TSVREFE (1 << 23)	   /**< temp sensor / Vrefint en */
+/* CH32V003RM section 9.3.3 has no CTLR2.TSVREFE bit.  The two
+ * internal channels (Vref on channel 8, Vcal on channel 9) are always
+ * connected and are selected by channel number. */
 
 /* --- SAMPTR1 / SAMPTR2 --------------------------------------------------- */
 

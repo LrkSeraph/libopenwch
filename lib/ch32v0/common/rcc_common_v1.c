@@ -411,6 +411,10 @@ void rcc_clock_setup_pll(const struct rcc_clock_scale *clock) {
 	rcc_adc_frequency = clock->adc_frequency;
 }
 
+void rcc_clock_setup(const struct rcc_clock_scale *clock) {
+	rcc_clock_setup_pll(clock);
+}
+
 void rcc_clock_setup_hsi_24mhz(void) {
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_HSI_24MHZ]);
 }

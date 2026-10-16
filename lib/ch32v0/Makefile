@@ -79,6 +79,8 @@ OBJS += adc.o adc_common_v1.o
 OBJS += dma.o dma_common_v1.o
 OBJS += exti.o exti_common_v1.o
 OBJS += flash.o flash_common_v1.o
+OBJS += esig.o esig_common_v1.o
+OBJS += exten.o exten_common_v1.o
 OBJS += opa.o opa_common_v1.o
 ## NOTE: there is no separate syscfg driver.  AFIO (the remap registers and
 ## the EXTI line-source selection) is owned by the GPIO driver, which is

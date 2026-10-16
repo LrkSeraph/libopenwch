@@ -108,10 +108,9 @@ LGPL License Terms @ref lgpl_license
 /*
  * Chip ID (R8_CHIP_ID, read-only, 0x40001041).
  *
- * The offset is spelled out here rather than taken from memorymap.h: that
- * header's R8_CHIP_ID macro points at SYS_BASE + 0x46, which the CH583 SFR
- * header defines as R8_RST_WDOG_CTRL.  The real R8_CHIP_ID is one byte above
- * R8_SAFE_ACCESS_SIG, at 0x40001041.
+ * The offset is spelled out here for clarity: it is one byte above
+ * R8_SAFE_ACCESS_SIG, matching CH583DS1 section 4.3 and the memorymap.h
+ * R8_CHIP_ID macro.
  */
 #define FLASH_CHIP_ID_ADDR (SYS_BASE + 0x41)
 #define FLASH_CHIP_ID MMIO8(FLASH_CHIP_ID_ADDR)

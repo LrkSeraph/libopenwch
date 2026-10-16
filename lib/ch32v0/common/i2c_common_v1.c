@@ -64,15 +64,8 @@
 /** Largest value the 12-bit CCR field can represent. */
 #define I2C_CCR_MAX 0x0fffu
 
-/** Maximum rise time, in ns, for each speed. */
-#define I2C_RISE_TIME_STANDARD_NS 1000u
-#define I2C_RISE_TIME_FAST_NS 300u
-
-/** One MHz, the unit of the CTLR2 FREQ field and of the TRISE calculation. */
+/** One MHz, the unit of the CTLR2 FREQ field. */
 #define I2C_MHZ 1000000u
-
-/** Nanoseconds in one second; the rise times are expressed in ns. */
-#define I2C_NS_PER_SECOND 1000000000u
 
 /* --- Internal helpers ---------------------------------------------------- */
 
@@ -82,30 +75,6 @@
  */
 static uint32_t i2c_div_round(uint32_t dividend, uint32_t divisor) {
 	return (dividend + (divisor / 2u)) / divisor;
-}
-
-/*
- * TRISE is the maximum tolerated SCL rise time expressed in APB1 periods,
- * plus one:
- *
- *	TRISE = (rise_ns * fPCLK1 / 1e9) + 1
- *
- * Dividing the clock down to kHz first would lose too much precision at the
- * low APB1 frequencies the part supports, so the whole product is kept.
- */
-static void i2c_set_rise_time(uint32_t i2c, uint32_t clock, uint32_t speed) {
-	uint32_t rise_ns;
-
-	if (speed > I2C_SPEED_STANDARD) {
-		rise_ns = I2C_RISE_TIME_FAST_NS;
-	} else {
-		rise_ns = I2C_RISE_TIME_STANDARD_NS;
-	}
-
-	I2C_CKCFGR(i2c) =
-	    (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK) |
-		       (i2c_div_round(clock, I2C_NS_PER_SECOND / rise_ns) +
-			1u));
 }
 
 /* --- Configuration ------------------------------------------------------- */
@@ -172,8 +141,6 @@ void i2c_init_master(uint32_t i2c,
 	openwch_assert((ckcfgr & ~(I2C_CKCFGR_CCR_MASK | I2C_CKCFGR_DUTY |
 				   I2C_CKCFGR_FS)) == 0);
 	I2C_CKCFGR(i2c) = ckcfgr;
-
-	i2c_set_rise_time(i2c, clock, speed);
 }
 
 void i2c_init_slave(uint32_t i2c, uint32_t clock, uint8_t address) {
@@ -260,17 +227,14 @@ void i2c_set_ccr(uint32_t i2c, uint32_t ccr) {
 }
 
 void i2c_set_trise(uint32_t i2c, uint32_t trise) {
-	openwch_assert((trise & I2C_CKCFGR_CCR_MASK) == trise);
-
 	/*
-	 * The CH32V00x has no separate TRISE register: both TRISE and CCR live
-	 * in the low twelve bits of CKCFGR and are swapped in and out while the
-	 * block is disabled.  This entry point therefore writes the same field
-	 * as i2c_set_ccr(), and the two are set in turn during configuration,
-	 * as WCH's own initialisation sequence does.
+	 * The CH32V00x I2C block has no separate TRISE register: CKCFGR only
+	 * contains the CCR field (CH32V003RM section 13.11.8).  Keep the API
+	 * entry point for source compatibility with libopencm3, but do not
+	 * corrupt CCR by writing a STM32-style rise-time value into it.
 	 */
-	I2C_CKCFGR(i2c) =
-	    (uint16_t)((I2C_CKCFGR(i2c) & ~I2C_CKCFGR_CCR_MASK) | trise);
+	(void)i2c;
+	(void)trise;
 }
 
 /* --- Acknowledge --------------------------------------------------------- */

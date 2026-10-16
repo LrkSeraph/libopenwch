@@ -32,6 +32,8 @@
 #include <libopenwch/ble/ble.h>
 #include <libopenwch/ch5xx58x/adc.h>
 #include <libopenwch/ch5xx58x/clk.h>
+#include <libopenwch/ch5xx58x/rcc.h>
+#include <libopenwch/ch5xx58x/esig.h>
 #include <libopenwch/ch5xx58x/flash.h>
 #include <libopenwch/ch5xx58x/gpio.h>
 #include <libopenwch/ch5xx58x/i2c.h>
@@ -42,6 +44,7 @@
 #include <libopenwch/ch5xx58x/sys.h>
 #include <libopenwch/ch5xx58x/tmr.h>
 #include <libopenwch/ch5xx58x/uart.h>
+#include <libopenwch/qingke/systick.h>
 
 void api_smoke(void);
 
@@ -62,6 +65,12 @@ int main(void) {
 void api_smoke(void) {
 	uint8_t buf[8];
 	uint32_t saved;
+
+	/* --- esig --- */
+	(void)esig_get_chip_id();
+	esig_get_unique_id(buf);
+	esig_get_mac_address(buf);
+	(void)esig_get_temp_cal_25c();
 
 	/* --- rwa --- */
 	rwa_open();
@@ -97,6 +106,17 @@ void api_smoke(void) {
 	clk_set_sys_clock(CLK_SOURCE_HSE_8MHZ);
 	(void)clk_get_sys_clock();
 	clk_set_sys_clock_48mhz();
+	rcc_clock_setup_pll(&rcc_sysclk_configs[RCC_SYSCLK_PLL_60MHZ]);
+	rcc_clock_setup(&rcc_sysclk_configs[RCC_SYSCLK_HSE_8MHZ]);
+	rcc_clock_setup_sysclk(RCC_SYSCLK_PLL_48MHZ);
+	rcc_clock_setup_pll_60mhz();
+	rcc_clock_setup_pll_48mhz();
+
+	/* --- qingke systick helpers --- */
+	qingke_systick_setup(rcc_sysclk_frequency, QINGKE_SYSTICK_CLOCK_HCLK);
+	qingke_systick_setup_hclk(rcc_sysclk_frequency);
+	qingke_systick_setup_hclk_div8(rcc_sysclk_frequency);
+	(void)qingke_systick_get_frequency();
 
 	/* --- gpio --- */
 	gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_PP_5MA, GPIO1);

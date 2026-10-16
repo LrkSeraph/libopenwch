@@ -69,8 +69,20 @@ gpio_toggle(GPIOA, GPIO1);
 }
 ```
 
-Clock trees are data (`rcc_hsi_configs[]`, `rcc_hse_configs[]`, CH58x
-`clk_source_t[]`); one call publishes `rcc_*_frequency`.
+Clock trees are data: `rcc_hsi_configs[]` / `rcc_hse_configs[]` on
+CH32V0, and `rcc_sysclk_configs[]` on CH58x.  The same call style
+works on both families:
+
+```c
+rcc_clock_setup_pll(&rcc_sysclk_configs[RCC_SYSCLK_PLL_60MHZ]);
+```
+
+One call publishes `rcc_sysclk_frequency`, and the SysTick helper can
+then be configured in one more call:
+
+```c
+qingke_systick_setup_hclk(rcc_sysclk_frequency);
+```
 
 ## BLE (CH58x)
 

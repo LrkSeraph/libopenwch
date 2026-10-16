@@ -73,6 +73,7 @@ OBJS += vector_handlers.o vector_names.o
 OBJS += rwa.o clk.o
 OBJS += gpio.o gpio_common_v1.o
 OBJS += adc.o adc_common_v1.o flash.o flash_common_v1.o
+OBJS += esig.o esig_common_v1.o
 OBJS += tmr.o tmr_common_v1.o
 OBJS += pwm.o pwm_common_v1.o
 OBJS += pwr.o pwr_common_v1.o

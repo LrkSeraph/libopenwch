@@ -98,6 +98,22 @@ uint32_t qingke_systick_get_frequency(void) {
 	return systick_freq;
 }
 
+void qingke_systick_setup(uint32_t counter_hz,
+			  enum qingke_systick_clock source) {
+	qingke_systick_set_frequency(counter_hz);
+	systick_set_clock_source(source == QINGKE_SYSTICK_CLOCK_HCLK ? 1u : 0u);
+	systick_clear_interrupt();
+	systick_enable_counter();
+}
+
+void qingke_systick_setup_hclk(uint32_t hclk_hz) {
+	qingke_systick_setup(hclk_hz, QINGKE_SYSTICK_CLOCK_HCLK);
+}
+
+void qingke_systick_setup_hclk_div8(uint32_t hclk_hz) {
+	qingke_systick_setup(hclk_hz / 8u, QINGKE_SYSTICK_CLOCK_HCLK_DIV8);
+}
+
 /*
  * Wait for `ticks` counter ticks.  Uses the compare register, so it is
  * independent of the counter width.  The comparison is done in signed

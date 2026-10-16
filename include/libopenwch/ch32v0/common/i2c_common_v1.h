@@ -173,8 +173,11 @@ low phase.  Pass one of these to i2c_init_master().
 #define I2C_SPEED_FAST 400000u	   /**< 400 kHz */
 /**@}*/
 
-/** Highest APB1 frequency the CTLR2 FREQ field can describe, in Hz. */
-#define I2C_MAX_CLOCK_FREQUENCY 36000000u
+/** Highest APB1 frequency the CTLR2 FREQ field can describe, in Hz.
+ *
+ * The CH32V003 reference manual (section 13.11.2) says CTLR2.FREQ accepts
+ * 8..48 MHz, so 48 MHz is the upper bound on this part. */
+#define I2C_MAX_CLOCK_FREQUENCY 48000000u
 
 /** @defgroup i2c_interrupt I2C Interrupt Sources
 @ingroup i2c_defines

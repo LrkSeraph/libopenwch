@@ -81,6 +81,17 @@ void systick_enable_interrupt(void);
 void systick_disable_interrupt(void);
 void systick_clear_interrupt(void);
 
+/**
+ * Clock source for the one-call SysTick setup helper.
+ *
+ * The hardware has only two choices: the system clock (HCLK) or HCLK/8.
+ * The enum exists so that a caller does not pass magic 0/1 values.
+ */
+enum qingke_systick_clock {
+	QINGKE_SYSTICK_CLOCK_HCLK = 1,	    /**< counter clock = HCLK */
+	QINGKE_SYSTICK_CLOCK_HCLK_DIV8 = 0, /**< counter clock = HCLK / 8 */
+};
+
 /* Current counter value as a 64-bit free-running tick. */
 uint64_t systick_get_counter(void);
 
@@ -94,6 +105,23 @@ uint32_t systick_get_value(void);
  */
 void qingke_systick_set_frequency(uint32_t hz);
 uint32_t qingke_systick_get_frequency(void);
+
+/**
+ * One-call setup for the common case: select the counter clock source, store
+ * the matching counter frequency for the delay helpers, clear any stale
+ * compare flag, and enable the counter.
+ *
+ * @param counter_hz  rate of the clock selected by @p source, not HCLK itself
+ * @param source      HCLK or HCLK/8
+ */
+void qingke_systick_setup(uint32_t counter_hz,
+			  enum qingke_systick_clock source);
+
+/** Convenience wrapper: counter runs directly from HCLK at @p hclk_hz. */
+void qingke_systick_setup_hclk(uint32_t hclk_hz);
+
+/** Convenience wrapper: counter runs from HCLK / 8. */
+void qingke_systick_setup_hclk_div8(uint32_t hclk_hz);
 
 void qingke_delay_us(uint32_t us);
 void qingke_delay_ms(uint32_t ms);

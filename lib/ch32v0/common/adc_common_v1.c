@@ -79,11 +79,27 @@ void adc_disable(uint32_t adc) {
 }
 
 void adc_start_conversion_regular(uint32_t adc) {
-	ADC_CTLR2(adc) |= ADC_CTLR2_SWSTART;
+	uint32_t reg = ADC_CTLR2(adc);
+
+	/*
+	 * WCH's EVT software-start helper selects the SWSTART trigger source
+	 * (EXTSEL = 111) and sets EXTTRIG together with SWSTART.  On this part
+	 * SWSTART alone is not selected by the reset EXTSEL value.
+	 */
+	reg &= ~ADC_CTLR2_EXTSEL_MASK;
+	reg |= ADC_EXTTRIG_REGULAR_NONE & ADC_CTLR2_EXTSEL_MASK;
+	reg |= ADC_CTLR2_EXTTRIG | ADC_CTLR2_SWSTART;
+	ADC_CTLR2(adc) = reg;
 }
 
 void adc_start_conversion_injected(uint32_t adc) {
-	ADC_CTLR2(adc) |= ADC_CTLR2_JSWSTART;
+	uint32_t reg = ADC_CTLR2(adc);
+
+	/* As above: JEXTSEL = 111 (JSWSTART), plus JEXTTRIG | JSWSTART. */
+	reg &= ~ADC_CTLR2_JEXTSEL_MASK;
+	reg |= ADC_EXTTRIG_INJECTED_NONE & ADC_CTLR2_JEXTSEL_MASK;
+	reg |= ADC_CTLR2_JEXTTRIG | ADC_CTLR2_JSWSTART;
+	ADC_CTLR2(adc) = reg;
 }
 
 void adc_set_continuous_conversion_mode(uint32_t adc) {
@@ -261,16 +277,16 @@ void adc_disable_dma(uint32_t adc) {
 }
 
 /*
- * CTLR2.TSVREFE gates both the on-die temperature sensor and the internal
- * reference, as on the STM32 parts the block derives from: a single bit
- * enables the pair, so both helpers touch the same bit.
+ * CH32V003RM section 9.3.3 documents no CTLR2.TSVREFE bit.  The internal
+ * Vref/Vcal channels are always connected, so these STM32-derived helpers are
+ * kept for source compatibility but intentionally do nothing.
  */
 void adc_enable_temperature_sensor(uint32_t adc) {
-	ADC_CTLR2(adc) |= ADC_CTLR2_TSVREFE;
+	(void)adc;
 }
 
 void adc_enable_vrefint(uint32_t adc) {
-	ADC_CTLR2(adc) |= ADC_CTLR2_TSVREFE;
+	(void)adc;
 }
 
 void adc_reset_calibration(uint32_t adc) {

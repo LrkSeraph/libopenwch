@@ -315,6 +315,9 @@ extern const struct rcc_clock_scale rcc_hse_configs[RCC_CLOCK_HSE_END];
  */
 void rcc_clock_setup_pll(const struct rcc_clock_scale *clock);
 
+/** Generic alias for @ref rcc_clock_setup_pll, for a common style across families. */
+void rcc_clock_setup(const struct rcc_clock_scale *clock);
+
 /** The named configurations, for callers that prefer a function name. */
 void rcc_clock_setup_hsi_24mhz(void);
 void rcc_clock_setup_hsi_48mhz(void);

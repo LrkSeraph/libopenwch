@@ -65,8 +65,18 @@ gpio_toggle(GPIOA, GPIO1);
 }
 ```
 
-时钟树是数据（`rcc_hsi_configs[]`、`rcc_hse_configs[]`、CH58x
-`clk_source_t[]`），一次调用发布 `rcc_*_frequency`。
+时钟树是数据：CH32V0 用 `rcc_hsi_configs[]` / `rcc_hse_configs[]`，
+CH58x 用 `rcc_sysclk_configs[]`。两个系列采用同一套调用风格：
+
+```c
+rcc_clock_setup_pll(&rcc_sysclk_configs[RCC_SYSCLK_PLL_60MHZ]);
+```
+
+一次调用发布 `rcc_sysclk_frequency`，SysTick 配置再进行一次调用即可：
+
+```c
+qingke_systick_setup_hclk(rcc_sysclk_frequency);
+```
 
 ## BLE（CH58x）
 

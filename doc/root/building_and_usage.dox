@@ -75,10 +75,32 @@ archive is not linked, so the two never shadow each other accidentally.
   is the application skeleton: `Makefile`, `src/main.c`, and submodules for
   the library and the flasher.
 * <a href="https://github.com/LrkSeraph/libopenwch-examples">libopenwch-examples</a>
-  contains ten complete examples grouped by family: CH32V003 blink, PWM on
+  contains eleven complete examples grouped by family: CH32V003 blink, PWM on
   PC2, UART counter, ADC+DMA+UART, SPI NOR CRC, SSD1315 I2C OLED, and one
   integrated self-test (under <code>examples/ch32v0/selftest/</code>);
-  CH582 blink, UART counter, and BLE advertiser.
+  CH582 blink, PWM5 breathing light on PA7, UART counter, and BLE advertiser.
+
+@section build_clock Clock and SysTick setup
+
+Both families use the same table-driven clock style:
+
+@code
+/* CH32V003 */
+rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_PLL_HSI_48MHZ]);
+
+/* CH582 */
+rcc_clock_setup_pll(&rcc_sysclk_configs[RCC_SYSCLK_PLL_60MHZ]);
+@endcode
+
+One call publishes <code>rcc_sysclk_frequency</code>.  The QingKe SysTick
+helper can then be configured with one more call:
+
+@code
+qingke_systick_setup_hclk(rcc_sysclk_frequency);
+@endcode
+
+Use <code>qingke_systick_setup_hclk_div8()</code> when the counter should run
+from HCLK/8 instead.
 * <a href="https://github.com/LrkSeraph/libopenwch-tools">libopenwch-tools</a>
   provides `wchlink`, the host-side WCH-LinkE flasher.
 
